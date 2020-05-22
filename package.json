@@ -1,0 +1,17 @@
+{
+  "name": "brain-bot",
+  "version": "1.0.0",
+  "description": "Brain Brain Brain Brain Brain Brain",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "morber",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "node-opus": "^0.3.3",
+    "ytdl": "^1.3.0"
+  }
+}
