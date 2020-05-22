@@ -13,6 +13,7 @@ client.once('ready', () => {
 });
 
 client.on('message', async message => {
+    // scan for any mention of brains or brain emotes...
     if (!message.content.startsWith(prefix)) {
         if (message.author.bot) return;
         brainScan(message);
@@ -34,11 +35,9 @@ client.on('message', async message => {
     if (command === 'pondering') {
         if (message.member.voice.channel) {
             const connection = await message.member.voice.channel.join();
-
             connection.play(ytdl('https://www.youtube.com/watch?v=AXqMnPyx73E', { filter: 'audioonly' }));
-        } else {
+        } else
             message.reply('You need to join a voice channel first!');
-        }
     }
 
     if (command === 'tonight')
@@ -85,6 +84,7 @@ async function brainScan(message) {
         message.react('\uD83C\uDDF3');
     }
 }
+
 async function getBrains(numBrains) {
     if (numBrains <= 0 && isNaN(typeof (numBrains)))
         numBrains = 0;
@@ -101,6 +101,7 @@ async function getBrains(numBrains) {
     return msg;
 }
 
+// TODO: make the carry images into an array and just parse for args there, should keep it cleaner.
 async function getJimCarrey() {
     let num = getRandomInt(8);
     let message = "";
