@@ -5,7 +5,7 @@ const client = new Discord.Client();
 const ytdl = require('ytdl-core');
 
 // constants
-const prefix = "\?b";
+const prefix = "\?b/g";
 const MAX_BRAINS = 300;
 
 client.once('ready', () => {
