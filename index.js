@@ -17,8 +17,7 @@ client.on('message', async message => {
     // scan for any mention of brains or brain emotes...
     if (!message.content.startsWith(prefix)) {
         if (message.author.bot) return;
-        brainScan(message);
-        return;
+        await brainScan(message); return;
     }
 
     // post brainscan, parse for args
