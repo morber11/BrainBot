@@ -5,7 +5,7 @@ const client = new Discord.Client();
 const ytdl = require('ytdl-core');
 
 // constants
-const prefix = "\?b/g";
+const prefix = "?b";
 const MAX_BRAINS = 300;
 
 client.once('ready', () => {
@@ -18,6 +18,7 @@ client.on('message', async message => {
     if (!message.content.startsWith(prefix)) {
         if (message.author.bot) return;
         brainScan(message);
+        return;
     }
 
     // post brainscan, parse for args
