@@ -151,6 +151,7 @@ async function handleSimpleResponse(ctx, command) {
     }
     else if (command === 'help') {
         ctx.message.channel.send("You don't need help");
+        hasResponded = true;
     }
     else if (command === 'sneed') {
         ctx.message.channel.send("Sneed's feed & seed, formally Chucks\nhttps://sneed.club/");
@@ -170,6 +171,7 @@ async function handleSimpleResponse(ctx, command) {
     }
     else if (command === 'captainalex' || command === 'ca') {
         ctx.message.channel.reply(" killed Captain Alex!");
+        hasResponded = true;
     }
 
     return hasResponded;
