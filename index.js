@@ -1,12 +1,17 @@
-// imports
+"use strict";
+
+// Imports.
 require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const ytdl = require('ytdl-core');
+const commands = ('./commands');
 
-// constants
-const prefix = "?b";
+// Constants
+const BOT_PREFIX = "?b";
 const MAX_BRAINS = 300;
+const BOT_TOKEN = process.env.BOT_TOKEN
+
 
 client.once('ready', () => {
     //client.user.setActivity("pondering");
@@ -15,120 +20,52 @@ client.once('ready', () => {
 
 client.on('message', async message => {
     // scan for any mention of brains or brain emotes...
-    if (!message.content.startsWith(prefix)) {
+    if (!message.content.startsWith(BOT_PREFIX)) {
         if (message.author.bot) return;
-        await brainScan(message); return;
+        await parseForBrains(message); return;
     }
 
-    // post brainscan, parse for args
-    const args = message.content.slice(prefix.length + 1).split(' ');
-    const command = args.shift().toLowerCase();
+    // post parseForBrains, parse for args
+    // parse for args
+    const args = message.content.slice(BOT_PREFIX.length + 1).split(' ');
+    const ctx = {
+        args: args,
+        message: message
+    };
 
-    // joins vc & plays either music or sound
-    if (command === 'pondering') {
-        if (message.member.voice.channel) {
-            const connection = await message.member.voice.channel.join();
-            connection.play(ytdl('https://www.youtube.com/watch?v=AXqMnPyx73E', { filter: 'audioonly' }));
-        } else
-            message.reply('You need to join a voice channel first!');
-    }
-
-    if (command === 'gadget') {
-        let _message = await getGadget();
-        message.channel.send(_message);
-
-        if (message.member.voice.channel) {
-            const connection = await message.member.voice.channel.join();
-            connection.play(ytdl("https://www.youtube.com/watch?v=e-JHfXVlkik", { filter: 'audioonly' }));
-        }
-    }
-
-    if (command === 'gun') {
-        if (message.member.voice.channel) {
-            const connection = await message.member.voice.channel.join();
-            connection.play(ytdl("https://www.youtube.com/watch?v=2YbwmQ0VY6g", { filter: 'audioonly' }));
-        } else
-            message.reply('You need to join a voice channel first!');
-    }
-
-    if (command === 'tim') {
-        if (message.member.voice.channel) {
-            const connection = await message.member.voice.channel.join();
-            connection.play(ytdl("https://www.youtube.com/watch?v=KnsiZOJjfUg", { filter: 'audioonly' }));
-        } else
-            message.reply('You need to join a voice channel first!');
-    }
-
-    if (command === 'wings') {
-        if (message.member.voice.channel) {
-            const connection = await message.member.voice.channel.join();
-            connection.play(`https://wakaliwood.com/wings.mp3`, { filter: 'audioonly' });
-        } else
-            message.reply('You need to join a voice channel first!');
-    }
-
-    if (command === 'vroom') {
-        if (message.member.voice.channel) {
-            const connection = await message.member.voice.channel.join();
-            connection.play(ytdl("https://www.youtube.com/watch?v=1V02S6FfhYE", { filter: 'audioonly' }));
-        } else
-            message.reply('You need to join a voice channel first!');
-    }
-
-    if (command === 'groovy') {
-        if (message.member.voice.channel) {
-            const connection = await message.member.voice.channel.join();
-            connection.play(ytdl("https://www.youtube.com/watch?v=DOz_jZqAFLE", { filter: 'audioonly' }));
-        } else
-            message.reply('You need to join a voice channel first!');
-    }
-
-    // basic functionality commands
-    if (command === 'brain') {
-        let _parsedParams = 0;
-        _parsedParams = parseInt(args[0]);
-
-        let _sendMsg = await getBrains(_parsedParams);
-
-        message.channel.send(_sendMsg);
-    }
-            
-    if (command === 'jimcarrey') {
-        let _message = "";
-        _message += await getJimCarrey();
-        message.channel.send(_message);
-    }
-
-    // basic ping commands
-    if (command === 'tonight')
-        message.channel.send("The same thing we do every night, try to take over the world!");
-
-    if (command === 'dysphoria')
-        message.channel.send("https://www.javascript.com/");
-
-    if (command === 'wise')
-        message.channel.send("I am feeling wise!" + "\nhttps://www.jamesonwhiskey.com/en-IE/");
-
-    if (command === 'sneed')
-        message.channel.send("Sneed's feed & seed, formally Chucks\nhttps://sneed.club/");
-
-    if (command === 'agar')
-        message.channel.send("BTC BTFO\nhttps://agarcoin.cash/");
-
-    if (command === 'captainalex')
-        message.channel.send(message.author.toString() + " killed Captain Alex!");
-
+    await handleCommandFromCtx(ctx);
 });
 
-client.login(process.env.TOKEN);
+// Now we finally login
+client.login(BOT_TOKEN);
 
-// the real big brain functions
-async function brainScan(message) {
-    // if someone mentions brains, react with brain emote
+// Command functions
+async function handleCommandFromCtx(ctx) {
+    let command = ctx.args.shift().toLowerCase();
+
+    if (command === 'brain')
+        await getBrains(ctx);
+    else if (command === 'pondering' || command === "pdr")
+        await ponder(ctx);
+    else if (command === 'gadget')
+        await gogoGadget(ctx);
+    else if (command === 'jimcarrey' || command === 'carrey' || command === 'jc')
+        await showJimCarrey(ctx);
+    else {
+        let hasResponded = await handleSimpleResponse(ctx, command)
+        if (!hasResponded)
+            ctx.message.channel.send('Please enter a valid command');
+    }
+}
+
+// Main Command Functions
+async function parseForBrains(message) {
+
+    // If someone mentions brains, react with brain emote
     if (message.content.toLowerCase().includes("brain"))
         message.react('\uD83E\uDDE0');
 
-    // if the message is the brain emote, react with regional indicators spelling out brain.
+    // If the message is the brain emote, react with regional indicators spelling out brain.
     if (message.content.toLowerCase().includes("\uD83E\uDDE0")) {
         message.react('\uD83C\uDDE7');
         message.react('\uD83C\uDDF7');
@@ -138,24 +75,37 @@ async function brainScan(message) {
     }
 }
 
-async function getBrains(numBrains) {
-    if (numBrains <= 0 && isNaN(typeof (numBrains)))
-        numBrains = 0;
+async function getBrains(ctx) {
+    let numOfBrains = 0;
+    numOfBrains = parseInt(ctx.args[0]);
 
-    if (numBrains > MAX_BRAINS)
-        numBrains = MAX_BRAINS;
+    if (numOfBrains <= 0 && isNaN(typeof (numBrains)))
+        numOfBrains = 0;
+
+    if (numOfBrains > MAX_BRAINS)
+        numOfBrains = MAX_BRAINS;
 
     let msg = "";
-    if (numBrains > 0)
-        for (let i = 0; i < numBrains; ++i)
+    if (numOfBrains > 0)
+        for (let i = 0; i < numOfBrains; ++i)
             msg += "Brain ";
     else
         msg += "Brain Brain Brain Brain Brain";
-    return msg;
+
+    ctx.message.channel.send(msg);
 }
 
-// TODO: make the carry images into an array and just parse for args there, should keep it cleaner. 
-async function getJimCarrey() {
+async function ponder(ctx) {
+    let message = ctx.message;
+
+    if (message.member.voice.channel) {
+        const connection = await message.member.voice.channel.join();
+        connection.play(ytdl('https://www.youtube.com/watch?v=AXqMnPyx73E', { filter: 'audioonly' }));
+    } else
+        message.reply('You need to join a voice channel first!');
+}
+
+async function showJimCarrey(ctx) {
     let carreyArray = ["Jim Carrey 99\nhttps://www.nme.com/wp-content/uploads/2019/07/Webp.net-resizeimage-2-2.jpg"
         , "Jim Carrey 37\nhttps://cdn.vox-cdn.com/thumbor/5W2c-p-j6zwXhsAdYLeBlaVhAcs=/0x0:1347x750/1200x800/filters:focal(567x268:781x482)/cdn.vox-cdn.com/uploads/chorus_image/image/66321056/sth_ff_027r2.0.jpg"
         , "Jim Carrey 11\nhttps://images-na.ssl-images-amazon.com/images/I/51itOpamguL._AC_.jpg"
@@ -165,16 +115,64 @@ async function getJimCarrey() {
         , "Jim Carrey 63\nhttps://images.apester.com/user-images%2F6b%2F6b9c3c6d290848d89a3ee155cd3ec1de.jpg/undefined/500/undefined"
         , "Jim Carrey 75\nhttps://cdn.discordapp.com/attachments/633293499478966282/713086129687101490/shutterstock_5875878f.png"
         , "Jim Carrey 40\nhttps://cdn.discordapp.com/attachments/633293499478966282/713086328610357258/thumbnail.png"
+        , "Jim Carrey 13\nhttps://www.gannett-cdn.com/presto/2020/07/06/USAT/7df2db60-9143-443f-8611-747c0c965170-jim_carrey.JPG?crop=4255,3192,x544,y0&quality=50&width=640"
+        , "Jim Carrey 21\nhttps://media.apnarm.net.au/media/images/2020/06/17/v3imagesbin92c595d02242488368b128570ae59a9c-x2hfjwgjlikfl5mriu2_t1880.jpg"
+        , "Jim Carrey 29\nhttps://www.irishcentral.com/uploads/article-v2/2020/9/141408/Jim_Carrey_-_Getty.jpg?t=1600510778"
+        , "Jim Carrey 131\nhttps://www.gannett-cdn.com/-mm-/615c23ee79d6417d42c8ea5f206fc801adf8b38d/c=0-196-2784-3908/local/-/media/2016/09/19/USATODAY/USATODAY/636098973898009175-AP-Ireland-Jim-Carrey.jpg"
+        , "Jim Carrey 73\nhttps://static.independent.co.uk/s3fs-public/thumbnails/image/2020/07/17/07/jim-carrey-renee-zellweger.jpg"
     ];
 
-    let message = selectRandomFromArray(carreyArray);
-
-    return message
+    let msg = selectRandomFromArray(carreyArray);
+    ctx.message.channel.send(msg);
 }
 
-async function getGadget() {
-    let gadgets = ["gun", "dilator", "brain", "knife", "pen", "ide", "bricks", "scissorhands", "mask", "plane", "apache", "subaru"];
-    return "Go go gadget " + selectRandomFromArray(gadgets) + "!";
+async function gogoGadget(ctx) {
+    await getGadget(ctx)
+    if (ctx.message.member.voice.channel) {
+        const connection = await ctx.message.member.voice.channel.join();
+        connection.play(ytdl("https://www.youtube.com/watch?v=e-JHfXVlkik", { filter: 'audioonly' }));
+    }
+}
+
+async function getGadget(ctx) {
+    let gadgets = ["gun", "dilator", "brain", "knife", "pen", "ide", "bricks", "scissorhands", "mask", "plane", "apache", "subaru", "cable guy", "toothpaste cannon", "bowling ball"];
+    let msg = "Go go gadget " + selectRandomFromArray(gadgets) + "!";
+
+    ctx.message.channel.send(msg);
+}
+
+// Simple response commands
+async function handleSimpleResponse(ctx, command) {
+    let hasResponded = false;
+
+    if (command === 'dysphoria') {
+        ctx.message.channel.send("https://www.javascript.com/");
+        hasResponded = true;
+    }
+    else if (command === 'help') {
+        ctx.message.channel.send("You don't need help");
+    }
+    else if (command === 'sneed') {
+        ctx.message.channel.send("Sneed's feed & seed, formally Chucks\nhttps://sneed.club/");
+        hasResponded = true;
+    }
+    else if (command === 'tonight') {
+        ctx.message.channel.send("The same thing we do every night, try to take over the world!");
+        hasResponded = true;
+    }
+    else if (command === 'wise' || command === 'wisdom') {
+        ctx.message.channel.send("I am feeling wise!" + "\nhttps://www.jamesonwhiskey.com/en-IE/");
+        hasResponded = true;
+    }
+    else if (command === 'agar' || command === 'wisdom') {
+        ctx.message.channel.send("BTC BTFO\nhttps://agarcoin.cash/");
+        hasResponded = true;
+    }
+    else if (command === 'captainalex' || command === 'ca') {
+        ctx.message.channel.reply(" killed Captain Alex!");
+    }
+
+    return hasResponded;
 }
 
 // Util Functions
