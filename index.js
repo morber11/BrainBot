@@ -45,14 +45,13 @@ async function handleCommandFromCtx(ctx) {
 
     if (command === 'brain')
         await getBrains(ctx);
-    else if (command === 'pondering' || command === "pdr")
-        await ponder(ctx);
     else if (command === 'gadget')
         await gogoGadget(ctx);
     else if (command === 'jimcarrey' || command === 'carrey' || command === 'jc')
         await showJimCarrey(ctx);
     else {
-        let hasResponded = await handleSimpleResponse(ctx, command)
+        let hasResponded = await handleSimpleCommand(ctx, command)
+
         if (!hasResponded)
             ctx.message.channel.send('Please enter a valid command');
     }
@@ -95,16 +94,6 @@ async function getBrains(ctx) {
     ctx.message.channel.send(msg);
 }
 
-async function ponder(ctx) {
-    let message = ctx.message;
-
-    if (message.member.voice.channel) {
-        const connection = await message.member.voice.channel.join();
-        connection.play(ytdl('https://www.youtube.com/watch?v=AXqMnPyx73E', { filter: 'audioonly' }));
-    } else
-        message.reply('You need to join a voice channel first!');
-}
-
 async function showJimCarrey(ctx) {
     let carreyArray = ["Jim Carrey 99\nhttps://www.nme.com/wp-content/uploads/2019/07/Webp.net-resizeimage-2-2.jpg"
         , "Jim Carrey 37\nhttps://cdn.vox-cdn.com/thumbor/5W2c-p-j6zwXhsAdYLeBlaVhAcs=/0x0:1347x750/1200x800/filters:focal(567x268:781x482)/cdn.vox-cdn.com/uploads/chorus_image/image/66321056/sth_ff_027r2.0.jpg"
@@ -141,10 +130,45 @@ async function getGadget(ctx) {
     ctx.message.channel.send(msg);
 }
 
+// Main simple command handlers
+async function handleSimpleCommand(ctx, command) {
+    let hasResponded = false;
+
+    hasResponded = await handleSimpleAudio(ctx, command);
+
+    if (hasResponded)
+        return true;
+
+    hasResponded = await handleSimpleResponse(ctx, command)
+    return hasResponded;
+}
+
+// Simple audio commands.
+async function handleSimpleAudio(ctx, command) {
+    let hasResponded = false;
+
+    // Audio Commands.
+    if (command === 'ponder' || command === 'pdr') {
+        playAudio(ctx, 'https://www.youtube.com/watch?v=AXqMnPyx73E');
+        hasResponded = true;
+    }
+    else if (command === 'mortis') {
+        playAudio(ctx, 'https://www.youtube.com/watch?v=iHLMnP7bpnk');
+        hasResponded = true;
+    }
+    else if (command === 'vroom') {
+        playAudio(ctx, 'https://www.youtube.com/watch?v=oalzkYxScdk');
+        hasResponded = true;
+    }
+
+    return hasResponded;
+}
+
 // Simple response commands
 async function handleSimpleResponse(ctx, command) {
     let hasResponded = false;
 
+    // Simple respone messages.
     if (command === 'dysphoria') {
         ctx.message.channel.send("https://www.javascript.com/");
         hasResponded = true;
@@ -165,7 +189,7 @@ async function handleSimpleResponse(ctx, command) {
         ctx.message.channel.send("I am feeling wise!" + "\nhttps://www.jamesonwhiskey.com/en-IE/");
         hasResponded = true;
     }
-    else if (command === 'agar' || command === 'wisdom') {
+    else if (command === 'agar') {
         ctx.message.channel.send("BTC BTFO\nhttps://agarcoin.cash/");
         hasResponded = true;
     }
@@ -180,4 +204,14 @@ async function handleSimpleResponse(ctx, command) {
 // Util Functions
 function selectRandomFromArray(array) {
     return array[Math.floor(Math.random() * array.length)];
+}
+
+async function playAudio(ctx, url) {
+    let message = ctx.message;
+
+    if (message.member.voice.channel) {
+        const connection = await message.member.voice.channel.join();
+        connection.play(ytdl(url, { filter: 'audioonly' }));
+    } else
+        message.reply('You need to join a voice channel first!');
 }
