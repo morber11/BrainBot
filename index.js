@@ -136,10 +136,9 @@ async function handleSimpleCommand(ctx, command) {
 
     hasResponded = await handleSimpleAudio(ctx, command);
 
-    if (hasResponded)
-        return true;
-
-    hasResponded = await handleSimpleResponse(ctx, command)
+    if (!hasResponded)
+        hasResponded = await handleSimpleResponse(ctx, command)
+  
     return hasResponded;
 }
 
