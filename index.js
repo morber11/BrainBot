@@ -22,7 +22,7 @@ client.on('message', async message => {
     // scan for any mention of brains or brain emotes...
     if (!message.content.startsWith(BOT_PREFIX)) {
         if (message.author.bot) return;
-        await parseForBrains(message); return;
+        await parseMessageSent(message); return;
     }
 
     // post parseForBrains, parse for args
@@ -33,24 +33,24 @@ client.on('message', async message => {
         message: message
     };
 
-    await handleCommandFromCtx(ctx);
+    handleCommandFromCtx(ctx);
 });
 
 // Now we finally login
 client.login(BOT_TOKEN);
 
 // Command functions
-async function handleCommandFromCtx(ctx) {
+function handleCommandFromCtx(ctx) {
     let command = ctx.args.shift().toLowerCase();
 
     if (command === 'brain')
-        await getBrains(ctx);
+        getBrains(ctx);
     else if (command === 'gadget')
-        await gogoGadget(ctx);
+        gogoGadget(ctx);
     else if (command === 'jimcarrey' || command === 'carrey' || command === 'jc')
-        await showJimCarrey(ctx);
+        showJimCarrey(ctx);
     else {
-        let hasResponded = await handleSimpleCommand(ctx, command)
+        let hasResponded = handleSimpleCommand(ctx, command)
 
         if (!hasResponded)
             ctx.message.channel.send('Please enter a valid command');
@@ -58,7 +58,7 @@ async function handleCommandFromCtx(ctx) {
 }
 
 // Main Command Functions
-async function parseForBrains(message) {
+function parseMessageSent(message) {
 
     // If someone mentions brains, react with brain emote
     if (message.content.toLowerCase().includes("brain"))
@@ -72,9 +72,16 @@ async function parseForBrains(message) {
         message.react('\uD83C\uDDEE');
         message.react('\uD83C\uDDF3');
     }
+    // The thinkers
+    if (message.content.toLowerCase().includes("umm"))
+        message.react("\uD83E\uDD14");
+
+    // Alternatives for spanish people
+    if (message.content.toLowerCase().includes("maricon"))
+        message.react("\uD83D\uDCAF");
 }
 
-async function getBrains(ctx) {
+function getBrains(ctx) {
     let numOfBrains = 0;
     numOfBrains = parseInt(ctx.args[0]);
 
@@ -94,7 +101,7 @@ async function getBrains(ctx) {
     ctx.message.channel.send(msg);
 }
 
-async function showJimCarrey(ctx) {
+function showJimCarrey(ctx) {
     let carreyArray = ["Jim Carrey 99\nhttps://www.nme.com/wp-content/uploads/2019/07/Webp.net-resizeimage-2-2.jpg"
         , "Jim Carrey 37\nhttps://cdn.vox-cdn.com/thumbor/5W2c-p-j6zwXhsAdYLeBlaVhAcs=/0x0:1347x750/1200x800/filters:focal(567x268:781x482)/cdn.vox-cdn.com/uploads/chorus_image/image/66321056/sth_ff_027r2.0.jpg"
         , "Jim Carrey 11\nhttps://images-na.ssl-images-amazon.com/images/I/51itOpamguL._AC_.jpg"
@@ -109,36 +116,40 @@ async function showJimCarrey(ctx) {
         , "Jim Carrey 29\nhttps://www.irishcentral.com/uploads/article-v2/2020/9/141408/Jim_Carrey_-_Getty.jpg?t=1600510778"
         , "Jim Carrey 131\nhttps://www.gannett-cdn.com/-mm-/615c23ee79d6417d42c8ea5f206fc801adf8b38d/c=0-196-2784-3908/local/-/media/2016/09/19/USATODAY/USATODAY/636098973898009175-AP-Ireland-Jim-Carrey.jpg"
         , "Jim Carrey 73\nhttps://static.independent.co.uk/s3fs-public/thumbnails/image/2020/07/17/07/jim-carrey-renee-zellweger.jpg"
+        , "Jim Carrey 46 \nhttps://e3.365dm.com/20/07/2048x1152/skynews-jim-carrey-actor_5041729.jpg"
+        , "Jim Carrey 7\n https://www.telegraph.co.uk/content/dam/news/2016/07/06/Cathriona_White_wi_3457871b_trans_NvBQzQNjv4BqpJliwavx4coWFCaEkEsb3kvxIt-lGGWCWqwLa_RXJU8.jpg?impolicy=logo-overlay"
+        , "Jim Carrey 15\n https://www.oregonlive.com/resizer/6xD8xPKk3SMAg9qb1a9Sq-vO-_c=/450x0/smart/arc-anglerfish-arc2-prod-advancelocal.s3.amazonaws.com/public/JPFMBD67MVF5TNAKZ73ABBWKFY.JPG"
+        , "Jim Carrey 88 \nhttps://www.tipsclear.in/wp-content/uploads/2020/10/Jim-Carrey-Is-Jeff-Goldblums-The-Fly-in-SNL-Pence.jpg"
     ];
 
     let msg = selectRandomFromArray(carreyArray);
     ctx.message.channel.send(msg);
 }
 
-async function gogoGadget(ctx) {
-    await getGadget(ctx)
+function gogoGadget(ctx) {
+    getGadget(ctx)
     if (ctx.message.member.voice.channel) {
-        const connection = await ctx.message.member.voice.channel.join();
+        const connection = ctx.message.member.voice.channel.join();
         connection.play(ytdl("https://www.youtube.com/watch?v=e-JHfXVlkik", { filter: 'audioonly' }));
     }
 }
 
-async function getGadget(ctx) {
-    let gadgets = ["gun", "dilator", "brain", "knife", "pen", "ide", "bricks", "scissorhands", "mask", "plane", "apache", "subaru", "cable guy", "toothpaste cannon", "bowling ball"];
+function getGadget(ctx) {
+    let gadgets = ["gun", "dilator", "brain", "knife", "pen", "ide", "bricks", "scissorhands", "mask", "erp party", "plane", "apache", "subaru", "cable guy", "toothpaste cannon", "bowling ball"];
     let msg = "Go go gadget " + selectRandomFromArray(gadgets) + "!";
 
     ctx.message.channel.send(msg);
 }
 
 // Main simple command handlers
-async function handleSimpleCommand(ctx, command) {
+function handleSimpleCommand(ctx, command) {
     let hasResponded = false;
 
-    hasResponded = await handleSimpleAudio(ctx, command);
+    //hasResponded = handleSimpleAudio(ctx, command);
 
     if (!hasResponded)
-        hasResponded = await handleSimpleResponse(ctx, command)
-  
+        hasResponded = handleSimpleResponse(ctx, command)
+
     return hasResponded;
 }
 
@@ -148,15 +159,15 @@ async function handleSimpleAudio(ctx, command) {
 
     // Audio Commands.
     if (command === 'ponder' || command === 'pdr') {
-        playAudio(ctx, 'https://www.youtube.com/watch?v=AXqMnPyx73E');
+        await playAudio(ctx, 'https://www.youtube.com/watch?v=AXqMnPyx73E');
         hasResponded = true;
     }
     else if (command === 'mortis') {
-        playAudio(ctx, 'https://www.youtube.com/watch?v=iHLMnP7bpnk');
+        await playAudio(ctx, 'https://www.youtube.com/watch?v=iHLMnP7bpnk');
         hasResponded = true;
     }
     else if (command === 'vroom') {
-        playAudio(ctx, 'https://www.youtube.com/watch?v=oalzkYxScdk');
+        await playAudio(ctx, 'https://www.youtube.com/watch?v=oalzkYxScdk');
         hasResponded = true;
     }
 
@@ -164,7 +175,7 @@ async function handleSimpleAudio(ctx, command) {
 }
 
 // Simple response commands
-async function handleSimpleResponse(ctx, command) {
+function handleSimpleResponse(ctx, command) {
     let hasResponded = false;
 
     // Simple respone messages.
@@ -193,7 +204,28 @@ async function handleSimpleResponse(ctx, command) {
         hasResponded = true;
     }
     else if (command === 'captainalex' || command === 'ca') {
-        ctx.message.channel.reply(" killed Captain Alex!");
+        var sender = ctx.message.author;
+
+        if (ctx.args[0]) {
+            sender = ctx.args[0];
+        }
+
+        ctx.message.channel.send(`${sender} killed Captain Alex!`);
+        hasResponded = true;
+    }
+    else if (command === 'maricon' || command === 'ma') {
+        var sender = ctx.message.author;
+
+        if (ctx.args[0]) {
+            sender = ctx.args[0];
+        }
+
+        let msgArray = [`pinche maricon ${sender}`,
+        `Es solo sexo, no te piques. ${sender}`
+        ]
+
+        let msg = selectRandomFromArray(msgArray);
+        ctx.message.channel.send(msg);
         hasResponded = true;
     }
 
