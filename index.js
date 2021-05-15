@@ -73,8 +73,12 @@ function parseMessageSent(message) {
         message.react('\uD83C\uDDF3');
     }
     // The thinkers
-    if (message.content.toLowerCase().includes("umm"))
-        message.react("\uD83E\uDD14");
+    if (message.content.toLowerCase().includes("umm")) {
+        let re = new RegExp('^umm*');
+        if(message.content.toLowerCase().match(re))
+            message.react("\uD83E\uDD14");
+    }
+        
 
     // Alternatives for spanish people
     if (message.content.toLowerCase().includes("maricon"))
