@@ -81,7 +81,7 @@ function parseMessageSent(message) {
         
 
     // Alternatives for spanish people
-    if (message.content.toLowerCase().includes("maricon"))
+    if (message.content.toLowerCase().includes("maricon") || message.content.toLowerCase().includes("maricón"))
         message.react("\uD83D\uDCAF");
 }
 
@@ -229,6 +229,12 @@ function handleSimpleResponse(ctx, command) {
         ]
 
         let msg = selectRandomFromArray(msgArray);
+        ctx.message.channel.send(msg);
+        hasResponded = true;
+    }
+    else if (command === 'wakeup') {
+        // clean this up please
+        let msg = "Joe Biden, Joe Biden, Joe Biden, Joe Biden. This mes-message from Mohammad Khanaqin, for place of Kurdistan for you Joe Biden. You go check up in the doctor, you have two year. You life is two year. Two year from now from today to two year au one year and s-s- uh six month au two year. You life. After this one you pass away. You go check the- check up in the do- doctor, this message from Mohammad Khanaqin for place of Kurdistan. You do - do you good job for the USA for the 50 states in 2 year, you do pull down Iran for us. We wanna Kurdistan can an- new country, no more Iran, no more Iraq, no more Turky, no more Suri for place of Kurdistan, we will give you";
         ctx.message.channel.send(msg);
         hasResponded = true;
     }
