@@ -238,6 +238,11 @@ function handleSimpleResponse(ctx, command) {
         ctx.message.channel.send(msg);
         hasResponded = true;
     }
+    else if (command === '2') {
+        let msg = "2yil";
+        ctx.message.channel.send(msg);
+        hasResponded = true;
+    }
 
     return hasResponded;
 }
