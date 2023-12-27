@@ -1,11 +1,27 @@
 require('dotenv').config();
 const token = process.env.BOT_TOKEN
-const { Client, Events, Collection, GatewayIntentBits } = require('discord.js');
-const fs = require('fs');
+const { Client, Events, Collection, GatewayIntentBits, ActivityType } = require('discord.js');
+const fs = require('node:fs');
 const ytdl = require('ytdl-core');
+const Sequelize = require('sequelize');
 const commands = ('./commands');
 
-const client = new Client({ intents: GatewayIntentBits.Guilds });
+const client = new Client({ 
+    presence: {
+        status: 'online',
+        afk: false,
+        activities: [{
+            name: "Pinky and the Brain",
+            type: ActivityType.Watching
+        }],
+    },
+    intents: [GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildMessages,
+                GatewayIntentBits.GuildMessageReactions,
+                GatewayIntentBits.MessageContent,
+                GatewayIntentBits.GuildVoiceStates ]
+});
+
 client.commands = new Collection();
 client.commandArray = [];
 
@@ -23,47 +39,28 @@ client.handleEvents();
 client.handleCommands();
 client.login(token);
 
+// db stuff
+const sequelize = new Sequelize('database', 'user', 'password', {
+	host: 'localhost',
+	dialect: 'sqlite',
+	logging: false,
+	// SQLite only
+	storage: 'database.sqlite',
+});
+
+const Users = sequelize.define('users', {
+    id: {
+        type: Sequelize.STRING,
+        primaryKey: true
+    },
+    username: Sequelize.TEXT,
+    testCount: Sequelize.INTEGER,
+    despair: Sequelize.INTEGER,
+});
+
+
+
 /*
-
-
-//client.colour = "";
-const BOT_PREFIX = "?b";
-const MAX_BRAINS = 300;
-
-
-
-client.once('ready', () => {
-    //client.user.setActivity("pondering");
-    console.log('Ready!');
-});
-
-client.on('message', async message => {
-    // scan for any mention of brains or brain emotes...
-    if (!message.content.startsWith(BOT_PREFIX)) {
-        if (message.author.bot) return;
-        await parseMessageSent(message); return;
-    }
-
-    // post parseForBrains, parse for args
-    // parse for args
-    const args = message.content.slice(BOT_PREFIX.length + 1).split(' ');
-    const ctx = {
-        args: args,
-        message: message
-    };
-
-    handleCommandFromCtx(ctx);
-});
-
-// Now we finally login
-client.login(BOT_TOKEN);
-
-// Command functions
-function handleCommandFromCtx(ctx) {
-    let command = ctx.args.shift().toLowerCase();
-
-    if (command === 'brain')
-        getBrains(ctx);
     else if (command === 'gadget')
         gogoGadget(ctx);
     else if (command === 'jimcarrey' || command === 'carrey' || command === 'jc')
@@ -74,54 +71,6 @@ function handleCommandFromCtx(ctx) {
         if (!hasResponded)
             ctx.message.channel.send('Please enter a valid command');
     }
-}
-
-// Main Command Functions
-function parseMessageSent(message) {
-
-    // If someone mentions brains, react with brain emote
-    if (message.content.toLowerCase().includes("brain"))
-        message.react('\uD83E\uDDE0');
-
-    // If the message is the brain emote, react with regional indicators spelling out brain.
-    if (message.content.toLowerCase().includes("\uD83E\uDDE0")) {
-        message.react('\uD83C\uDDE7');
-        message.react('\uD83C\uDDF7');
-        message.react('\uD83C\uDDE6');
-        message.react('\uD83C\uDDEE');
-        message.react('\uD83C\uDDF3');
-    }
-    // The thinkers
-    if (message.content.toLowerCase().includes("umm")) {
-        let re = new RegExp('^umm*');
-        if (message.content.toLowerCase().match(re))
-            message.react("\uD83E\uDD14");
-    }
-
-
-    // Alternatives for spanish people
-    if (message.content.toLowerCase().includes("maricon") || message.content.toLowerCase().includes("maricón"))
-        message.react("\uD83D\uDCAF");
-}
-
-function getBrains(ctx) {
-    let numOfBrains = 0;
-    numOfBrains = parseInt(ctx.args[0]);
-
-    if (numOfBrains <= 0 && isNaN(typeof (numBrains)))
-        numOfBrains = 0;
-
-    if (numOfBrains > MAX_BRAINS)
-        numOfBrains = MAX_BRAINS;
-
-    let msg = "";
-    if (numOfBrains > 0)
-        for (let i = 0; i < numOfBrains; ++i)
-            msg += "Brain ";
-    else
-        msg += "Brain Brain Brain Brain Brain";
-
-    ctx.message.channel.send(msg);
 }
 
 function showJimCarrey(ctx) {
@@ -164,17 +113,6 @@ function getGadget(ctx) {
     ctx.message.channel.send(msg);
 }
 
-// Main simple command handlers
-function handleSimpleCommand(ctx, command) {
-    let hasResponded = false;
-
-    //hasResponded = handleSimpleAudio(ctx, command);
-
-    if (!hasResponded)
-        hasResponded = handleSimpleResponse(ctx, command)
-
-    return hasResponded;
-}
 
 // Simple audio commands.
 async function handleSimpleAudio(ctx, command) {
