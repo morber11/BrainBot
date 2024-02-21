@@ -1,17 +1,30 @@
 {
   "name": "brain-bot",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Brain Brain Brain Brain Brain Brain",
-  "main": "index.js",
+  "main": "./src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./src/index.js",
+    "test": "node .",
+    "db-sync": "node ./src/dal/database/sync-db.js",
+    "db-run-migrations" : "node ./src/dal/database/migrator.js"
   },
   "author": "morber",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^12.2.0",
+    "@discordjs/voice": "^0.16.1",
+    "cron": "^3.1.6",
+    "discord.js": "^14.14.1",
     "dotenv": "^8.2.0",
     "node-opus": "^0.3.3",
-    "ytdl": "^1.3.0"
+    "nodemon": "^3.0.2",
+    "sequelize": "^6.35.2",
+    "sqlite3": "^5.1.6",
+    "tweetnacl": "^1.0.3",
+    "ytdl-core": "^4.11.5",
+    "ytdl-core-discord": "^1.3.1"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.2"
   }
 }

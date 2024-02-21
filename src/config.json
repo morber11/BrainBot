@@ -1,0 +1,7 @@
+{
+    "database": {
+        "path": "./src/dal/database/database.sqlite",
+        "username": "user",
+        "password": "password"
+    }
+}
