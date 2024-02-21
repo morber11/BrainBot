@@ -1,34 +1,35 @@
 const fs = require('fs');
-const { REST }  = require('@discordjs/rest');
-const { Routes }  = require('discord-api-types/v9');
+const path = require('path');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
+const CONSTANTS = require('../../utils/constants.js');
+const { BOT_TOKEN } = process.env;
 
 module.exports = (client) => {
-    client.handleCommands = async() => {
+    client.handleCommands = async () => {
         const commandFolders = fs.readdirSync('./src/commands');
-        
-        for (const folder of commandFolders) {
+
+        commandFolders.forEach(folder => {
+            const commandFilesPath = path.join(__dirname, '..', '..', 'commands', folder);
             const commandFiles = fs
-                .readdirSync(`./src/commands/${folder}`)
+                .readdirSync(commandFilesPath)
                 .filter(file => file.endsWith('.js'));
-                
+
             const { commands, commandArray } = client;
-            for (const file of commandFiles) {
-                const command = require(`../../commands/${folder}/${file}`);
+            commandFiles.forEach(file => {
+                const command = require(path.join(commandFilesPath, file));
 
                 commands.set(command.data.name, command);
                 commandArray.push(command.data.toJSON());
+            });
+        });
 
-            }
-        }
-
-        const clientId = '713026155929665569';
-        //const guildId = '432933197001523213';
-        const rest = new REST({ version: '9'}).setToken(process.env.BOT_TOKEN);
+        const rest = new REST({ version: '9' }).setToken(BOT_TOKEN);
 
         try {
             console.log("Started refreshing application (/) commands.");
 
-            await rest.put(Routes.applicationCommands(clientId), {
+            await rest.put(Routes.applicationCommands(CONSTANTS.CLIENT.CLIENT_ID), {
                 body: client.commandArray,
             });
 

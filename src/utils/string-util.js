@@ -1,11 +1,9 @@
 module.exports = {
-    isNumeric: function isNumeric(str) {
-        if (typeof str != "string") return false
-        return !isNaN(str) &&
-            !isNaN(parseFloat(str))
+    isNumeric(str) {
+        if (typeof str !== "string") return false;
+        return !isNaN(str) && !isNaN(parseFloat(str));
     },
-    selectRandomFromArray: function selectRandomFromArray(array) {
+    selectRandomFromArray(array) {
         return array[Math.floor(Math.random() * array.length)];
     }
 }
-

@@ -4,10 +4,10 @@ const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@d
 
 module.exports = {
         data: new SlashCommandBuilder()
-                .setName('ponder')
-                .setDescription('when you want to brain'),
+                .setName('waterphone')
+                .setDescription('WAAAAAAAAAAAAAAAAAAAAAAAAAAA'),
         async execute(interaction) {
-                const url = 'https://www.youtube.com/watch?v=AXqMnPyx73E'
+                const url = 'https://www.youtube.com/watch?v=WJIP2C9v654'
                 const stream = ytdl(url, { filter: 'audioonly' });
                 const player = createAudioPlayer();
                 const resource = createAudioResource(stream);
@@ -20,6 +20,6 @@ module.exports = {
                 });
                 connection.subscribe(player);
                 player.play(resource);
-                await interaction.reply("brain brain brain brain");
+                await interaction.reply("WAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         },
 };
