@@ -14,7 +14,7 @@
   "dependencies": {
     "@discordjs/voice": "^0.16.1",
     "cron": "^3.1.6",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.15.3",
     "dotenv": "^8.2.0",
     "node-opus": "^0.3.3",
     "nodemon": "^3.0.2",
