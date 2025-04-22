@@ -9,8 +9,7 @@ module.exports = {
                 .setDescription('Realign your chakras with 30khz binaural beats and 528hz frequency music'),
         async execute(interaction) {
                 try {
-                        // const urls = await urlUtility.getUrls('meditate');
-                        const urls = [];
+                        const urls = await urlUtility.getUrls('meditate');
 
                         if (urls.length === 0) {
                                 await interaction.reply('No URLs found.');
