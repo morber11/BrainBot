@@ -25,6 +25,9 @@ module.exports = (client) => {
                 }
             });
         });
+        const patriotAct = new cron.CronJob(CONSTANTS.CRON.PATRIOT_ACT, async () => {
+            
+        });
         decrementDespair.start();
     }
 };

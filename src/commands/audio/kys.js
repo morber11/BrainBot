@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const ytdl = require('ytdl-core');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
+const { playAudioInVoiceChannel } = require('../../utils/voice-chat-util');
 
 module.exports = {
         data: new SlashCommandBuilder()
@@ -8,18 +7,14 @@ module.exports = {
                 .setDescription('young man'),
         async execute(interaction) {
                 const url = 'https://www.youtube.com/watch?v=SQsmW0mMKZc'
-                const stream = ytdl(url, { filter: 'audioonly' });
-                const player = createAudioPlayer();
-                const resource = createAudioResource(stream);
-                const guildMember = await interaction.member.guild.members.fetch(interaction.user.id);
-                const { channelId } = guildMember.voice;
-                const connection = joinVoiceChannel({
-                        channelId: channelId,
-                        guildId: interaction.guildId,
-                        adapterCreator: interaction.channel.guild.voiceAdapterCreator,
-                });
-                connection.subscribe(player);
-                player.play(resource);
-                await interaction.reply("young man");
+
+                try {
+                        await playAudioInVoiceChannel(interaction, url);
+
+                        await interaction.reply("young man");
+                } catch (error) {
+                        console.error('Error:', error);
+                        await interaction.reply('An error occurred while trying to play the audio.');
+                }
         },
 };
