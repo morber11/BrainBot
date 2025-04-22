@@ -18,6 +18,7 @@ const CONSTANTS = {
     },
     CRON: {
         HANDLE_DESPAIR: "*/5 * * * *",
+        PATRIOT_ACT: "16 19 * * *"
     }
 }
 module.exports = CONSTANTS

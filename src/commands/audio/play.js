@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const ytdl = require('ytdl-core');
+const ytdl = require('@distube/ytdl-core');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
 
 module.exports = {
@@ -13,22 +13,31 @@ module.exports = {
                 ),
         async execute(interaction) {
                 const url = interaction.options.getString('url');
-                const stream = ytdl(url, { filter: 'audioonly' });
-                const player = createAudioPlayer();
-                const resource = createAudioResource(stream);
 
-                const guildMember = await interaction.member.guild.members.fetch(interaction.user.id);
-                const { channelId } = guildMember.voice;
+                try {
+                        const stream = ytdl(url, { filter: 'audioonly', highWaterMark: 1 << 25 });
+                        const resource = createAudioResource(stream);
+                        const guildMember = await interaction.member.guild.members.fetch(interaction.user.id);
+                        const { channelId } = guildMember.voice;
 
-                const connection = joinVoiceChannel({
-                        channelId: channelId,
-                        guildId: interaction.guildId,
-                        adapterCreator: interaction.channel.guild.voiceAdapterCreator,
-                });
+                        if (!channelId) {
+                                return interaction.reply('You must join a voice channel first!');
+                        }
 
-                connection.subscribe(player);
-                player.play(resource);
+                        const connection = joinVoiceChannel({
+                                channelId: channelId,
+                                guildId: interaction.guildId,
+                                adapterCreator: interaction.channel.guild.voiceAdapterCreator,
+                        });
 
-                await interaction.reply(`Now playing: ${url}`);
+                        const player = createAudioPlayer();
+                        player.play(resource);
+                        connection.subscribe(player);
+
+                        await interaction.reply(`Now playing: ${url}`);
+                } catch (error) {
+                        console.error('Error:', error);
+                        await interaction.reply('An error occurred while trying to play the audio.');
+                }
         },
 };

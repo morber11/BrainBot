@@ -7,12 +7,13 @@
     "start": "node ./src/index.js",
     "test": "node .",
     "db-sync": "node ./src/dal/database/sync-db.js",
-    "db-run-migrations" : "node ./src/dal/database/migrator.js"
+    "db-run-migrations": "node ./src/dal/database/migrator.js"
   },
   "author": "morber",
   "license": "ISC",
   "dependencies": {
     "@discordjs/voice": "^0.16.1",
+    "@distube/ytdl-core": "^4.16.8",
     "cron": "^3.1.6",
     "discord.js": "^14.14.1",
     "dotenv": "^8.2.0",
