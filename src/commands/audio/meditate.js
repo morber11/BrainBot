@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const ytdl = require('@distube/ytdl-core');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
+const { playAudioInVoiceChannel } = require('../../utils/voice-chat-util');
 const urlUtility = require('../../utils/custom-url-util.js');
 const stringUtility = require('../../utils/string-util.js');
 
@@ -19,24 +18,7 @@ module.exports = {
                         }
 
                         const { url } = stringUtility.selectRandomFromArray(urls);
-                        const stream = ytdl(url, { filter: 'audioonly', highWaterMark: 1 << 25 });
-                        const resource = createAudioResource(stream);
-                        const guildMember = await interaction.member.guild.members.fetch(interaction.user.id);
-                        const { channelId } = guildMember.voice;
-
-                        if (!channelId) {
-                                return interaction.reply('You must join a voice channel first!');
-                        }
-
-                        const connection = joinVoiceChannel({
-                                channelId: channelId,
-                                guildId: interaction.guildId,
-                                adapterCreator: interaction.channel.guild.voiceAdapterCreator,
-                        });
-
-                        const player = createAudioPlayer();
-                        player.play(resource);
-                        connection.subscribe(player);
+                        await playAudioInVoiceChannel(interaction, url);
 
                         await interaction.reply("release yourself from worldly desires and become one with the universe.");
                 } catch (error) {
