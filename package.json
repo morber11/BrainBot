@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "start": "node ./src/index.js",
-    "test": "node .",
+    "test":  "jest",
     "db-sync": "node ./src/dal/database/sync-db.js",
     "db-run-migrations": "node ./src/dal/database/migrator.js"
   },
@@ -26,6 +26,7 @@
     "ytdl-core-discord": "^1.3.1"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "sequelize-cli": "^6.6.2"
   }
 }
