@@ -32,7 +32,10 @@ for (const folder of functionFolders) {
         require(`./functions/${folder}/${file}`)(client);
 }
 
+const commandFolders = fs.readdirSync('./src/commands');
+//const commandFilesPath = path.join(__dirname, '..', '..', 'commands', commandFolders);
+
 client.handleEvents();
-client.handleCommands();
+client.handleCommands(commandFolders);
 client.handleCrons();
 client.login(BOT_TOKEN);

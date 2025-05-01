@@ -6,8 +6,11 @@ const CONSTANTS = require('../../utils/constants.js');
 const { BOT_TOKEN } = process.env;
 
 module.exports = (client) => {
-    client.handleCommands = async () => {
-        const commandFolders = fs.readdirSync('./src/commands');
+    client.handleCommands = async (commandFolders) => {
+
+        if (!Array.isArray(commandFolders)) {
+            return
+        }
 
         commandFolders.forEach(folder => {
             const commandFilesPath = path.join(__dirname, '..', '..', 'commands', folder);
@@ -16,12 +19,15 @@ module.exports = (client) => {
                 .filter(file => file.endsWith('.js'));
 
             const { commands, commandArray } = client;
-            commandFiles.forEach(file => {
-                const command = require(path.join(commandFilesPath, file));
 
-                commands.set(command.data.name, command);
-                commandArray.push(command.data.toJSON());
-            });
+            if (Array.isArray(commandFiles)) {
+                commandFiles.forEach(file => {
+                    const command = require(path.join(commandFilesPath, file));
+
+                    commands.set(command.data.name, command);
+                    commandArray.push(command.data.toJSON());
+                });
+            }
         });
 
         const rest = new REST({ version: '9' }).setToken(BOT_TOKEN);
