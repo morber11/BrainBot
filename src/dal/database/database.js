@@ -7,7 +7,10 @@ const sequelize = new Sequelize('database', dbUser, dbPassword, {
     host: 'localhost',
     dialect: 'sqlite',
     logging: false,
-	storage: dbPath,
+    storage: dbPath,
+    retry: {
+        max: 10
+    },
 });
 
 module.exports = sequelize;
