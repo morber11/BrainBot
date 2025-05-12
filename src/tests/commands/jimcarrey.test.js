@@ -35,7 +35,7 @@ describe('Jim Carrey Command', () => {
         expect(mockCommandInteraction.editReply).toHaveBeenCalledWith('No URLs found.');
     });
 
-    it('should handle errors gracefully', async () => {
+    it('should handle errors', async () => {
         CustomUrl.findAll.mockRejectedValue(new Error('Oh no an error'));
 
         await jimCarreyCommand.execute(mockCommandInteraction);
