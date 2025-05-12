@@ -1,4 +1,5 @@
 const CustomUrl = require('../models/custom-url.js');
+const retryOperation = require('../../utils/retry.js');
 
 const urls = [
     { type: 'jimcarrey', value: '99', url: 'https://www.nme.com/wp-content/uploads/2019/07/Webp.net-resizeimage-2-2.jpg' },
@@ -25,15 +26,18 @@ const urls = [
 ];
 
 async function up() {
-    await Promise.all(urls.map(obj => 
-        CustomUrl.findOrCreate({
-            where: {
-                value: obj.value,
-                url: obj.url,
-                type: obj.type
-            }
-        })
-    ));
+    for (const obj of urls) {
+        await retryOperation(() =>
+            CustomUrl.findOrCreate({
+                where: {
+                    value: obj.value,
+                    url: obj.url,
+                    type: obj.type
+                }
+            })
+        );
+    }
 }
+
 
 module.exports = { Up: up }

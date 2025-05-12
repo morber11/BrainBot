@@ -1,0 +1,76 @@
+const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
+const FactOrFiction = require('../../dal/models/fact-or-fiction.js');
+const cryptUtil = require('../../utils/crypt-util.js');
+const pathUtility = require('../../utils/path-util.js');
+const CONSTANTS = require('../../utils/constants.js');
+const stringUtility = require('../../utils/string-util.js');
+
+// should PROBbly be moved to a util at some point
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('fact-or-fictionator')
+        .setDescription('will you discover the truth? or get lost in the lies?')
+        .addStringOption(option =>
+            option.setName('url')
+                .setDescription(`we'll find out if this url is fact or fiction at the end of the episode`)
+                .setMaxLength(300)
+                .setRequired(true),
+        ),
+    async execute(interaction) {
+        try {
+            await interaction.deferReply();
+
+            const url = interaction.options.getString('url');
+            const hash = await cryptUtil.getHash(url);
+
+            const [factOrFictionEntry, created] = await FactOrFiction.findOrCreate({
+                where: {
+                    entryHash: hash,
+                }
+            });
+
+            let value = factOrFictionEntry.dataValues.value;
+
+            if (created) {
+                let rand = getRandomInt(999);
+                let result = rand % 2 === 0
+                    ? CONSTANTS.FACT_OR_FICTION.VALUES.FACT
+                    : CONSTANTS.FACT_OR_FICTION.VALUES.FICTION;
+
+                await FactOrFiction.update(
+                    { value: result },
+                    { where: { id: factOrFictionEntry.id } }
+                );
+
+                value = result;
+            }
+            const dir = pathUtility.getMediaFilePath(__dirname, 'images',
+                value === CONSTANTS.FACT_OR_FICTION.VALUES.FACT ? 'fact.gif' : 'fiction.gif');
+
+            const attachment = new AttachmentBuilder(dir);
+
+            const response = stringUtility.selectRandomFromArray(
+                CONSTANTS.FACT_OR_FICTION.RESPONSES.filter(x => x.category === value)
+            );
+
+            // ideas
+            // add a based on x events by y etc, column in db.
+            // similar events took place in x location
+            await interaction.editReply({
+                content: `Did you manage to work it out? \nThe story in question: \`${url}\`\n${response.response}\n`,
+                files: [attachment]
+            });
+        }
+        catch (error) {
+            console.error('An error occurred.:', error);
+            await interaction.reply({
+                content: 'An error occurred.',
+                ephemeral: true,
+            });
+        }
+    }
+};

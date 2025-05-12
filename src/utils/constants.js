@@ -53,6 +53,95 @@ const CONSTANTS = {
             { "response_number": 29, "response": "Very probable", "category": "Positive" },
             { "response_number": 30, "response": "I can't say right now", "category": "Neutral" }
         ]
+    },
+    FACT_OR_FICTION: {
+        VALUES: {
+            FACT: "fact",
+            FICTION: "fiction"
+        },
+        RESPONSES: [
+            {
+                "response": "Is it possible? Maybe. But is it true? Absolutely not. It's fiction",
+                "category": "fiction"
+            },
+            {
+                "response": "It's a wild story, but stranger things have happened. True? I'm not so sure. We made this one up.",
+                "category": "fiction"
+            },
+            {
+                "response": "Could it be the truth? Not this time. Absolutely no evidence. It's made up.",
+                "category": "fiction"
+            },
+            {
+                "response": "That sounds like a tall tale. But then again, truth is stranger than fiction, right? This time however, it's false.",
+                "category": "fiction"
+            },
+            {
+                "response": "Did you believe this strange story? You shouldn't. It was a creative story from our writers.",
+                "category": "fiction"
+            },
+            {
+                "response": "Is it true? Not this time. We got you.",
+                "category": "fiction"
+            },
+            {
+                "response": "Could it have happened? Absolutely. Did it? No. A complete fabrication.",
+                "category": "fiction"
+            },
+            {
+                "response": "Hmm. Well, it's a story, that's for sure. One cooked up by our writers.",
+                "category": "fiction"
+            },
+            {
+                "response": "A fascinating tale, but it's nothing but smoke and mirrors.",
+                "category": "fiction"
+            },
+            {
+                "response": "Could this really have happened? Maybe you heard a similar story, but this ones made up by our writers.",
+                "category": "fiction"
+            },
+            {
+                "response": "This one can't be possible right? If you thought this was from the mind of one of our writers, you'd be wrong. It happened.",
+                "category": "fact"
+            },
+            {
+                "response": "Did you believe this story? You should have. It's true.",
+                "category": "fact"
+            },
+            {
+                "response": "This story has a ring of truth  to it. But is it really fact? Yes. It happened.",
+                "category": "fact"
+            },
+            {
+                "response": "Have you heard of this story? you might have, it happened.",
+                "category": "fact"
+            },
+            {
+                "response": "Did this really happen? Yes.",
+                "category": "fact"
+            },
+            {
+                "response": "Seems impossible right? This story is actually fact. It happened.",
+                "category": "fact"
+            },
+            {
+                "response": "It's too absurd to be true, right? If you think this was a lie you'd be wrong, it's fact.",
+                "category": "fact"
+            },
+            {
+                "response": "Sounds unbelievable? According to our researchers, it's true.",
+                "category": "fact"
+            },
+            {
+                "response": "It has to be false right? Wrong. It's true.",
+                "category": "fact"
+            },
+            {
+                "response": "It couldn't have possibly happened. If you thought it did, you'd be right. ",
+                "category": "fact"
+            }
+        ]
     }
 }
+
 module.exports = CONSTANTS
