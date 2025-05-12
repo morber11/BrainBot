@@ -8,6 +8,7 @@ const CONSTANTS = {
         REGIONAL_SIGN_N: "\uD83C\uDDF3",
         THINKING: "\uD83E\uDD14",
         ONE_HUNDRED: "\uD83D\uDCAF",
+        MILK: "🥛",
     },
     CLIENT: {
         CLIENT_ID: "713026155929665569",
