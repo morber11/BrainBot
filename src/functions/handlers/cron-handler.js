@@ -31,10 +31,11 @@ module.exports = (client) => {
                 for (const guild of client.guilds.cache.values()) {
                     let targetChannel = guild.channels.cache.find(ch =>
                         ch.type === 0 && (ch.name.toLowerCase() === 'general'
-                            || ch.name.toLowerCase().includes('bots')
-                            || ch.name.toLowerCase().includes('bot')
                             || ch.name.toLowerCase().includes('2fort') // fuck it we ball
                             || ch.name.toLowerCase().includes('real-fungheads')) // help me get all the shen gong wu. should probably make these channel ids
+                            || ch.name.toLowerCase().includes('bots')
+                            || ch.name.toLowerCase().includes('bot')
+
                     );
 
                     if (targetChannel) {
