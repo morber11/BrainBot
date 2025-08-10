@@ -25,9 +25,31 @@ module.exports = (client) => {
                 }
             });
         });
+
         const patriotAct = new cron.CronJob(CONSTANTS.CRON.PATRIOT_ACT, async () => {
-            
+            try {
+                for (const guild of client.guilds.cache.values()) {
+                    let targetChannel = guild.channels.cache.find(ch =>
+                        ch.type === 0 && (ch.name.toLowerCase() === 'general'
+                            || ch.name.toLowerCase().includes('bots')
+                            || ch.name.toLowerCase().includes('bot')
+                            || ch.name.toLowerCase().includes('2fort') // fuck it we ball
+                            || ch.name.toLowerCase().includes('real-fungheads')) // help me get all the shen gong wu. should probably make these channel ids
+                    );
+
+                    if (targetChannel) {
+                        await targetChannel.send('o7');
+                    } else {
+                        console.log("No suitable channel found in", guild.name);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching servers or sending message:', error);
+            }
         });
+
+        // start our crons
         decrementDespair.start();
+        patriotAct.start();
     }
 };
