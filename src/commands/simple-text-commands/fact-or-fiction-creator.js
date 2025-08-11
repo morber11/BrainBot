@@ -4,11 +4,7 @@ const cryptUtil = require('../../utils/crypt-util.js');
 const pathUtility = require('../../utils/path-util.js');
 const CONSTANTS = require('../../utils/constants.js');
 const stringUtility = require('../../utils/string-util.js');
-
-// should PROBbly be moved to a util at some point
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-}
+const mathUtil = require('../../utils/math-util.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -36,7 +32,7 @@ module.exports = {
             let value = factOrFictionEntry.dataValues.value;
 
             if (created) {
-                let rand = getRandomInt(999);
+                let rand = mathUtil.getRandomInt(999);
                 let result = rand % 2 === 0
                     ? CONSTANTS.FACT_OR_FICTION.VALUES.FACT
                     : CONSTANTS.FACT_OR_FICTION.VALUES.FICTION;
