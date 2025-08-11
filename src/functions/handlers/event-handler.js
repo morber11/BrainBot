@@ -11,7 +11,7 @@ module.exports = (client) => {
                 .readdirSync(eventFilesPath)
                 .filter(file => file.endsWith('.js'));
 
-            if (folder === "client") {
+            if (folder === 'client') {
                 eventFiles.forEach(file => {
                     const event = require(path.join(eventFilesPath, file));
 
