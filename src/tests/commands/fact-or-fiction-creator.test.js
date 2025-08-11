@@ -13,9 +13,12 @@ jest.mock('../../utils/constants.js');
 jest.mock('../../utils/string-util.js');
 
 describe('Fact or Fictionator Command', () => {
-    let mockCommandInteraction;
+    let mockCommandInteraction, originalMathRandom;
 
     beforeEach(() => {
+        originalMathRandom = Math.random;
+        Math.random = jest.fn(() => 1.5 / 999);
+
         mockCommandInteraction = {
             options: {
                 getString: jest.fn(),
@@ -35,6 +38,10 @@ describe('Fact or Fictionator Command', () => {
                 { category: 'fiction', response: 'fiction' },
             ],
         };
+    });
+
+    afterEach(() => {
+        Math.random = originalMathRandom;
     });
 
     it('should reply with the correct fact or fiction result and an attachment', async () => {
@@ -79,12 +86,6 @@ describe('Fact or Fictionator Command', () => {
 
         stringUtility.selectRandomFromArray.mockReturnValue({ response: 'fiction' });
         pathUtility.getMediaFilePath.mockReturnValue('path/to/fiction.gif');
-
-        // force non-random odd result
-        jest.mock('../../utils/path-util.js', () => ({
-            ...jest.requireActual('../../utils/path-util.js'),
-            getRandomInt: jest.fn().mockReturnValue(0),
-        }));
 
         await factOrFictionatorCommand.execute(mockCommandInteraction);
 
@@ -136,5 +137,4 @@ describe('Fact or Fictionator Command', () => {
             ephemeral: true,
         });
     });
-
 });
