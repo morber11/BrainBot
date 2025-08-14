@@ -24,6 +24,10 @@ const patriotAct = (client) => new cron.CronJob(CONSTANTS.CRON.PATRIOT_ACT, asyn
             }
 
             if (targetChannel) {
+                // add a small delay so the bot doesn't automatically post it at the exact time - give people some time to react
+                const delay = CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD;
+                await new Promise(resolve => setTimeout(resolve, delay));
+                
                 await targetChannel.send('o7');
             } else {
                 console.log('No suitable channel found in', guild.name);

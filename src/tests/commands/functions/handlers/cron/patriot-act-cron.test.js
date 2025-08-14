@@ -27,6 +27,12 @@ describe('patriot act', () => {
         jest.clearAllMocks();
         mockClient = new (require('discord.js')).Client();
         cronJob = patriotAct(mockClient);
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.clearAllTimers();
+        jest.useRealTimers(); 
     });
 
     it('should send message to target channel when found', async () => {
@@ -44,6 +50,7 @@ describe('patriot act', () => {
 
         await cronJob.fireOnTick();
 
+        await jest.advanceTimersByTimeAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
         expect(mockFind).toHaveBeenCalledTimes(1);
         expect(mockSend).toHaveBeenCalledWith('o7');
     });
@@ -63,6 +70,7 @@ describe('patriot act', () => {
 
         await cronJob.fireOnTick();
 
+        await jest.advanceTimersByTimeAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
         expect(mockFind).toHaveBeenCalledTimes(2);
         expect(mockSend).toHaveBeenCalledWith('o7');
     });
