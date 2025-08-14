@@ -20,6 +20,7 @@ const CONSTANTS = {
     CRON: {
         HANDLE_DESPAIR: "*/5 * * * *",
         PATRIOT_ACT: "16 19 * * *",
+        PATRIOT_ACT_DELAY_PERIOD: 30000,
         DEBUG: "* * * * *",
     },
     MAGIC_BALL: {
