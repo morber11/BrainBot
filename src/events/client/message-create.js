@@ -40,8 +40,19 @@ async function handleBasicReactResponse(message) {
     if (msgContent.includes("maricon") || msgContent.includes("maricón"))
         message.react(CONSTANTS.EMOJI.ONE_HUNDRED);
 
-    if (msgContent.includes("milk")  || msgContent.includes(CONSTANTS.EMOJI.MILK)) {
+    if (msgContent.includes("milk") || msgContent.includes(CONSTANTS.EMOJI.MILK)) {
         const dir = pathUtility.getMediaFilePath(__dirname, 'audio', 'milk03.mp3');
+        try {
+            await message.reply({
+                files: [dir]
+            });
+        } catch (err) {
+            console.log("Error during File read " + err);
+        }
+    }
+
+    if (msgContent.includes("make your choice")) {
+        const dir = pathUtility.getMediaFilePath(__dirname, 'image', 'jigsaw.jpg');
         try {
             await message.reply({
                 files: [dir]
