@@ -52,7 +52,7 @@ async function handleBasicReactResponse(message) {
     }
 
     if (msgContent.includes("make your choice")) {
-        const dir = pathUtility.getMediaFilePath(__dirname, 'image', 'jigsaw.jpg');
+        const dir = pathUtility.getMediaFilePath(__dirname, 'images', 'jigsaw.jpg');
         try {
             await message.reply({
                 files: [dir]
