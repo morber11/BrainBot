@@ -9,6 +9,7 @@ const decrementDespair = new cron.CronJob(CONSTANTS.CRON.HANDLE_DESPAIR, async (
         const { despairCount, id } = member;
 
         if (despairCount > 0) {
+            // this is some sort of insane syntax but it works anyway
             await member.increment({ despairCount: CONSTANTS.POINT_VALUES.DESPAIR_DECREMENT });
         }
 
