@@ -7,6 +7,8 @@ const Keyword = require('../../dal/models/keyword.js');
 const CustomUrl = require('../../dal/models/custom-url.js');
 const stringUtility = require('../../utils/string-util.js');
 
+const lastRavenByGuild = new Map();
+
 module.exports = {
     name: 'messageCreate',
     async execute(message, client) {
@@ -73,6 +75,28 @@ async function handleBasicReactResponse(message) {
 
     if (msgContent.includes("make your choice")) {
         const dir = pathUtility.getMediaFilePath(__dirname, 'images', 'jigsaw.jpg');
+        try {
+            await message.reply({
+                files: [dir]
+            });
+        } catch (err) {
+            console.log("Error during File read " + err);
+        }
+    }
+
+    if (msgContent.includes("lost a life")) {
+        const ravenImages = ['raven-1.gif', 'raven-2.gif', 'raven-3.gif'];
+
+        const guildKey = message.guildId || 'dm';
+        const lastForGuild = lastRavenByGuild.get(guildKey);
+
+        const choices = lastForGuild ? ravenImages.filter(img => img !== lastForGuild) : ravenImages;
+        const selection = choices[Math.floor(Math.random() * choices.length)];
+        
+        lastRavenByGuild.set(guildKey, selection);
+
+        const dir = pathUtility.getMediaFilePath(__dirname, 'images', selection);
+
         try {
             await message.reply({
                 files: [dir]
