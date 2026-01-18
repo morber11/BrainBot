@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const stringUtility = require('../../utils/string-util.js');
+const CONSTANTS = require('../../utils/constants.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,7 +16,7 @@ module.exports = {
         var message = '';
 
         if (stringUtility.isNumeric(numBrains)) {
-            numBrains = Math.min(numBrains, 330);
+            numBrains = Math.min(Math.max(parseInt(numBrains, 10) || 0, 0), CONSTANTS.BRAIN.MAX_BRAINS);
 
             for (var i = 0; i < numBrains; ++i) {
                 message += 'brain ';

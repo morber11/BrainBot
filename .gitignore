@@ -2,3 +2,7 @@ node_modules
 .env
 database.sqlite
 .vs
+
+# Ignore generated player script files like 1768749238852-player-script.js
+# These are from ytdl-core generating them as error logs
+[0-9][0-9]*-player-script.js
