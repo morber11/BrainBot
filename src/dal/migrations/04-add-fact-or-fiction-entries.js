@@ -9,7 +9,7 @@ const factOrFictionEntry = [
 async function up() {
     for (const obj of factOrFictionEntry) {
         await retryOperation(() =>
-            CustomUrl.findOrCreate({
+            FactOrFiction.findOrCreate({
                 where: {
                     value: obj.value,
                     entryHash: obj.entryHash,
