@@ -10,8 +10,11 @@ const CONSTANTS = {
         ONE_HUNDRED: "\uD83D\uDCAF",
         MILK: "🥛",
     },
+    BRAIN: {
+        MAX_BRAINS: 330,
+    },
     CLIENT: {
-        CLIENT_ID: "713026155929665569",
+        CLIENT_ID: process.env.CLIENT_ID || "713026155929665569",
     },
     POINT_VALUES: {
         MAX_DESPAIR: 10,
