@@ -10,11 +10,31 @@ const stringUtility = require('../../utils/string-util.js');
 module.exports = {
     name: 'messageCreate',
     async execute(message, client) {
-        if (message.author.id == client.application.id)
+        if (message.author.id == client.application.id) {
             return;
+        }
+        
+        try {
+            await handleBasicReactResponse(message);
+        } catch (err) {
+            console.error('Error in handleBasicReactResponse:', err, {
+                guildId: message.guildId,
+                channelId: message.channelId,
+                messageId: message.id,
+                authorId: message.author.id
+            });
+        }
 
-        await handleBasicReactResponse(message);
-        await handleMentalDespair(message);
+        try {
+            await handleMentalDespair(message);
+        } catch (err) {
+            console.error('Error in handleMentalDespair:', err, {
+                guildId: message.guildId,
+                channelId: message.channelId,
+                messageId: message.id,
+                authorId: message.author.id
+            });
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { playAudioInVoiceChannel } = require('../../utils/voice-chat-util');
+const { playAudioInVoiceChannel, isValidAudioUrl } = require('../../utils/voice-chat-util');
 
 module.exports = {
         data: new SlashCommandBuilder()
@@ -13,13 +13,18 @@ module.exports = {
         async execute(interaction) {
                 const url = interaction.options.getString('url');
 
+                if (!isValidAudioUrl(url)) {
+                        await interaction.reply({ content: 'Invalid or unsupported URL. Please provide a valid YouTube URL.', ephemeral: true });
+                        return;
+                }
+
                 try {
                         await playAudioInVoiceChannel(interaction, url);
 
-                        await interaction.reply(`Now playing: ${url}`);
+                        await interaction.reply({ content: `Now playing: ${url}` });
                 } catch (error) {
-                        console.error('Error:', error);
-                        await interaction.reply('An error occurred while trying to play the audio.');
+                        console.error('Error playing audio:', error);
+                        await interaction.reply({ content: 'An error occurred while trying to play the audio.', ephemeral: true });
                 }
         },
 };
