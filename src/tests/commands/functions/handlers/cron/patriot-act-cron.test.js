@@ -5,6 +5,7 @@ const CONSTANTS = require('../../../../../utils/constants');
 const mockSend = jest.fn();
 const mockFind = jest.fn();
 const mockGuildsCacheValues = jest.fn();
+const mockStatIncrement = jest.fn();
 
 jest.mock('discord.js', () => ({
     Client: jest.fn().mockImplementation(() => ({
@@ -19,12 +20,20 @@ jest.mock('discord.js', () => ({
     })),
 }));
 
+jest.mock('../../../../../dal/models/stat', () => ({
+    findOrCreate: jest.fn(),
+}));
+
+const Stat = require('../../../../../dal/models/stat');
+
 describe('patriot act', () => {
     let cronJob;
     let mockClient;
 
     beforeEach(() => {
         jest.clearAllMocks();
+        Stat.findOrCreate.mockResolvedValue([{ increment: mockStatIncrement }]);
+
         mockClient = new (require('discord.js')).Client();
         cronJob = patriotAct(mockClient);
         jest.useFakeTimers();
@@ -53,6 +62,11 @@ describe('patriot act', () => {
         await jest.advanceTimersByTimeAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
         expect(mockFind).toHaveBeenCalledTimes(1);
         expect(mockSend).toHaveBeenCalledWith('o7');
+        expect(Stat.findOrCreate).toHaveBeenCalledWith({
+            where: { stat: CONSTANTS.STATS.PATRIOT_ACT },
+            defaults: { count: 0 },
+        });
+        expect(mockStatIncrement).toHaveBeenCalledWith('count');
     });
 
     it('should fall back to "bot/general" channel if specified channel is not found', async () => {
@@ -73,6 +87,8 @@ describe('patriot act', () => {
         await jest.advanceTimersByTimeAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
         expect(mockFind).toHaveBeenCalledTimes(2);
         expect(mockSend).toHaveBeenCalledWith('o7');
+        expect(Stat.findOrCreate).toHaveBeenCalled();
+        expect(mockStatIncrement).toHaveBeenCalledWith('count');
     });
 
     it('should log message when no suitable channel is found', async () => {
@@ -91,7 +107,9 @@ describe('patriot act', () => {
 
         await cronJob.fireOnTick();
 
+        await jest.advanceTimersByTimeAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
         expect(console.log).toHaveBeenCalledWith('No suitable channel found in', undefined);
+        expect(mockStatIncrement).not.toHaveBeenCalled();
     });
 
     it('should handle errors gracefully', async () => {
@@ -112,6 +130,8 @@ describe('patriot act', () => {
 
         await cronJob.fireOnTick();
 
+        await jest.advanceTimersByTimeAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
         expect(console.error).toHaveBeenCalledWith('Error fetching servers or sending message:', expect.any(Error));
+        expect(mockStatIncrement).not.toHaveBeenCalled();
     });
 });

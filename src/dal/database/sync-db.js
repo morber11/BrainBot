@@ -4,6 +4,7 @@ const Member = require('../models/member.js');
 const Keyword = require('../models/keyword.js');
 const CustomUrl = require('../models/custom-url.js');
 const FactOrFiction = require('../models/fact-or-fiction.js');
+const Stat = require('../models/stat.js');
 
 console.log("beginning sync");
 

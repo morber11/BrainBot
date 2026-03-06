@@ -1,11 +1,17 @@
 const cron = require('cron');
 const CONSTANTS = require('../../../utils/constants.js');
+const Stat = require('../../../dal/models/stat');
 
 const patriotAct = (client) => new cron.CronJob(CONSTANTS.CRON.PATRIOT_ACT, async () => {
     try {
         // add a small delay so the bot doesn't automatically post it at the exact time - give people some time to react
         const delay = CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD;
         await new Promise(resolve => setTimeout(resolve, delay));
+        
+        const [statRow] = await Stat.findOrCreate({
+            where: { stat: CONSTANTS.STATS.PATRIOT_ACT },
+            defaults: { count: 0 },
+        });
         
         for (const guild of client.guilds.cache.values()) {
             // we have to do this because of funky behaviour with .find() always finding bot/bots instead
@@ -29,6 +35,11 @@ const patriotAct = (client) => new cron.CronJob(CONSTANTS.CRON.PATRIOT_ACT, asyn
 
             if (targetChannel) {
                 await targetChannel.send('o7');
+                try {
+                    await statRow.increment('count');
+                } catch (e) {
+                    console.error('Failed to update patriot act stat:', e);
+                }
             } else {
                 console.log('No suitable channel found in', guild.name);
             }
