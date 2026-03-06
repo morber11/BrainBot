@@ -29,6 +29,9 @@ const CONSTANTS = {
     STATS: {
         PATRIOT_ACT: "patriot_act",
     },
+    COMMANDS: {
+        PATRIOT_ACT: "patriot_act",
+    },
     MAGIC_BALL: {
         RESPONSES: [
             { "response_number": 1, "response": "Yes", "category": "Positive" },
