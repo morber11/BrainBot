@@ -17,6 +17,11 @@ const Stat = database.define('stat', {
         allowNull: false,
         defaultValue: 0,
     },
+    friendly_name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: "times i didn't set the default friendly name",
+    },
 });
 
 module.exports = Stat;

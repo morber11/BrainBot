@@ -21,29 +21,18 @@ describe('Stats Command', () => {
         expect(mockInteraction.reply).toHaveBeenCalledWith('There are no statistics recorded yet.');
     });
 
-    it('should format a table of stats with friendly labels', async () => {
+    it('should format a table of stats including extras', async () => {
         const sampleRows = [
-            { stat: 'patriot_act', count: 5 },
-            { stat: 'other', count: 2 },
+            { stat: 'patriot_act', count: 5, friendly_name: "times i've saluted" },
+            { stat: 'other', count: 2, friendly_name: '' },
         ];
         Stat.findAll.mockResolvedValue(sampleRows);
 
         await statsCommand.execute(mockInteraction);
 
-        // replicate table-building logic so test stays in sync
-        const LABELS = { patriot_act: 'number of salutes o7' };
-        const data = sampleRows.map(r => ({ label: LABELS[r.stat] || r.stat, count: String(r.count) }));
-        const header = { label: 'Command', count: 'Times run' };
-        const maxLabel = Math.max(header.label.length, ...data.map(d => d.label.length));
-        const maxCount = Math.max(header.count.length, ...data.map(d => d.count.length));
-        const pad = (str, len) => str + ' '.repeat(len - str.length);
-        let expectedTable = '```\n';
-        expectedTable += `${pad(header.label, maxLabel)} | ${pad(header.count, maxCount)}\n`;
-        expectedTable += `${'-'.repeat(maxLabel)}-|-${'-'.repeat(maxCount)}\n`;
-        data.forEach(d => {
-            expectedTable += `${pad(d.label, maxLabel)} | ${pad(d.count, maxCount)}\n`;
-        });
-        expectedTable += '```';
+        const entries = sampleRows.map(r => ({ label: r.friendly_name || r.stat, value: String(r.count) }));
+        entries.push({ label: 'times i asked', value: '0' });
+        const expectedTable = `\`\`\`\n${statsCommand.generateStatsTable(entries)}\`\`\``;
 
         expect(mockInteraction.reply).toHaveBeenCalledWith(expectedTable);
     });
