@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const fs = require('fs');
 const path = require('path');
 const { REST } = require('@discordjs/rest');
@@ -24,8 +26,15 @@ module.exports = (client) => {
                 commandFiles.forEach(file => {
                     const command = require(path.join(commandFilesPath, file));
 
+                    // this order does matter for short circuiting
+                    if (process.env.NODE_ENV && command.devOnly && process.env.NODE_ENV !== 'development') {
+                        console.log(`Skipping dev-only command: ${command.data.name} (NODE_ENV=${process.env.NODE_ENV})`);
+                        return;
+                    }
+
                     commands.set(command.data.name, command);
                     commandArray.push(command.data.toJSON());
+                    console.log(`Registered command: ${command.data.name}`);
                 });
             }
         });
