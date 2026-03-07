@@ -1,6 +1,7 @@
 const cron = require('cron');
 const CONSTANTS = require('../../../utils/constants.js');
 const Stat = require('../../../dal/models/stat');
+const logger = require('../../../utils/logger.js');
 
 const patriotAct = (client) => new cron.CronJob(CONSTANTS.CRON.PATRIOT_ACT, async () => {
     try {
@@ -38,14 +39,14 @@ const patriotAct = (client) => new cron.CronJob(CONSTANTS.CRON.PATRIOT_ACT, asyn
                 try {
                     await statRow.increment('count');
                 } catch (e) {
-                    console.error('Failed to update patriot act stat:', e);
+                    logger.error('Failed to update patriot act stat:', e);
                 }
             } else {
-                console.log('No suitable channel found in', guild.name);
+                logger.info('No suitable channel found in', { guild: guild.name });
             }
         }
     } catch (error) {
-        console.error('Error fetching servers or sending message:', error);
+        logger.error('Error fetching servers or sending message:', error);
     }
 });
 

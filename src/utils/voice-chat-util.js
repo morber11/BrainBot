@@ -2,6 +2,7 @@ const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerSta
 const ytdl = require('@distube/ytdl-core');
 
 const DEFAULT_IDLE_TIMEOUT_MS = process.env.VOICE_IDLE_TIMEOUT_MS ? parseInt(process.env.VOICE_IDLE_TIMEOUT_MS, 10) : 30000;
+const logger = require('./logger.js');
 const activeConnections = new Map();
 
 function isValidAudioUrl(url) {
@@ -48,7 +49,7 @@ function cleanupVoiceConnection(guildId) {
     }
   } finally {
     activeConnections.delete(guildId);
-    console.log(`Cleaned up voice connection for guild ${guildId}`);
+    logger.info(`Cleaned up voice connection for guild ${guildId}`);
   }
 }
 
@@ -91,9 +92,9 @@ async function playAudioInVoiceChannel(interaction, url) {
       try {
         entry.player.play(resource);
         return;
-      } catch (err) {
+        } catch (err) {
         // if reuse fails, cleanup and continue to create new
-        console.error('Error reusing existing player, cleaning up and recreating:', err);
+        logger.error('Error reusing existing player, cleaning up and recreating:', err);
         cleanupVoiceConnection(guildId);
       }
     }
@@ -128,7 +129,7 @@ async function playAudioInVoiceChannel(interaction, url) {
     });
 
     player.on('error', (error) => {
-      console.error('Audio player error for guild', guildId, error);
+      logger.error('Audio player error for guild', { guildId, error });
       cleanupVoiceConnection(guildId);
     });
 
