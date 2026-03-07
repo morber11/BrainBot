@@ -7,6 +7,7 @@ const Keyword = require('../../dal/models/keyword.js');
 const CustomUrl = require('../../dal/models/custom-url.js');
 const stringUtility = require('../../utils/string-util.js');
 const ask = require('../../utils/ask-util.js');
+const logger = require('../../utils/logger.js');
 
 const lastRavenByGuild = new Map();
 
@@ -17,133 +18,122 @@ module.exports = {
             return;
         }
 
-        //TODO: move the try/catch to the handle functions instead to keep
-        // the main function cleaner
-        try {
-            await handleBasicReactResponse(message);
-        } catch (err) {
-            console.error('Error in handleBasicReactResponse:', err, {
-                guildId: message.guildId,
-                channelId: message.channelId,
-                messageId: message.id,
-                authorId: message.author.id
-            });
-        }
-
-        try {
-            await handleMentalDespair(message);
-        } catch (err) {
-            console.error('Error in handleMentalDespair:', err, {
-                guildId: message.guildId,
-                channelId: message.channelId,
-                messageId: message.id,
-                authorId: message.author.id
-            });
-        }
-
-        try {
-            await handleAsking(message);
-        } catch (err) {
-            console.error('Error in handleAsking:', err, {
-                guildId: message.guildId,
-                channelId: message.channelId,
-                messageId: message.id,
-                authorId: message.author.id
-            });
-        }
+        await handleBasicReactResponse(message);
+        await handleMentalDespair(message);
+        await handleAsking(message);
     }
 }
 
 async function handleBasicReactResponse(message) {
-    const msgContent = message.content.toLowerCase();
+    try {
+        const msgContent = message.content.toLowerCase();
 
-    if (msgContent.includes("brain"))
-        message.react(CONSTANTS.EMOJI.BRAIN)
+        if (msgContent.includes("brain"))
+            message.react(CONSTANTS.EMOJI.BRAIN)
 
-    if (msgContent.includes(CONSTANTS.EMOJI.BRAIN)) {
-        message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_B);
-        message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_R);
-        message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_A);
-        message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_I);
-        message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_N);
-    }
-
-    const re = new RegExp("^umm*");
-    if (re.test(msgContent))
-        message.react(CONSTANTS.EMOJI.THINKING);
-
-    // we dont need i18n, we only need one spanish word
-    if (msgContent.includes("maricon") || msgContent.includes("maricón"))
-        message.react(CONSTANTS.EMOJI.ONE_HUNDRED);
-
-    if (msgContent.includes("milk") || msgContent.includes(CONSTANTS.EMOJI.MILK)) {
-        const dir = pathUtility.getMediaFilePath(__dirname, 'audio', 'milk03.mp3');
-        try {
-            await message.reply({
-                files: [dir]
-            });
-        } catch (err) {
-            console.log("Error during File read " + err);
+        if (msgContent.includes(CONSTANTS.EMOJI.BRAIN)) {
+            message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_B);
+            message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_R);
+            message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_A);
+            message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_I);
+            message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_N);
         }
-    }
 
-    if (msgContent.includes("make your choice")) {
-        const dir = pathUtility.getMediaFilePath(__dirname, 'images', 'jigsaw.jpg');
-        try {
-            await message.reply({
-                files: [dir]
-            });
-        } catch (err) {
-            console.log("Error during File read " + err);
+        const re = new RegExp("^umm*");
+        if (re.test(msgContent))
+            message.react(CONSTANTS.EMOJI.THINKING);
+
+        // we dont need i18n, we only need one spanish word
+        if (msgContent.includes("maricon") || msgContent.includes("maricón"))
+            message.react(CONSTANTS.EMOJI.ONE_HUNDRED);
+
+        if (msgContent.includes("milk") || msgContent.includes(CONSTANTS.EMOJI.MILK)) {
+            const dir = pathUtility.getMediaFilePath(__dirname, 'audio', 'milk03.mp3');
+            try {
+                await message.reply({
+                    files: [dir]
+                });
+            } catch (err) {
+                logger.error(err, { file: dir, handler: 'handleBasicReactResponse' });
+            }
         }
-    }
 
-    if (msgContent.includes("lost a life")) {
-        const ravenImages = ['raven-1.gif', 'raven-2.gif', 'raven-3.gif'];
-
-        const guildKey = message.guildId || 'dm';
-        const lastForGuild = lastRavenByGuild.get(guildKey);
-
-        const choices = lastForGuild ? ravenImages.filter(img => img !== lastForGuild) : ravenImages;
-        const selection = choices[Math.floor(Math.random() * choices.length)];
-
-        lastRavenByGuild.set(guildKey, selection);
-
-        const dir = pathUtility.getMediaFilePath(__dirname, 'images', selection);
-
-        try {
-            await message.reply({
-                files: [dir]
-            });
-        } catch (err) {
-            console.log("Error during File read " + err);
+        if (msgContent.includes("make your choice")) {
+            const dir = pathUtility.getMediaFilePath(__dirname, 'images', 'jigsaw.jpg');
+            try {
+                await message.reply({
+                    files: [dir]
+                });
+            } catch (err) {
+                logger.error(err, { file: dir, handler: 'handleBasicReactResponse' });
+            }
         }
+
+        if (msgContent.includes("lost a life")) {
+            const ravenImages = ['raven-1.gif', 'raven-2.gif', 'raven-3.gif'];
+
+            const guildKey = message.guildId || 'dm';
+            const lastForGuild = lastRavenByGuild.get(guildKey);
+
+            const choices = lastForGuild ? ravenImages.filter(img => img !== lastForGuild) : ravenImages;
+            const selection = choices[Math.floor(Math.random() * choices.length)];
+
+            lastRavenByGuild.set(guildKey, selection);
+
+            const dir = pathUtility.getMediaFilePath(__dirname, 'images', selection);
+
+            try {
+                await message.reply({
+                    files: [dir]
+                });
+            } catch (err) {
+                logger.error(err, { file: dir, handler: 'handleBasicReactResponse' });
+            }
+        }
+    } catch (err) {
+        logger.error(err, {
+            guildId: message.guildId,
+            channelId: message.channelId,
+            messageId: message.id,
+            authorId: message.author.id,
+            handler: 'handleBasicReactResponse'
+        });
     }
 }
 
 async function handleMentalDespair(message) {
-    await parseMentalDespairKeywords(message);
+    try {
+        await parseMentalDespairKeywords(message);
 
-    const currentDespair = await Member.findOne({
-        attributes: ['despairCount'],
-        where: {
-            id: await message.author.id,
-        }
-    });
-
-    if (!currentDespair)
-        return;
-
-    if (currentDespair.despairCount >= CONSTANTS.POINT_VALUES.MAX_DESPAIR) {
-        const urls = await CustomUrl.findAll({
-            attributes: ['url'],
-            where: { type: 'despair' },
-            raw: true
+        const currentDespair = await Member.findOne({
+            attributes: ['despairCount'],
+            where: {
+                id: message.author.id,
+            }
         });
 
-        const el = stringUtility.selectRandomFromArray(urls);
+        if (!currentDespair)
+            return;
 
-        await message.reply(`Your despair is too high! \n${el.url}`);
+        if (currentDespair.despairCount >= CONSTANTS.POINT_VALUES.MAX_DESPAIR) {
+            const urls = await CustomUrl.findAll({
+                attributes: ['url'],
+                where: { type: 'despair' },
+                raw: true
+            });
+
+            const el = stringUtility.selectRandomFromArray(urls);
+
+            await message.reply(`Your despair is too high! \n${el.url}`);
+        }
+    } catch (err) {
+        logger.error(err, {
+            guildId: message.guildId,
+            channelId: message.channelId,
+            messageId: message.id,
+            authorId: message.author.id,
+            handler: 'handleMentalDespair'
+        });
     }
 }
 
@@ -189,10 +179,19 @@ async function parseMentalDespairKeywords(message) {
     }
 }
 
-// lightweight wrapper around the main function call just for readability
 async function handleAsking(message) {
-    if (!message.guild) return;
+    try {
+        if (!message.guild) return;
 
-    await ask.chanceToSend(message);
+        await ask.chanceToSend(message);
+    } catch (err) {
+        logger.error(err, {
+            guildId: message.guildId,
+            channelId: message.channelId,
+            messageId: message.id,
+            authorId: message.author.id,
+            handler: 'handleAsking'
+        });
+    }
 }
 
