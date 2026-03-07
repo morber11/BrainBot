@@ -4,6 +4,7 @@ const { Client, Events, Collection, GatewayIntentBits, ActivityType } = require(
 const fs = require('node:fs');
 const database = require('./dal/database/database.js');
 const retryOperation = require('./utils/retry.js');
+const logger = require('./utils/logger.js');
 
 const client = new Client({
     presence: {
@@ -30,9 +31,9 @@ const commandFolders = fs.readdirSync('./src/commands');
 
 (async function init() {
     try {
-        console.log('Checking database connection...');
+        logger.info('Checking database connection...');
         await retryOperation(() => database.authenticate(), 5, 1000);
-        console.log('Database connection established.');
+        logger.info('Database connection established.');
 
         // load functions after DB is ready
         const functionFolders = fs.readdirSync(`./src/functions`);
@@ -50,14 +51,14 @@ const commandFolders = fs.readdirSync('./src/commands');
         client.handleCrons();
 
         if (!BOT_TOKEN) {
-            console.error('BOT_TOKEN is not set. Please set it in your .env file or environment variables.');
+            logger.error('BOT_TOKEN is not set. Please set it in your .env file or environment variables.');
             process.exit(1);
         }
 
         await client.login(BOT_TOKEN);
-        console.log('Bot logged in successfully.');
+        logger.info('Bot logged in successfully.');
     } catch (err) {
-        console.error('Startup failed:', err);
+        logger.error('Startup failed:', err);
         process.exit(1);
     }
 })();
