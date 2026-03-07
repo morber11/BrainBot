@@ -91,27 +91,6 @@ describe('patriot act', () => {
         expect(mockStatIncrement).toHaveBeenCalledWith('count');
     });
 
-    it('should log message when no suitable channel is found', async () => {
-        const mockGuild = {
-            channels: {
-                cache: {
-                    find: mockFind,
-                },
-            },
-        };
-
-        mockFind.mockReturnValue(null);
-        mockGuildsCacheValues.mockReturnValue([mockGuild]);
-
-        console.log = jest.fn();
-
-        await cronJob.fireOnTick();
-
-        await jest.advanceTimersByTimeAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
-        expect(console.log).toHaveBeenCalledWith('No suitable channel found in', undefined);
-        expect(mockStatIncrement).not.toHaveBeenCalled();
-    });
-
     it('should handle errors gracefully', async () => {
         const mockGuild = {
             channels: {

@@ -8,6 +8,7 @@ const CustomUrl = require('../../dal/models/custom-url.js');
 const stringUtility = require('../../utils/string-util.js');
 const ask = require('../../utils/ask-util.js');
 const logger = require('../../utils/logger.js');
+const mathUtil = require('../../utils/math-util.js');
 
 const lastRavenByGuild = new Map();
 
@@ -21,6 +22,7 @@ module.exports = {
         await handleBasicReactResponse(message);
         await handleMentalDespair(message);
         await handleAsking(message);
+        await handleInSpace(message);
     }
 }
 
@@ -192,6 +194,26 @@ async function handleAsking(message) {
             authorId: message.author.id,
             handler: 'handleAsking'
         });
+    }
+}
+
+async function handleInSpace(message) {
+    try {
+        const msgContent = message.content.toLowerCase();
+
+        if (!msgContent.includes('in space')) return;
+
+        const count = mathUtil.getRandomInt(6) + 5;
+        const phrase = 'in space no one can hear you in space';
+        const response = Array(count).fill(phrase).join(' ');
+
+        try {
+            await message.reply(response);
+        } catch (err) {
+            logger.error(err, { handler: 'handleInSpace' });
+        }
+    } catch (err) {
+        logger.error(err, { handler: 'handleInSpace' });
     }
 }
 
