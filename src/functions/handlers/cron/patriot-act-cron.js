@@ -42,7 +42,7 @@ const patriotAct = (client) => new cron.CronJob(CONSTANTS.CRON.PATRIOT_ACT, asyn
                     logger.error('Failed to update patriot act stat:', e);
                 }
             } else {
-                logger.info('No suitable channel found in', { guild: guild.name });
+                logger.info('No suitable channel found in', guild.name);
             }
         }
     } catch (error) {

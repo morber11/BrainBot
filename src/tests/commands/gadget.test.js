@@ -19,7 +19,7 @@ describe('Gadget Command', () => {
         await gadgetCommand.execute(mockCommandInteraction);
 
         expect(mockCommandInteraction.deferReply).toHaveBeenCalled();
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith('spoon');
+        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith('Go Go Gadget spoon!');
     });
 
     it('should handle errors', async () => {

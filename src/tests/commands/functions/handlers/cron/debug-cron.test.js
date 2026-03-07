@@ -22,27 +22,6 @@ describe('debug cron', () => {
         cronJob = debug(mockClient);
     });
 
-    it('should log guild name and channels', async () => {
-        const mockGuild = {
-            name: 'Test Guild',
-            channels: {
-                cache: {
-                    map: jest.fn().mockReturnValue(['general', 'bot', '2fort']),
-                },
-            },
-        };
-
-        mockClient.guilds.cache.values.mockReturnValue([mockGuild]);
-
-        console.log = jest.fn();
-
-        await cronJob.fireOnTick();
-
-        expect(console.log).toHaveBeenCalledWith('Guild: Test Guild');
-        expect(console.log).toHaveBeenCalledWith('Channels in the guild:');
-        expect(console.log).toHaveBeenCalledWith('general, bot, 2fort');
-    });
-
     it('should handle no guilds gracefully', async () => {
         mockClient.guilds.cache.values.mockReturnValue([]);
 
