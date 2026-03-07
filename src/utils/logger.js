@@ -13,4 +13,12 @@ module.exports = {
             console.info(message);
         }
     }
+    ,
+    warn(message, context) {
+        if (context) {
+            console.warn(message, context);
+        } else {
+            console.warn(message);
+        }
+    }
 };

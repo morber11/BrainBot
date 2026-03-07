@@ -6,6 +6,7 @@ const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const CONSTANTS = require('../../utils/constants.js');
 const { BOT_TOKEN } = process.env;
+const logger = require('../../utils/logger.js');
 
 module.exports = (client) => {
     client.handleCommands = async (commandFolders) => {
@@ -25,21 +26,21 @@ module.exports = (client) => {
             if (Array.isArray(commandFiles)) {
                 commandFiles.forEach(file => {
                     const command = require(path.join(commandFilesPath, file));
-                    
+
                     if (!command || !command.data || !command.data.name) {
-                        console.log(`Skipping file without command data: ${file}`);
+                        logger.info(`Skipping file without command data: ${file}`);
                         return;
                     }
 
                     // this order does matter for short circuiting
                     if (process.env.NODE_ENV && command.devOnly && process.env.NODE_ENV !== 'development') {
-                        console.log(`Skipping dev-only command: ${command.data.name} (NODE_ENV=${process.env.NODE_ENV})`);
+                        logger.info(`Skipping dev-only command: ${command.data.name} (NODE_ENV=${process.env.NODE_ENV})`);
                         return;
                     }
 
                     commands.set(command.data.name, command);
                     commandArray.push(command.data.toJSON());
-                    console.log(`Registered command: ${command.data.name}`);
+                    logger.info(`Registered command: ${command.data.name}`);
                 });
             }
         });
@@ -47,15 +48,15 @@ module.exports = (client) => {
         const rest = new REST({ version: '9' }).setToken(BOT_TOKEN);
 
         try {
-            console.log("Started refreshing application (/) commands.");
+            logger.info("Started refreshing application (/) commands.");
 
             await rest.put(Routes.applicationCommands(CONSTANTS.CLIENT.CLIENT_ID), {
                 body: client.commandArray,
             });
 
-            console.log("Succesfully refreshed application (/) commands.");
+            logger.info("Succesfully refreshed application (/) commands.");
         } catch (err) {
-            console.error(err);
+            logger.error(err, { handler: 'command-handler' });
         }
     };
 }
