@@ -25,6 +25,11 @@ module.exports = (client) => {
             if (Array.isArray(commandFiles)) {
                 commandFiles.forEach(file => {
                     const command = require(path.join(commandFilesPath, file));
+                    
+                    if (!command || !command.data || !command.data.name) {
+                        console.log(`Skipping file without command data: ${file}`);
+                        return;
+                    }
 
                     // this order does matter for short circuiting
                     if (process.env.NODE_ENV && command.devOnly && process.env.NODE_ENV !== 'development') {

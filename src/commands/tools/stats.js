@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const Stat = require('../../dal/models/stat.js');
+const CONSTANTS = require('../../utils/constants.js');
 
 function buildTable(entries) {
     const header = { label: 'Command', value: 'Times run' };
@@ -45,7 +46,7 @@ module.exports = {
         const entries = rows.map(r =>
             addStatEntry({ label: r.friendly_name || r.stat, value: r.count })
         );
-        entries.push(addStatEntry({ label: 'times i asked', value: 0 }));
+        entries.push(addStatEntry({ label: CONSTANTS.STATS.ASK_FRIENDLY, value: '0' }));
 
         const table = generateStatsTable(entries);
         await interaction.reply(`\`\`\`\n${table}\`\`\``);
