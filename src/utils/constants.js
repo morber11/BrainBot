@@ -28,9 +28,12 @@ const CONSTANTS = {
     },
     STATS: {
         PATRIOT_ACT: "patriot_act",
+        DIDNT_ASK: "didnt_ask",
+        ASK_FRIENDLY: "times i asked",
     },
     COMMANDS: {
         PATRIOT_ACT: "patriot_act",
+        DIDNT_ASK: "didnt_ask",
     },
     MAGIC_BALL: {
         RESPONSES: [

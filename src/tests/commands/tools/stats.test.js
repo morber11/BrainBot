@@ -21,7 +21,7 @@ describe('Stats Command', () => {
         expect(mockInteraction.reply).toHaveBeenCalledWith('There are no statistics recorded yet.');
     });
 
-    it('should format a table of stats including extras', async () => {
+    it('should always append hardcoded rows', async () => {
         const sampleRows = [
             { stat: 'patriot_act', count: 5, friendly_name: "times i've saluted" },
             { stat: 'other', count: 2, friendly_name: '' },
@@ -31,7 +31,7 @@ describe('Stats Command', () => {
         await statsCommand.execute(mockInteraction);
 
         const entries = sampleRows.map(r => ({ label: r.friendly_name || r.stat, value: String(r.count) }));
-        entries.push({ label: 'times i asked', value: '0' });
+        entries.push({ label: "times i asked", value: '0' });
         const expectedTable = `\`\`\`\n${statsCommand.generateStatsTable(entries)}\`\`\``;
 
         expect(mockInteraction.reply).toHaveBeenCalledWith(expectedTable);

@@ -6,6 +6,7 @@ const Member = require('../../dal/models/member.js');
 const Keyword = require('../../dal/models/keyword.js');
 const CustomUrl = require('../../dal/models/custom-url.js');
 const stringUtility = require('../../utils/string-util.js');
+const ask = require('../../utils/ask-util.js');
 
 const lastRavenByGuild = new Map();
 
@@ -15,7 +16,9 @@ module.exports = {
         if (message.author.id == client.application.id) {
             return;
         }
-        
+
+        //TODO: move the try/catch to the handle functions instead to keep
+        // the main function cleaner
         try {
             await handleBasicReactResponse(message);
         } catch (err) {
@@ -31,6 +34,17 @@ module.exports = {
             await handleMentalDespair(message);
         } catch (err) {
             console.error('Error in handleMentalDespair:', err, {
+                guildId: message.guildId,
+                channelId: message.channelId,
+                messageId: message.id,
+                authorId: message.author.id
+            });
+        }
+
+        try {
+            await handleAsking(message);
+        } catch (err) {
+            console.error('Error in handleAsking:', err, {
                 guildId: message.guildId,
                 channelId: message.channelId,
                 messageId: message.id,
@@ -92,7 +106,7 @@ async function handleBasicReactResponse(message) {
 
         const choices = lastForGuild ? ravenImages.filter(img => img !== lastForGuild) : ravenImages;
         const selection = choices[Math.floor(Math.random() * choices.length)];
-        
+
         lastRavenByGuild.set(guildKey, selection);
 
         const dir = pathUtility.getMediaFilePath(__dirname, 'images', selection);
@@ -174,3 +188,11 @@ async function parseMentalDespairKeywords(message) {
         }
     }
 }
+
+// lightweight wrapper around the main function call just for readability
+async function handleAsking(message) {
+    if (!message.guild) return;
+
+    await ask.chanceToSend(message);
+}
+
