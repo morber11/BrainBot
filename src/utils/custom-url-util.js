@@ -1,4 +1,5 @@
 const CustomUrl = require('../dal/models/custom-url.js');
+const logger = require('./logger.js');
 
 exports.getUrls = async function(type) {
     try {
@@ -9,7 +10,7 @@ exports.getUrls = async function(type) {
         });
         return urls;
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         return [];
     }
 }

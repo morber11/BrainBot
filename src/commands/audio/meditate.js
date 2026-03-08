@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const { playAudioInVoiceChannel } = require('../../utils/voice-chat-util');
 const urlUtility = require('../../utils/custom-url-util.js');
 const stringUtility = require('../../utils/string-util.js');
+const logger = require('../../utils/logger.js');
 
 module.exports = {
         data: new SlashCommandBuilder()
@@ -21,7 +22,7 @@ module.exports = {
 
                         await interaction.reply("release yourself from worldly desires and become one with the universe.");
                 } catch (error) {
-                        console.error('Error:', error);
+                        logger.error('Error:', error);
                         await interaction.reply('An error occurred while trying to play the audio.');
                 }
         },

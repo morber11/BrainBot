@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { playAudioInVoiceChannel, isValidAudioUrl } = require('../../utils/voice-chat-util');
+const logger = require('../../utils/logger.js');
 
 module.exports = {
         data: new SlashCommandBuilder()
@@ -23,7 +24,7 @@ module.exports = {
 
                         await interaction.reply({ content: `Now playing: ${url}` });
                 } catch (error) {
-                        console.error('Error playing audio:', error);
+                        logger.error('Error playing audio:', error);
                         await interaction.reply({ content: 'An error occurred while trying to play the audio.', ephemeral: true });
                 }
         },

@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
+const logger = require('../../utils/logger.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -18,7 +19,7 @@ module.exports = {
             ].join('\n');
             await interaction.editReply(response);
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             await interaction.editReply('An error occurred.');
         }
     }

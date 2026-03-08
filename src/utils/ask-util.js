@@ -1,5 +1,6 @@
 const statsUtil = require('./stats-util.js');
 const CONSTANTS = require('./constants.js');
+const logger = require('./logger.js');
 
 //const COOLDOWN_MS = 1000 // debug
 const COOLDOWN_MS = 48 * 60 * 60 * 1000;
@@ -86,7 +87,7 @@ async function chanceToSend(messageOrInteraction) {
 
         return true;
     } catch (err) {
-        console.error('Failed to send "i didn\'t ask" reply:', err);
+        logger.error('Failed to send "i didn\'t ask" reply:', err);
         return false;
     }
 }
@@ -99,7 +100,7 @@ async function forceSend(messageOrInteraction) {
 
         return true;
     } catch (err) {
-        console.error('Failed to force-send "i didn\'t ask" reply:', err);
+        logger.error('Failed to force-send "i didn\'t ask" reply:', err);
         return false;
     }
 }
