@@ -64,7 +64,7 @@ function getAskText(messageOrInteraction) {
             const remainder = match[1] || '';
             return "i didn't ask" + remainder;
         }
-        remainderRoll -= 10;
+        remainderRoll -= 10; // not really neeeded but in case we want to extend later
     }
 
     return "i didn't ask";
