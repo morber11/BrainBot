@@ -3,7 +3,7 @@ const CONSTANTS = require('./constants.js');
 
 //const COOLDOWN_MS = 1000 // debug
 const COOLDOWN_MS = 48 * 60 * 60 * 1000;
-const CHANCE = 70000;
+const CHANCE = 40000;
 const LONG_MESSAGE_THRESHOLD = 70;
 
 const cooldownGuilds = new Set();
