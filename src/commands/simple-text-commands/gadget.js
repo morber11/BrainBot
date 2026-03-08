@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const stringUtility = require('../../utils/string-util.js');
+const CONSTANTS = require('../../utils/constants.js');
+const statsUtil = require('../../utils/stats-util.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -41,6 +43,8 @@ module.exports = {
                 // custom ones now
                 'gun'
             ]);
+
+            await statsUtil.incrementStat(CONSTANTS.STATS.GADGET, CONSTANTS.STATS.GADGET_FRIENDLY);
 
             await interaction.editReply(`Go Go Gadget ${el}!`);
         } catch (error) {

@@ -28,8 +28,12 @@ const CONSTANTS = {
     },
     STATS: {
         PATRIOT_ACT: "patriot_act",
+        PATRIOT_ACT_FRIENDLY: "times i've saluted",
         DIDNT_ASK: "didnt_ask",
+        DIDNT_ASK_FRIENDLY: "times i didn't ask",
         ASK_FRIENDLY: "times i asked",
+        GADGET: "gadget",
+        GADGET_FRIENDLY: "gadgets used",
     },
     COMMANDS: {
         PATRIOT_ACT: "patriot_act",
