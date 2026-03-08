@@ -41,7 +41,7 @@ describe('patriot act', () => {
 
     afterEach(() => {
         jest.clearAllTimers();
-        jest.useRealTimers(); 
+        jest.useRealTimers();
     });
 
     it('should send message to target channel when found', async () => {
@@ -62,10 +62,10 @@ describe('patriot act', () => {
         await jest.advanceTimersByTimeAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
         expect(mockFind).toHaveBeenCalledTimes(1);
         expect(mockSend).toHaveBeenCalledWith('o7');
-        expect(Stat.findOrCreate).toHaveBeenCalledWith({
+        expect(Stat.findOrCreate).toHaveBeenCalledWith(expect.objectContaining({
             where: { stat: CONSTANTS.STATS.PATRIOT_ACT },
-            defaults: { count: 0 },
-        });
+            defaults: expect.objectContaining({ count: 0 }),
+        }));
         expect(mockStatIncrement).toHaveBeenCalledWith('count');
     });
 

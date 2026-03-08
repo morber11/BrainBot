@@ -22,6 +22,11 @@ const Stat = database.define('stat', {
         allowNull: false,
         defaultValue: "times i didn't set the default friendly name",
     },
+    sort_order: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1000, // use an intentionally high number
+    },
 });
 
 module.exports = Stat;

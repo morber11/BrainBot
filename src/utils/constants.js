@@ -28,7 +28,7 @@ const CONSTANTS = {
     },
     STATS: {
         PATRIOT_ACT: "patriot_act",
-        PATRIOT_ACT_FRIENDLY: "times i've saluted",
+        PATRIOT_ACT_FRIENDLY: "salutes given",
         RAVEN: "raven",
         RAVEN_FRIENDLY: "lives lost",
         MILK: "milk",

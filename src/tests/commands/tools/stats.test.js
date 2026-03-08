@@ -31,7 +31,7 @@ describe('Stats Command', () => {
         await statsCommand.execute(mockInteraction);
 
         const entries = sampleRows.map(r => ({ label: r.friendly_name || r.stat, value: String(r.count) }));
-        entries.push({ label: "times i asked", value: '0' });
+        entries.unshift({ label: "times i asked", value: '0' });
         const expectedTable = `\`\`\`\n${statsCommand.generateStatsTable(entries)}\`\`\``;
 
         expect(mockInteraction.reply).toHaveBeenCalledWith(expectedTable);

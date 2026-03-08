@@ -1,11 +1,11 @@
 const Stat = require('../dal/models/stat.js');
 const logger = require('./logger.js');
 
-async function incrementStat(statKey, friendlyName = null) {
+async function incrementStat(statKey, friendlyName = null, sortOrder = 100) {
     try {
         const [statRow] = await Stat.findOrCreate({
             where: { stat: statKey },
-            defaults: { count: 0, friendly_name: friendlyName || statKey },
+            defaults: { count: 0, friendly_name: friendlyName || statKey, sort_order: sortOrder },
         });
         await statRow.increment('count');
 
