@@ -9,20 +9,33 @@ const stringUtility = require('../../utils/string-util.js');
 const ask = require('../../utils/ask-util.js');
 const logger = require('../../utils/logger.js');
 const mathUtil = require('../../utils/math-util.js');
+const statsUtil = require('../../utils/stats-util.js');
 
 const lastRavenByGuild = new Map();
 
 module.exports = {
     name: 'messageCreate',
-    async execute(message, client) {
-        if (message.author.id == client.application.id) {
+    async execute(message) {
+        if (message.author.bot) {
             return;
         }
 
-        await handleBasicReactResponse(message);
-        await handleMentalDespair(message);
-        await handleAsking(message);
-        await handleInSpace(message);
+        // some of these rely on msg content (for example - what guild they are in) 
+        // so we'll handle .toLowerCase() inside the handlers
+        // consider changing later
+        const handlers = [
+            handleBasicReactResponse,
+            handleMilk,
+            handleJigsaw,
+            handleRaven,
+            handleMentalDespair,
+            handleAsking,
+            handleInSpace,
+        ];
+
+        for (const handler of handlers) {
+            await handler(message);
+        }
     }
 }
 
@@ -30,8 +43,10 @@ async function handleBasicReactResponse(message) {
     try {
         const msgContent = message.content.toLowerCase();
 
-        if (msgContent.includes("brain"))
+        if (msgContent.includes("brain")) {
             message.react(CONSTANTS.EMOJI.BRAIN)
+            await statsUtil.incrementStat(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
+        }
 
         if (msgContent.includes(CONSTANTS.EMOJI.BRAIN)) {
             message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_B);
@@ -39,6 +54,7 @@ async function handleBasicReactResponse(message) {
             message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_A);
             message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_I);
             message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_N);
+            await statsUtil.incrementStat(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
         }
 
         const re = new RegExp("^umm*");
@@ -49,49 +65,6 @@ async function handleBasicReactResponse(message) {
         if (msgContent.includes("maricon") || msgContent.includes("maricón"))
             message.react(CONSTANTS.EMOJI.ONE_HUNDRED);
 
-        if (msgContent.includes("milk") || msgContent.includes(CONSTANTS.EMOJI.MILK)) {
-            const dir = pathUtility.getMediaFilePath(__dirname, 'audio', 'milk03.mp3');
-            try {
-                await message.reply({
-                    files: [dir]
-                });
-            } catch (err) {
-                logger.error(err, { file: dir, handler: 'handleBasicReactResponse' });
-            }
-        }
-
-        if (msgContent.includes("make your choice")) {
-            const dir = pathUtility.getMediaFilePath(__dirname, 'images', 'jigsaw.jpg');
-            try {
-                await message.reply({
-                    files: [dir]
-                });
-            } catch (err) {
-                logger.error(err, { file: dir, handler: 'handleBasicReactResponse' });
-            }
-        }
-
-        if (msgContent.includes("lost a life")) {
-            const ravenImages = ['raven-1.gif', 'raven-2.gif', 'raven-3.gif'];
-
-            const guildKey = message.guildId || 'dm';
-            const lastForGuild = lastRavenByGuild.get(guildKey);
-
-            const choices = lastForGuild ? ravenImages.filter(img => img !== lastForGuild) : ravenImages;
-            const selection = choices[Math.floor(Math.random() * choices.length)];
-
-            lastRavenByGuild.set(guildKey, selection);
-
-            const dir = pathUtility.getMediaFilePath(__dirname, 'images', selection);
-
-            try {
-                await message.reply({
-                    files: [dir]
-                });
-            } catch (err) {
-                logger.error(err, { file: dir, handler: 'handleBasicReactResponse' });
-            }
-        }
     } catch (err) {
         logger.error(err, {
             guildId: message.guildId,
@@ -100,6 +73,59 @@ async function handleBasicReactResponse(message) {
             authorId: message.author.id,
             handler: 'handleBasicReactResponse'
         });
+    }
+}
+
+async function handleMilk(message) {
+    try {
+        const msgContent = message.content.toLowerCase();
+        if (!(msgContent.includes("milk") || msgContent.includes(CONSTANTS.EMOJI.MILK))) return;
+
+        const dir = pathUtility.getMediaFilePath(__dirname, 'audio', 'milk03.mp3');
+
+        await statsUtil.incrementStat(CONSTANTS.STATS.MILK, CONSTANTS.STATS.MILK_FRIENDLY);
+        await message.reply({ files: [dir] });
+    } catch (err) {
+        logger.error(err, { handler: 'handleMilk' });
+    }
+}
+
+async function handleJigsaw(message) {
+    try {
+        const msgContent = message.content.toLowerCase();
+        if (!msgContent.includes("make your choice")) return;
+
+        const dir = pathUtility.getMediaFilePath(__dirname, 'images', 'jigsaw.jpg');
+
+        await statsUtil.incrementStat(CONSTANTS.STATS.JIGSAW, CONSTANTS.STATS.JIGSAW_FRIENDLY);
+        await message.reply({ files: [dir] });
+    } catch (err) {
+        logger.error(err, { handler: 'handleJigsaw' });
+    }
+}
+
+async function handleRaven(message) {
+    try {
+        const msgContent = message.content.toLowerCase();
+        if (!msgContent.includes("lost a life")) return;
+
+        const ravenImages = ['raven-1.gif', 'raven-2.gif', 'raven-3.gif'];
+
+        const guildKey = message.guildId || 'dm';
+        const lastForGuild = lastRavenByGuild.get(guildKey);
+
+        const choices = lastForGuild ? ravenImages.filter(img => img !== lastForGuild) : ravenImages;
+        const selection = choices[Math.floor(Math.random() * choices.length)];
+
+        lastRavenByGuild.set(guildKey, selection);
+
+        const dir = pathUtility.getMediaFilePath(__dirname, 'images', selection);
+
+        await statsUtil.incrementStat(CONSTANTS.STATS.RAVEN, CONSTANTS.STATS.RAVEN_FRIENDLY);
+        await message.reply({ files: [dir] });
+
+    } catch (err) {
+        logger.error(err, { handler: 'handleRaven' });
     }
 }
 
@@ -207,11 +233,7 @@ async function handleInSpace(message) {
         const phrase = 'in space no one can hear you in space';
         const response = Array(count).fill(phrase).join(' ');
 
-        try {
-            await message.reply(response);
-        } catch (err) {
-            logger.error(err, { handler: 'handleInSpace' });
-        }
+        await message.reply(response);
     } catch (err) {
         logger.error(err, { handler: 'handleInSpace' });
     }

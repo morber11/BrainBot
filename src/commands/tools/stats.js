@@ -37,7 +37,7 @@ module.exports = {
         .setName('stats')
         .setDescription('display collected command usage statistics'),
     async execute(interaction) {
-        const rows = await Stat.findAll();
+        const rows = await Stat.findAll({ order: [['sort_order', 'ASC'], ['count', 'DESC']] });
 
         if (!rows || rows.length === 0) {
             return interaction.reply('There are no statistics recorded yet.');
@@ -46,7 +46,9 @@ module.exports = {
         const entries = rows.map(r =>
             addStatEntry({ label: r.friendly_name || r.stat, value: r.count })
         );
-        entries.push(addStatEntry({ label: CONSTANTS.STATS.ASK_FRIENDLY, value: '0' }));
+
+        const askEntry = addStatEntry({ label: CONSTANTS.STATS.ASK_FRIENDLY, value: '0' });
+        if (askEntry) entries.unshift(askEntry);
 
         const table = generateStatsTable(entries);
         await interaction.reply(`\`\`\`\n${table}\`\`\``);

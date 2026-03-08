@@ -1,4 +1,4 @@
-const Stat = require('../dal/models/stat.js');
+const statsUtil = require('./stats-util.js');
 const CONSTANTS = require('./constants.js');
 
 //const COOLDOWN_MS = 1000 // debug
@@ -78,11 +78,7 @@ async function chanceToSend(messageOrInteraction) {
     if (!shouldReply(guildId)) return false;
 
     try {
-        const [statRow] = await Stat.findOrCreate({
-            where: { stat: CONSTANTS.STATS.DIDNT_ASK },
-            defaults: { count: 0, friendly_name: "times i didn't ask" },
-        });
-        await statRow.increment('count');
+        await statsUtil.incrementStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
 
         const text = getAskText(messageOrInteraction);
         if (!text) return false;
@@ -97,11 +93,7 @@ async function chanceToSend(messageOrInteraction) {
 
 async function forceSend(messageOrInteraction) {
     try {
-        const [statRow] = await Stat.findOrCreate({
-            where: { stat: CONSTANTS.STATS.DIDNT_ASK },
-            defaults: { count: 0, friendly_name: CONSTANTS.STATS.ASK_FRIENDLY },
-        });
-        await statRow.increment('count');
+        await statsUtil.incrementStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
         const text = getAskText(messageOrInteraction);
         await messageOrInteraction.reply(text);
 
