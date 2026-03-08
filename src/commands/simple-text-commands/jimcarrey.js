@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const CustomUrl = require('../../dal/models/custom-url.js');
 const stringUtility = require('../../utils/string-util.js');
+const logger = require('../../utils/logger.js');
 
 async function getUrls() {
     try {
@@ -11,7 +12,7 @@ async function getUrls() {
         });
         return urls;
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         return [];
     }
 }

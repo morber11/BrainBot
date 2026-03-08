@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const stringUtility = require('../../utils/string-util.js');
 const CONSTANTS = require('../../utils/constants.js');
 const statsUtil = require('../../utils/stats-util.js');
+const logger = require('../../utils/logger.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -48,7 +49,7 @@ module.exports = {
 
             await interaction.editReply(`Go Go Gadget ${el}!`);
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             await interaction.editReply('An error occurred.');
         }
     }

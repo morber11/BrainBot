@@ -5,6 +5,7 @@ const pathUtility = require('../../utils/path-util.js');
 const CONSTANTS = require('../../utils/constants.js');
 const stringUtility = require('../../utils/string-util.js');
 const mathUtil = require('../../utils/math-util.js');
+const logger = require('../../utils/logger.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -62,7 +63,7 @@ module.exports = {
             });
         }
         catch (error) {
-            console.error('An error occurred.:', error);
+            logger.error('An error occurred.:', error);
             await interaction.reply({
                 content: 'An error occurred.',
                 ephemeral: true,
