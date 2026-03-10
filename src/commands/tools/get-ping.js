@@ -4,6 +4,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('get_current_ping')
         .setDescription('Returns a ping and latency'),
+    devOnly: true,
     async execute(interaction, client) {
         const { createdTimestamp } = await interaction.deferReply({
             fetchReply: true
