@@ -3,19 +3,20 @@ const { playAudioInVoiceChannel } = require('../../utils/voice-chat-util');
 const logger = require('../../utils/logger.js');
 
 module.exports = {
-        data: new SlashCommandBuilder()
-                .setName('kys')
-                .setDescription('young man'),
-        async execute(interaction) {
-                const url = 'https://www.youtube.com/watch?v=SQsmW0mMKZc'
+    data: new SlashCommandBuilder()
+        .setName('kys')
+        .setDescription('young man'),
+    deprecated: true,
+    async execute(interaction) {
+        const url = 'https://www.youtube.com/watch?v=SQsmW0mMKZc'
 
-                try {
-                        await playAudioInVoiceChannel(interaction, url);
+        try {
+            await playAudioInVoiceChannel(interaction, url);
 
-                        await interaction.reply("young man");
-                } catch (error) {
-                        logger.error('Error:', error);
-                        await interaction.reply('An error occurred while trying to play the audio.');
-                }
-        },
+            await interaction.reply("young man");
+        } catch (error) {
+            logger.error('Error:', error);
+            await interaction.reply('An error occurred while trying to play the audio.');
+        }
+    },
 };

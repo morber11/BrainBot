@@ -32,6 +32,11 @@ module.exports = (client) => {
                         return;
                     }
 
+                    if (command.deprecated) {
+                        logger.info(`Skipping deprecated command: ${command.data.name}`);
+                        return;
+                    }
+
                     // this order does matter for short circuiting
                     if (process.env.NODE_ENV && command.devOnly && process.env.NODE_ENV !== 'development') {
                         logger.info(`Skipping dev-only command: ${command.data.name} (NODE_ENV=${process.env.NODE_ENV})`);
