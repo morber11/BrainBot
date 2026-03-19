@@ -42,6 +42,8 @@ const CONSTANTS = {
         ASK_FRIENDLY: "times i asked",
         GADGET: "gadget",
         GADGET_FRIENDLY: "gadgets used",
+        USER_STATS: "queried_stats",
+        USER_STATS_FRIENDLY: "queried stats"
     },
     COMMANDS: {
         PATRIOT_ACT: "patriot_act",
