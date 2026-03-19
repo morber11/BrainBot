@@ -1,58 +1,32 @@
 const { SlashCommandBuilder } = require('discord.js');
-const Stat = require('../../dal/models/stat.js');
+const UserStat = require('../../dal/models/user-stat.js');
+const statsUtil = require('../../utils/stats-util.js');
 const CONSTANTS = require('../../utils/constants.js');
 
-function buildTable(entries) {
-    const header = { label: 'Command', value: 'Times run' };
-    const maxLabel = Math.max(header.label.length, ...entries.map(e => e.label.length));
-    const maxValue = Math.max(header.value.length, ...entries.map(e => e.value.length));
-    const pad = (str, len) => str + ' '.repeat(len - str.length);
-
-    let t = '';
-    t += `${pad(header.label, maxLabel)} | ${pad(header.value, maxValue)}\n`;
-    t += `${'-'.repeat(maxLabel)}-|-${'-'.repeat(maxValue)}\n`;
-    entries.forEach(e => {
-        t += `${pad(e.label, maxLabel)} | ${pad(e.value, maxValue)}\n`;
-    });
-    return t;
-}
-
-function addStatEntry(item) {
-    if (item == null) return null;
-    if ('stat' in item && 'count' in item) {
-        return { label: item.stat, value: String(item.count) };
-    }
-    if ('label' in item && 'value' in item) {
-        return { label: item.label, value: String(item.value) };
-    }
-    throw new Error('Invalid stat entry');
-}
-
-function generateStatsTable(entries) {
-    return buildTable(entries.filter(Boolean));
-}
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('stats')
-        .setDescription('display collected command usage statistics'),
+        .setDescription('what have you or have you not done'),
     async execute(interaction) {
-        const rows = await Stat.findAll({ order: [['sort_order', 'ASC'], ['count', 'DESC']] });
+        const userId = interaction.user && interaction.user.id;
+        if (!userId) return interaction.reply('Unable to determine user.');
+
+        await statsUtil.incrementUserStat(userId, CONSTANTS.STATS.USER_STATS, CONSTANTS.STATS.USER_STATS_FRIENDLY);
+
+        const rows = await UserStat.findAll({ where: { userId }, order: [['count', 'DESC']] });
 
         if (!rows || rows.length === 0) {
-            return interaction.reply('There are no statistics recorded yet.');
+            return interaction.reply('You have no recorded statistics yet.');
         }
 
         const entries = rows.map(r =>
-            addStatEntry({ label: r.friendly_name || r.stat, value: r.count })
+            statsUtil.addStatEntry({ label: r.user_friendly_name || r.stat, value: r.count })
         );
 
-        const askEntry = addStatEntry({ label: CONSTANTS.STATS.ASK_FRIENDLY, value: '0' });
-        if (askEntry) entries.unshift(askEntry);
-
-        const table = generateStatsTable(entries);
+        const table = statsUtil.generateStatsTable(entries);
         await interaction.reply(`\`\`\`\n${table}\`\`\``);
     },
-    buildTable,
-    generateStatsTable,
+    buildTable: statsUtil.buildTable,
+    generateStatsTable: statsUtil.generateStatsTable,
 };

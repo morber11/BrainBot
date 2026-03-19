@@ -79,7 +79,7 @@ async function chanceToSend(messageOrInteraction) {
     if (!shouldReply(guildId)) return false;
 
     try {
-        await statsUtil.incrementStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
+        await statsUtil.incrementSystemStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
 
         const text = getAskText(messageOrInteraction);
         if (!text) return false;
@@ -94,7 +94,7 @@ async function chanceToSend(messageOrInteraction) {
 
 async function forceSend(messageOrInteraction) {
     try {
-        await statsUtil.incrementStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
+        await statsUtil.incrementSystemStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
         const text = getAskText(messageOrInteraction);
         await messageOrInteraction.reply(text);
 

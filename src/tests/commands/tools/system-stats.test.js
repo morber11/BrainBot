@@ -1,4 +1,4 @@
-const statsCommand = require('../../../commands/tools/stats.js');
+const statsCommand = require('../../../commands/tools/system-stats.js');
 const Stat = require('../../../dal/models/stat.js');
 
 jest.mock('../../../dal/models/stat.js');
@@ -11,14 +11,6 @@ describe('Stats Command', () => {
             reply: jest.fn(),
         };
         jest.clearAllMocks();
-    });
-
-    it('should inform when no stats exist', async () => {
-        Stat.findAll.mockResolvedValue([]);
-
-        await statsCommand.execute(mockInteraction);
-
-        expect(mockInteraction.reply).toHaveBeenCalledWith('There are no statistics recorded yet.');
     });
 
     it('should always append hardcoded rows', async () => {
