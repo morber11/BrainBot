@@ -1,13 +1,13 @@
-const statsUtil = require('../../../utils/stats-util.js');
+const statsUtil = require('../../utils/stats-util.js');
 
-const Stat = require('../../../dal/models/stat.js');
-const UserStat = require('../../../dal/models/user-stat.js');
+const Stat = require('../../dal/models/stat.js');
+const UserStat = require('../../dal/models/user-stat.js');
 
-jest.mock('../../../dal/models/stat.js', () => ({
+jest.mock('../../dal/models/stat.js', () => ({
     findOrCreate: jest.fn(),
 }));
 
-jest.mock('../../../dal/models/user-stat.js', () => ({
+jest.mock('../../dal/models/user-stat.js', () => ({
     findOrCreate: jest.fn(),
     update: jest.fn(),
 }));
