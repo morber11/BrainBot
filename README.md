@@ -20,7 +20,7 @@ Simple Discord bot for brain spam. Made for a few friends.
 
 ## Running tests
 
-Run the entire Jest suite with:
+Run the entire test suite (Mocha/Chai/Sinon/Proxyquire) with:
 ```bash
 npm test
 ```
