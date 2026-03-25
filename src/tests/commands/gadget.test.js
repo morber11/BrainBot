@@ -1,34 +1,38 @@
-const stringUtility = require('../../utils/string-util.js');
-const gadgetCommand = require('../../commands/simple-text-commands/gadget.js');
-
-jest.mock('../../utils/string-util.js');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 
 describe('Gadget Command', () => {
     let mockCommandInteraction;
+    let stringUtilityStub;
+    let gadgetCommand;
 
     beforeEach(() => {
+        stringUtilityStub = { selectRandomFromArray: sinon.stub() };
+
+        gadgetCommand = proxyquire('../../commands/simple-text-commands/gadget.js', {
+            '../../utils/string-util.js': stringUtilityStub,
+        });
+
         mockCommandInteraction = {
-            deferReply: jest.fn(),
-            editReply: jest.fn(),
+            deferReply: sinon.stub(),
+            editReply: sinon.stub(),
         };
     });
 
     it('should reply with a random gadget item', async () => {
-        stringUtility.selectRandomFromArray.mockReturnValue('spoon');
+        stringUtilityStub.selectRandomFromArray.returns('spoon');
 
         await gadgetCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.deferReply).toHaveBeenCalled();
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith('Go Go Gadget spoon!');
+        expect(mockCommandInteraction.deferReply).to.have.been.called;
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith('Go Go Gadget spoon!');
     });
 
     it('should handle errors', async () => {
-        stringUtility.selectRandomFromArray.mockImplementation(() => {
-            throw new Error('Boom');
-        });
+        stringUtilityStub.selectRandomFromArray.throws(new Error('Boom'));
 
         await gadgetCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith('An error occurred.');
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith('An error occurred.');
     });
 });

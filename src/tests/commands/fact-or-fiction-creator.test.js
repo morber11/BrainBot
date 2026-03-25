@@ -1,38 +1,43 @@
-const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
-const FactOrFiction = require('../../dal/models/fact-or-fiction.js');
-const cryptUtil = require('../../utils/crypt-util.js');
-const pathUtility = require('../../utils/path-util.js');
-const CONSTANTS = require('../../utils/constants.js');
-const stringUtility = require('../../utils/string-util.js');
-const factOrFictionatorCommand = require('../../commands/simple-text-commands/fact-or-fiction-creator.js');
-
-jest.mock('../../dal/models/fact-or-fiction.js');
-jest.mock('../../utils/crypt-util.js');
-jest.mock('../../utils/path-util.js');
-jest.mock('../../utils/constants.js');
-jest.mock('../../utils/string-util.js');
+const { AttachmentBuilder } = require('discord.js');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 
 describe('Fact or Fictionator Command', () => {
-    let mockCommandInteraction, originalMathRandom;
+    let mockCommandInteraction;
+    let mathRandomStub;
+    let FactOrFictionStub;
+    let cryptUtilStub;
+    let pathUtilityStub;
+    let constantsStub;
+    let stringUtilityStub;
+    let factOrFictionatorCommand;
 
     beforeEach(() => {
-        originalMathRandom = Math.random;
-        Math.random = jest.fn(() => 1.5 / 999);
+        mathRandomStub = sinon.stub(Math, 'random').returns(1.5 / 999);
+
+        FactOrFictionStub = { findOrCreate: sinon.stub(), update: sinon.stub() };
+        cryptUtilStub = { getHash: sinon.stub() };
+        pathUtilityStub = { getMediaFilePath: sinon.stub() };
+        constantsStub = {};
+        stringUtilityStub = { selectRandomFromArray: sinon.stub() };
+
+        factOrFictionatorCommand = proxyquire('../../commands/simple-text-commands/fact-or-fiction-creator.js', {
+            '../../dal/models/fact-or-fiction.js': FactOrFictionStub,
+            '../../utils/crypt-util.js': cryptUtilStub,
+            '../../utils/path-util.js': pathUtilityStub,
+            '../../utils/constants.js': constantsStub,
+            '../../utils/string-util.js': stringUtilityStub,
+        });
 
         mockCommandInteraction = {
-            options: {
-                getString: jest.fn(),
-            },
-            deferReply: jest.fn(),
-            editReply: jest.fn(),
-            reply: jest.fn(),
+            options: { getString: sinon.stub() },
+            deferReply: sinon.stub(),
+            editReply: sinon.stub(),
+            reply: sinon.stub(),
         };
 
-        CONSTANTS.FACT_OR_FICTION = {
-            VALUES: {
-                FACT: 'fact',
-                FICTION: 'fiction',
-            },
+        constantsStub.FACT_OR_FICTION = {
+            VALUES: { FACT: 'fact', FICTION: 'fiction' },
             RESPONSES: [
                 { category: 'fact', response: 'fact' },
                 { category: 'fiction', response: 'fiction' },
@@ -41,7 +46,8 @@ describe('Fact or Fictionator Command', () => {
     });
 
     afterEach(() => {
-        Math.random = originalMathRandom;
+        mathRandomStub.restore();
+        sinon.restore();
     });
 
     it('should reply with the correct fact or fiction result and an attachment', async () => {
@@ -49,90 +55,75 @@ describe('Fact or Fictionator Command', () => {
         const expectedResponse = 'fact';
         const expectedAttachmentPath = 'path/to/fact.gif';
 
-        const mockFactOrFictionEntry = {
-            dataValues: { value: CONSTANTS.FACT_OR_FICTION.VALUES.FACT },
-            id: 1,
-        };
+        const mockFactOrFictionEntry = { dataValues: { value: constantsStub.FACT_OR_FICTION.VALUES.FACT }, id: 1 };
 
-        mockCommandInteraction.options.getString.mockReturnValue(url);
-        cryptUtil.getHash.mockResolvedValue('hashed_value');
-        FactOrFiction.findOrCreate.mockResolvedValue([mockFactOrFictionEntry, false]);
-        stringUtility.selectRandomFromArray.mockReturnValue({ response: expectedResponse });
-        pathUtility.getMediaFilePath.mockReturnValue(expectedAttachmentPath);
+        mockCommandInteraction.options.getString.returns(url);
+        cryptUtilStub.getHash.resolves('hashed_value');
+        FactOrFictionStub.findOrCreate.resolves([mockFactOrFictionEntry, false]);
+        stringUtilityStub.selectRandomFromArray.returns({ response: expectedResponse });
+        pathUtilityStub.getMediaFilePath.returns(expectedAttachmentPath);
 
         await factOrFictionatorCommand.execute(mockCommandInteraction);
 
         const expectedContent = `Did you manage to work it out? \nThe story in question: \`${url}\`\n${expectedResponse}\n`;
 
-        expect(mockCommandInteraction.deferReply).toHaveBeenCalled();
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith({
+        expect(mockCommandInteraction.deferReply).to.have.been.called;
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith({
             content: expectedContent,
-            files: [expect.any(AttachmentBuilder)],
+            files: [sinon.match.instanceOf(AttachmentBuilder)],
         });
     });
 
-
     it('should create a new fact or fiction entry if one does not exist and return a response with attachment', async () => {
         const url = 'https://www.google.com/';
-        mockCommandInteraction.options.getString.mockReturnValue(url);
-        cryptUtil.getHash.mockResolvedValue('new_hashed_value');
+        mockCommandInteraction.options.getString.returns(url);
+        cryptUtilStub.getHash.resolves('new_hashed_value');
 
-        const mockFactOrFictionEntry = {
-            dataValues: { value: null },
-            id: 2,
-        };
+        const mockFactOrFictionEntry = { dataValues: { value: null }, id: 2 };
 
-        FactOrFiction.findOrCreate.mockResolvedValue([mockFactOrFictionEntry, true]);
+        FactOrFictionStub.findOrCreate.resolves([mockFactOrFictionEntry, true]);
 
-        stringUtility.selectRandomFromArray.mockReturnValue({ response: 'fiction' });
-        pathUtility.getMediaFilePath.mockReturnValue('path/to/fiction.gif');
+        stringUtilityStub.selectRandomFromArray.returns({ response: 'fiction' });
+        pathUtilityStub.getMediaFilePath.returns('path/to/fiction.gif');
 
         await factOrFictionatorCommand.execute(mockCommandInteraction);
 
-        expect(FactOrFiction.update).toHaveBeenCalledWith(
-            { value: CONSTANTS.FACT_OR_FICTION.VALUES.FICTION },
-            { where: { id: 2 } }
-        );
+        sinon.assert.calledWith(FactOrFictionStub.update, { value: constantsStub.FACT_OR_FICTION.VALUES.FICTION }, { where: { id: 2 } });
 
-        expect(mockCommandInteraction.deferReply).toHaveBeenCalled();
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith({
+        expect(mockCommandInteraction.deferReply).to.have.been.called;
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith({
             content: `Did you manage to work it out? \nThe story in question: \`https://www.google.com/\`\nfiction\n`,
-            files: [expect.any(AttachmentBuilder)],
+            files: [sinon.match.instanceOf(AttachmentBuilder)],
         });
     });
 
     it('should reply with a fact or fiction result if the entry already exists', async () => {
         const url = 'https://en.wikipedia.org/wiki/Beyond_Belief:_Fact_or_Fiction';
-        mockCommandInteraction.options.getString.mockReturnValue(url);
-        cryptUtil.getHash.mockResolvedValue('existing_hashed_value');
+        mockCommandInteraction.options.getString.returns(url);
+        cryptUtilStub.getHash.resolves('existing_hashed_value');
 
-        const mockFactOrFictionEntry = {
-            dataValues: { value: CONSTANTS.FACT_OR_FICTION.VALUES.FICTION },
-            id: 3,
-        };
+        const mockFactOrFictionEntry = { dataValues: { value: constantsStub.FACT_OR_FICTION.VALUES.FICTION }, id: 3 };
 
-        FactOrFiction.findOrCreate.mockResolvedValue([mockFactOrFictionEntry, false]);
-        stringUtility.selectRandomFromArray.mockReturnValue({
-            response: 'fiction',
-        });
-        pathUtility.getMediaFilePath.mockReturnValue('path/to/fiction.gif');
+        FactOrFictionStub.findOrCreate.resolves([mockFactOrFictionEntry, false]);
+        stringUtilityStub.selectRandomFromArray.returns({ response: 'fiction' });
+        pathUtilityStub.getMediaFilePath.returns('path/to/fiction.gif');
 
         await factOrFictionatorCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.deferReply).toHaveBeenCalled();
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith({
+        expect(mockCommandInteraction.deferReply).to.have.been.called;
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith({
             content: `Did you manage to work it out? \nThe story in question: \`https://en.wikipedia.org/wiki/Beyond_Belief:_Fact_or_Fiction\`\nfiction\n`,
-            files: [expect.any(AttachmentBuilder)],
+            files: [sinon.match.instanceOf(AttachmentBuilder)],
         });
     });
 
     it('should handle errors', async () => {
         const errorMessage = 'Something went wrong during processing';
-        cryptUtil.getHash.mockRejectedValue(new Error(errorMessage));
+        cryptUtilStub.getHash.rejects(new Error(errorMessage));
 
         await factOrFictionatorCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.reply).toHaveBeenCalledWith({
+        expect(mockCommandInteraction.reply).to.have.been.calledWith({
             content: 'An error occurred.',
             ephemeral: true,
         });

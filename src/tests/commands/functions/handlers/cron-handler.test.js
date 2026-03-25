@@ -1,28 +1,34 @@
-const mockDecrementDespair = { start: jest.fn() };
-const mockPatriotAct = { start: jest.fn() };
-const mockDebug = { start: jest.fn() };
-
-jest.mock('../../../../functions/handlers/cron/decrement-despair-cron', () => mockDecrementDespair);
-jest.mock('../../../../functions/handlers/cron/patriot-act-cron', () => jest.fn(() => mockPatriotAct));
-jest.mock('../../../../functions/handlers/cron/debug-cron', () => jest.fn(() => mockDebug));
-
-const cronHandler = require('../../../../functions/handlers/cron-handler');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 
 describe('handleCrons', () => {
     let mockClient;
+    let mockDecrementDespair;
+    let mockPatriotAct;
+    let mockDebug;
+    let cronHandler;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        mockDecrementDespair = { start: sinon.stub() };
+        mockPatriotAct = { start: sinon.stub() };
+        mockDebug = { start: sinon.stub() };
+
+        cronHandler = proxyquire('../../../../functions/handlers/cron-handler', {
+            './cron/decrement-despair-cron': mockDecrementDespair,
+            './cron/patriot-act-cron': sinon.stub().returns(mockPatriotAct),
+            './cron/debug-cron': sinon.stub().returns(mockDebug),
+        });
+
         mockClient = {
-            handleCrons: jest.fn(),
+            handleCrons: sinon.stub(),
             guilds: {
                 cache: {
-                    values: jest.fn().mockReturnValue([
+                    values: sinon.stub().returns([
                         {
                             name: 'Test Guild',
                             channels: {
                                 cache: new Map([
-                                    ['1', { name: 'general', type: 0, send: jest.fn() }],
+                                    ['1', { name: 'general', type: 0, send: sinon.stub() }],
                                 ]),
                             },
                         },
@@ -35,8 +41,8 @@ describe('handleCrons', () => {
     it('should start all cron jobs', async () => {
         cronHandler(mockClient);
         await mockClient.handleCrons();
-        expect(mockDecrementDespair.start).toHaveBeenCalledTimes(1);
-        expect(mockPatriotAct.start).toHaveBeenCalledTimes(1);
-        expect(mockDebug.start).not.toHaveBeenCalled(); // we'll keep this for now, debug
+        sinon.assert.calledOnce(mockDecrementDespair.start);
+        sinon.assert.calledOnce(mockPatriotAct.start);
+        sinon.assert.notCalled(mockDebug.start);
     });
 });

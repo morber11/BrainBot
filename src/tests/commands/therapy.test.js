@@ -1,3 +1,4 @@
+const sinon = require('sinon');
 const therapyCommand = require('../../commands/simple-text-commands/therapy.js');
 
 describe('Therapy Command', () => {
@@ -5,8 +6,8 @@ describe('Therapy Command', () => {
 
     beforeEach(() => {
         mockCommandInteraction = {
-            deferReply: jest.fn(),
-            editReply: jest.fn(),
+            deferReply: sinon.stub(),
+            editReply: sinon.stub(),
         };
     });
 
@@ -22,15 +23,15 @@ describe('Therapy Command', () => {
             'https://youtu.be/x6LovY_DdEE?si=bv3gjBJyXuVc7U-u',
         ].join('\n');
 
-        expect(mockCommandInteraction.deferReply).toHaveBeenCalled();
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith(expected);
+        expect(mockCommandInteraction.deferReply).to.have.been.called;
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith(expected);
     });
 
     it('should handle errors', async () => {
-        mockCommandInteraction.deferReply.mockImplementation(() => { throw new Error('boom'); });
+        mockCommandInteraction.deferReply.throws(new Error('boom'));
 
         await therapyCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith('An error occurred.');
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith('An error occurred.');
     });
 });

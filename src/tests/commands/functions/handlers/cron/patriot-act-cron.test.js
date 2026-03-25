@@ -1,116 +1,99 @@
-const cron = require('cron');
-const patriotAct = require('../../../../../functions/handlers/cron/patriot-act-cron');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 const CONSTANTS = require('../../../../../utils/constants');
 
-const mockSend = jest.fn();
-const mockFind = jest.fn();
-const mockGuildsCacheValues = jest.fn();
-const mockStatIncrement = jest.fn();
-
-jest.mock('discord.js', () => ({
-    Client: jest.fn().mockImplementation(() => ({
-        guilds: {
-            cache: {
-                values: mockGuildsCacheValues,
-            },
-        },
-    })),
-    TextChannel: jest.fn().mockImplementation(() => ({
-        send: mockSend,
-    })),
-}));
-
-jest.mock('../../../../../dal/models/stat', () => ({
-    findOrCreate: jest.fn(),
-}));
-
-const Stat = require('../../../../../dal/models/stat');
-
 describe('patriot act', () => {
-    let cronJob;
-    let mockClient;
+  let patriotAct;
+  let mockClient;
+  let mockSend;
+  let mockGuildsCacheValues;
+  let loggerStub;
+  let clock;
+  let statsUtilStub;
 
-    beforeEach(() => {
-        jest.clearAllMocks();
-        Stat.findOrCreate.mockResolvedValue([{ increment: mockStatIncrement }]);
+  beforeEach(() => {
+    mockSend = sinon.stub();
+    mockGuildsCacheValues = sinon.stub();
+    statsUtilStub = { incrementSystemStat: sinon.stub().resolves() };
+    loggerStub = { error: sinon.stub(), info: sinon.stub() };
 
-        mockClient = new (require('discord.js')).Client();
-        cronJob = patriotAct(mockClient);
-        jest.useFakeTimers();
+    patriotAct = proxyquire('../../../../../functions/handlers/cron/patriot-act-cron', {
+      '../../../utils/stats-util.js': statsUtilStub,
+      '../../../utils/logger.js': loggerStub,
     });
 
-    afterEach(() => {
-        jest.clearAllTimers();
-        jest.useRealTimers();
-    });
+    mockClient = {
+      guilds: {
+        cache: {
+          values: mockGuildsCacheValues,
+        },
+      },
+    };
 
-    it('should send message to target channel when found', async () => {
-        const mockChannel = { type: 0, name: '2fort', send: mockSend };
-        const mockGuild = {
-            channels: {
-                cache: {
-                    find: mockFind,
-                },
-            },
-        };
+    clock = sinon.useFakeTimers();
+  });
 
-        mockFind.mockReturnValue(mockChannel);
-        mockGuildsCacheValues.mockReturnValue([mockGuild]);
+  afterEach(() => {
+    clock.restore();
+    sinon.restore();
+  });
 
-        await cronJob.fireOnTick();
+  it('should send message to target channel when found', async () => {
+    const cronJob = patriotAct(mockClient);
+    const mockChannel = { type: 0, name: '2fort', send: mockSend };
 
-        await jest.advanceTimersByTimeAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
-        expect(mockFind).toHaveBeenCalledTimes(1);
-        expect(mockSend).toHaveBeenCalledWith('o7');
-        expect(Stat.findOrCreate).toHaveBeenCalledWith(expect.objectContaining({
-            where: { stat: CONSTANTS.STATS.PATRIOT_ACT },
-            defaults: expect.objectContaining({ count: 0 }),
-        }));
-        expect(mockStatIncrement).toHaveBeenCalledWith('count');
-    });
+    const mockGuild = {
+      channels: { cache: { find: (pred) => [mockChannel].find(pred) } },
+    };
 
-    it('should fall back to "bot/general" channel if specified channel is not found', async () => {
-        const mockBotChannel = { type: 0, name: 'bot', send: mockSend };
-        const mockGuild = {
-            channels: {
-                cache: {
-                    find: mockFind,
-                },
-            },
-        };
+    mockGuildsCacheValues.returns([mockGuild]);
 
-        mockFind.mockReturnValueOnce(null).mockReturnValueOnce(mockBotChannel);
-        mockGuildsCacheValues.mockReturnValue([mockGuild]);
+    const p = cronJob.fireOnTick();
+    await clock.tickAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
+    await p;
 
-        await cronJob.fireOnTick();
+    sinon.assert.calledOnce(mockSend);
+    sinon.assert.calledWithExactly(mockSend, 'o7');
+    sinon.assert.calledOnce(statsUtilStub.incrementSystemStat);
+    sinon.assert.calledWithExactly(statsUtilStub.incrementSystemStat, CONSTANTS.STATS.PATRIOT_ACT);
+    sinon.assert.notCalled(loggerStub.error);
+  });
 
-        await jest.advanceTimersByTimeAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
-        expect(mockFind).toHaveBeenCalledTimes(2);
-        expect(mockSend).toHaveBeenCalledWith('o7');
-        expect(Stat.findOrCreate).toHaveBeenCalled();
-        expect(mockStatIncrement).toHaveBeenCalledWith('count');
-    });
+  it('should fall back to "bot/general" channel if specified channel is not found', async () => {
+    const cronJob = patriotAct(mockClient);
+    const mockBotChannel = { type: 0, name: 'bot', send: mockSend };
+    let call = 0;
+    const findFn = (pred) => {
+      call += 1;
+      if (call === 1) return null;
+      return [mockBotChannel].find(pred);
+    };
 
-    it('should handle errors gracefully', async () => {
-        const mockGuild = {
-            channels: {
-                cache: {
-                    find: mockFind,
-                },
-            },
-        };
+    const mockGuild = { channels: { cache: { find: findFn } } };
+    mockGuildsCacheValues.returns([mockGuild]);
 
-        mockFind.mockImplementation(() => {
-            throw new Error('Test Error');
-        });
-        mockGuildsCacheValues.mockReturnValue([mockGuild]);
+    const p = cronJob.fireOnTick();
+    await clock.tickAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
+    await p;
 
-        console.error = jest.fn();
+    expect(call).to.equal(2);
+    sinon.assert.calledOnce(mockSend);
+    sinon.assert.calledWithExactly(mockSend, 'o7');
+    sinon.assert.calledOnce(statsUtilStub.incrementSystemStat);
+    sinon.assert.calledWithExactly(statsUtilStub.incrementSystemStat, CONSTANTS.STATS.PATRIOT_ACT);
+  });
 
-        await cronJob.fireOnTick();
+  it('should handle errors gracefully', async () => {
+    const cronJob = patriotAct(mockClient);
+    const mockGuild = { channels: { cache: { find: () => { throw new Error('Test Error'); } } } };
 
-        await jest.advanceTimersByTimeAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
-        expect(console.error).toHaveBeenCalledWith('Error fetching servers or sending message:', expect.any(Error));
-        expect(mockStatIncrement).not.toHaveBeenCalled();
-    });
+    mockGuildsCacheValues.returns([mockGuild]);
+
+    const p = cronJob.fireOnTick();
+    await clock.tickAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
+    await p;
+
+    sinon.assert.calledWithMatch(loggerStub.error, 'Error fetching servers or sending message:', sinon.match.instanceOf(Error));
+    sinon.assert.notCalled(statsUtilStub.incrementSystemStat);
+  });
 });

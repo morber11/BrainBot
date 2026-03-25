@@ -1,46 +1,39 @@
-const cron = require('cron');
-const debug = require('../../../../../functions/handlers/cron/debug-cron');
-const CONSTANTS = require('../../../../../utils/constants');
-
-jest.mock('discord.js', () => ({
-    Client: jest.fn().mockImplementation(() => ({
-        guilds: {
-            cache: {
-                values: jest.fn(),
-            },
-        },
-    })),
-}));
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 
 describe('debug cron', () => {
     let cronJob;
     let mockClient;
+    let loggerStub;
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        mockClient = new (require('discord.js')).Client();
+        loggerStub = {
+            info: sinon.stub(),
+            error: sinon.stub(),
+        };
+
+        mockClient = { guilds: { cache: { values: sinon.stub() } } };
+        const debug = proxyquire('../../../../../functions/handlers/cron/debug-cron', {
+            '../../../utils/logger.js': loggerStub,
+        });
+
         cronJob = debug(mockClient);
     });
 
     it('should handle no guilds gracefully', async () => {
-        mockClient.guilds.cache.values.mockReturnValue([]);
-
-        console.log = jest.fn();
+        mockClient.guilds.cache.values.returns([]);
 
         await cronJob.fireOnTick();
 
-        expect(console.log).not.toHaveBeenCalled();
+        sinon.assert.notCalled(loggerStub.info);
+        sinon.assert.notCalled(loggerStub.error);
     });
 
     it('should handle errors gracefully', async () => {
-        mockClient.guilds.cache.values.mockImplementation(() => {
-            throw new Error('Test Error');
-        });
-
-        console.error = jest.fn();
+        mockClient.guilds.cache.values.throws(new Error('Test Error'));
 
         await cronJob.fireOnTick();
 
-        expect(console.error).toHaveBeenCalledWith('Error while fetching servers or sending messages:', expect.any(Error));
+        sinon.assert.calledWithMatch(loggerStub.error, 'Error while fetching servers or sending messages:', sinon.match.instanceOf(Error));
     });
 });

@@ -1,40 +1,46 @@
-const Member = require('../../dal/models/member.js');
-const despairCommand = require('../../commands/simple-text-commands/despair.js');
-
-jest.mock('../../dal/models/member.js');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 
 describe('Despair Command', () => {
     let mockCommandInteraction;
+    let MemberStub;
+    let despairCommand;
 
     beforeEach(() => {
+        MemberStub = { findOrCreate: sinon.stub(), update: sinon.stub() };
+
+        despairCommand = proxyquire('../../commands/simple-text-commands/despair.js', {
+            '../../dal/models/member.js': MemberStub,
+        });
+
         mockCommandInteraction = {
             user: {
                 id: '123',
                 username: 'testUser',
             },
-            deferReply: jest.fn(),
-            editReply: jest.fn(),
+            deferReply: sinon.stub(),
+            editReply: sinon.stub(),
         };
     });
 
     it('should create a new member if not exists and reply with despair  count', async () => {
-        Member.findOrCreate.mockResolvedValue([{ dataValues: { despairCount: 0 } }, true]);
+        MemberStub.findOrCreate.resolves([{ dataValues: { despairCount: 0 } }, true]);
 
         await despairCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.deferReply).toHaveBeenCalled();
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith('Your mental despair is: 0');
+        expect(mockCommandInteraction.deferReply).to.have.been.called;
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith('Your mental despair is: 0');
     });
 
     it('should update an existing member and reply with despair count', async () => {
-        Member.findOrCreate.mockResolvedValue([{ dataValues: { despairCount: 5 } }, false]);
-        Member.update.mockResolvedValue([1]);
+        MemberStub.findOrCreate.resolves([{ dataValues: { despairCount: 5 } }, false]);
+        MemberStub.update.resolves([1]);
 
         await despairCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.deferReply).toHaveBeenCalled();
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith('Your mental despair is: 5');
-        expect(Member.update).toHaveBeenCalledWith(
+        expect(mockCommandInteraction.deferReply).to.have.been.called;
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith('Your mental despair is: 5');
+        expect(MemberStub.update).to.have.been.calledWith(
             { name: 'testUser' },
             { where: { id: '123' } }
         );
