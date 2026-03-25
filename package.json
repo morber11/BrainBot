@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "start": "node ./src/index.js",
-    "test":  "jest",
+    "test": "mocha \"src/tests/**/*.test.js\" --require test/setup.js --exit",
     "db-sync": "node ./src/dal/database/sync-db.js",
     "db-run-migrations": "node ./src/dal/database/migrator.js",
     "test-multiple": "powershell -Command \"1..10 | ForEach-Object { npm run test; if ($LASTEXITCODE -ne 0) { Write-Host 'Test failed!'; exit 1 } }\""
@@ -32,6 +32,11 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "sequelize-cli": "^6.6.5",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "mocha": "^10.2.0",
+    "chai": "^4.3.7",
+    "sinon": "^15.1.0",
+    "sinon-chai": "^3.7.0",
+    "proxyquire": "^2.1.3"
   }
 }

@@ -1,57 +1,63 @@
-const stringUtility = require('../../utils/string-util.js');
-const brainCommand = require('../../commands/simple-text-commands/brain.js');
-
-jest.mock('../../utils/string-util.js');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 
 describe('Brain Command', () => {
     let mockCommandInteraction;
+    let stringUtilityStub;
+    let brainCommand;
 
     beforeEach(() => {
+        stringUtilityStub = { isNumeric: sinon.stub() };
+
+        brainCommand = proxyquire('../../commands/simple-text-commands/brain.js', {
+            '../../utils/string-util.js': stringUtilityStub,
+        });
+
         mockCommandInteraction = {
             options: {
-                getString: jest.fn(),
+                getString: sinon.stub(),
             },
-            reply: jest.fn(),
+            reply: sinon.stub(),
         };
     });
 
     it('should reply with the correct number of brains when a valid number is provided', async () => {
         const numBrains = '5';
-        mockCommandInteraction.options.getString.mockReturnValue(numBrains);
-        stringUtility.isNumeric.mockReturnValue(true);
+        mockCommandInteraction.options.getString.returns(numBrains);
+        stringUtilityStub.isNumeric.returns(true);
 
         await brainCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.reply).toHaveBeenCalledWith('brain brain brain brain brain');
+        expect(mockCommandInteraction.reply).to.have.been.calledWith('brain brain brain brain brain');
     });
 
     it('should limit the number of brains', async () => {
         const numBrains = '400';
-        mockCommandInteraction.options.getString.mockReturnValue(numBrains);
-        stringUtility.isNumeric.mockReturnValue(true);
+        mockCommandInteraction.options.getString.returns(numBrains);
+        stringUtilityStub.isNumeric.returns(true);
 
         await brainCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.reply).toHaveBeenCalledWith('brain '.repeat(330).trimEnd());
+        expect(mockCommandInteraction.reply).to.have.been.calledWith('brain '.repeat(330).trimEnd());
     });
 
     it('should handle non-numeric input by returning default', async () => {
         const numBrains = 'not-a-number';
-        mockCommandInteraction.options.getString.mockReturnValue(numBrains);
-        stringUtility.isNumeric.mockReturnValue(false);
+        mockCommandInteraction.options.getString.returns(numBrains);
+        stringUtilityStub.isNumeric.returns(false);
 
         await brainCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.reply).toHaveBeenCalledWith('brain brain brain brain');
+        expect(mockCommandInteraction.reply).to.have.been.calledWith('brain brain brain brain');
     });
 
     it('should handle 0 brains', async () => {
         const numBrains = '0';
-        mockCommandInteraction.options.getString.mockReturnValue(numBrains);
-        stringUtility.isNumeric.mockReturnValue(true);
+        mockCommandInteraction.options.getString.returns(numBrains);
+        stringUtilityStub.isNumeric.returns(true);
 
         await brainCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.reply).toHaveBeenCalledWith('');
+        expect(mockCommandInteraction.reply).to.have.been.calledWith('');
     });
 });

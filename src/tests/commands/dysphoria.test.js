@@ -1,46 +1,53 @@
-const CustomUrl = require('../../dal/models/custom-url.js');
-const stringUtility = require('../../utils/string-util.js');
-const dysphoriaCommand = require('../../commands/simple-text-commands/dysphoria.js');
-
-jest.mock('../../dal/models/custom-url.js');
-jest.mock('../../utils/string-util.js');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 
 describe('Dysphoria Command', () => {
     let mockCommandInteraction;
+    let CustomUrlStub;
+    let stringUtilityStub;
+    let dysphoriaCommand;
 
     beforeEach(() => {
+        CustomUrlStub = { findAll: sinon.stub() };
+        stringUtilityStub = { selectRandomFromArray: sinon.stub() };
+
+        dysphoriaCommand = proxyquire('../../commands/simple-text-commands/dysphoria.js', {
+            '../../dal/models/custom-url.js': CustomUrlStub,
+            '../../utils/string-util.js': stringUtilityStub,
+        });
+
         mockCommandInteraction = {
-            deferReply: jest.fn(),
-            editReply: jest.fn(),
+            deferReply: sinon.stub(),
+            editReply: sinon.stub(),
         };
     });
 
     it('should reply with a URL when URLs are available', async () => {
         const urls = [{ url: 'https://www.w3schools.com/js/' }, { url: 'https://google.com/' }];
-        CustomUrl.findAll.mockResolvedValue(urls);
-        stringUtility.selectRandomFromArray.mockReturnValue(urls[0]);
+        CustomUrlStub.findAll.resolves(urls);
+        stringUtilityStub.selectRandomFromArray.returns(urls[0]);
 
         await dysphoriaCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.deferReply).toHaveBeenCalled();
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith('https://www.w3schools.com/js/');
+        expect(mockCommandInteraction.deferReply).to.have.been.called;
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith('https://www.w3schools.com/js/');
     });
 
     it('should handle when no URLs are available', async () => {
-        CustomUrl.findAll.mockResolvedValue([]);
+        CustomUrlStub.findAll.resolves([]);
 
         await dysphoriaCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.deferReply).toHaveBeenCalled();
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith('No URLs found.');
+        expect(mockCommandInteraction.deferReply).to.have.been.called;
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith('No URLs found.');
     });
 
     it('should handle errors', async () => {
-        CustomUrl.findAll.mockRejectedValue(new Error("Oh no an error"));
+        CustomUrlStub.findAll.rejects(new Error("Oh no an error"));
 
         await dysphoriaCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.deferReply).toHaveBeenCalled();
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith('No URLs found.');
+        expect(mockCommandInteraction.deferReply).to.have.been.called;
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith('No URLs found.');
     });
 });

@@ -1,47 +1,48 @@
-const stringUtility = require('../../utils/string-util.js');
-const CONSTANTS = require('../../utils/constants.js');
-const magicBallCommand = require('../../commands/simple-text-commands/magic-ball.js');
-
-jest.mock('../../utils/string-util.js');
-jest.mock('../../utils/constants.js');
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
 
 describe('Magic Ball Command', () => {
     let mockCommandInteraction;
+    let stringUtilityStub;
+    let constantsStub;
+    let magicBallCommand;
 
     beforeEach(() => {
+        stringUtilityStub = { selectRandomFromArray: sinon.stub() };
+        constantsStub = { MAGIC_BALL: { RESPONSES: [{ response: 'Yes, definitely' }, { response: 'Ask again later' }, { response: 'No way' }] } };
+
+        magicBallCommand = proxyquire('../../commands/simple-text-commands/magic-ball.js', {
+            '../../utils/string-util.js': stringUtilityStub,
+            '../../utils/constants.js': constantsStub,
+        });
+
         mockCommandInteraction = {
             options: {
-                getString: jest.fn(),
+                getString: sinon.stub(),
             },
-            deferReply: jest.fn(),
-            editReply: jest.fn(),
-        };
-
-        CONSTANTS.MAGIC_BALL = {
-            RESPONSES: [{ response: 'Yes, definitely' }, { response: 'Ask again later' }, { response: 'No way' }],
+            deferReply: sinon.stub(),
+            editReply: sinon.stub(),
         };
     });
 
     it('should reply with a random Magic Ball response', async () => {
         const question = 'Will this test work?';
-        mockCommandInteraction.options.getString.mockReturnValue(question);
-        stringUtility.selectRandomFromArray.mockReturnValue(CONSTANTS.MAGIC_BALL.RESPONSES[0]);
+        mockCommandInteraction.options.getString.returns(question);
+        stringUtilityStub.selectRandomFromArray.returns(constantsStub.MAGIC_BALL.RESPONSES[0]);
 
         await magicBallCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.deferReply).toHaveBeenCalled();
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith(
+        expect(mockCommandInteraction.deferReply).to.have.been.called;
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith(
             `You have pondered the Magic 9-Ball for guidance\nYour answer is: Yes, definitely.\nYour question was: "Will this test work?"`
         );
     });
 
     it('should handle errors', async () => {
-        stringUtility.selectRandomFromArray.mockImplementation(() => {
-            throw new Error('Something went wrong');
-        });
+        stringUtilityStub.selectRandomFromArray.throws(new Error('Something went wrong'));
 
         await magicBallCommand.execute(mockCommandInteraction);
         
-        expect(mockCommandInteraction.editReply).toHaveBeenCalledWith('An error occurred.');
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith('An error occurred.');
     });
 });
