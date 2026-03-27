@@ -43,7 +43,9 @@ const CONSTANTS = {
         GADGET: "gadget",
         GADGET_FRIENDLY: "gadgets used",
         USER_STATS: "queried_stats",
-        USER_STATS_FRIENDLY: "queried stats"
+        USER_STATS_FRIENDLY: "queried stats",
+        FACT_OR_FICTION: "fact_or_fiction",
+        FACT_OR_FICTION_FRIENDLY: "figured it out",
     },
     COMMANDS: {
         PATRIOT_ACT: "patriot_act",

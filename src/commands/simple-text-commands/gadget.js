@@ -45,9 +45,11 @@ module.exports = {
                 'gun'
             ]);
 
-            await statsUtil.incrementStat(CONSTANTS.STATS.GADGET, CONSTANTS.STATS.GADGET_FRIENDLY);
-
             await interaction.editReply(`Go Go Gadget ${el}!`);
+
+            const userId = interaction.user && interaction.user.id;
+            await statsUtil.incrementUserStat(userId, CONSTANTS.STATS.GADGET, CONSTANTS.STATS.GADGET_FRIENDLY);
+            await statsUtil.incrementStat(CONSTANTS.STATS.GADGET, CONSTANTS.STATS.GADGET_FRIENDLY);
         } catch (error) {
             logger.error(error);
             await interaction.editReply('An error occurred.');
