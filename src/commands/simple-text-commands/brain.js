@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const stringUtility = require('../../utils/string-util.js');
+const statsUtil = require('../../utils/stats-util.js');
 const CONSTANTS = require('../../utils/constants.js');
 
 module.exports = {
@@ -28,5 +29,8 @@ module.exports = {
         message = message.trimEnd();
 
         await interaction.reply(message);
+
+        const userId = interaction.user && interaction.user.id;
+        await statsUtil.incrementUserStat(userId, CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
     }
 };
