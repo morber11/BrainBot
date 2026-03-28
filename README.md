@@ -1,6 +1,8 @@
 # BrainBot
 Simple Discord bot for brain spam. Made for a few friends.
 
+Requires GLIBC 2.36
+
 ## Setup & Build
 
 1. **Install dependencies**
