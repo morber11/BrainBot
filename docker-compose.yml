@@ -1,0 +1,15 @@
+services:
+  brainbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - brainbot-db:/app/src/dal/database
+    environment:
+      - NODE_ENV=production
+
+volumes:
+  brainbot-db:
+    driver: local

@@ -1,26 +1,9 @@
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require('@discordjs/voice');
-const { Innertube, UniversalCache, Platform } = require('youtubei.js');
+const ytdl = require('ytdl-core');
 const { Readable } = require('stream');
 
 const DEFAULT_IDLE_TIMEOUT_MS = process.env.VOICE_IDLE_TIMEOUT_MS ? parseInt(process.env.VOICE_IDLE_TIMEOUT_MS, 10) : 30000;
 const activeConnections = new Map();
-
-if (Platform?.shim && typeof Platform.shim.eval === 'function') {
-  Platform.shim.eval = async (data, env) => {
-    const properties = [];
-
-    if (typeof env?.n === 'string') {
-      properties.push(`n: exportedVars.nFunction(${JSON.stringify(env.n)})`);
-    }
-
-    if (typeof env?.sig === 'string') {
-      properties.push(`sig: exportedVars.sigFunction(${JSON.stringify(env.sig)})`);
-    }
-
-    const code = `${data.output}\nreturn { ${properties.join(', ')} };`;
-    return new Function(code)();
-  };
-}
 
 function isValidAudioUrl(url) {
   if (!url || typeof url !== 'string' || url.length > 2048) {
@@ -99,71 +82,19 @@ async function playAudioInVoiceChannel(interaction, url) {
 
     let stream;
     try {
-      const youtube = await Innertube.create({ cache: new UniversalCache(false) });
-
       const cleanUrl = url.trim().replace(/['"]+$/, '');
-      let videoId = extractYouTubeVideoId(cleanUrl);
 
-      if (!videoId) {
-        const endpoint = await youtube.resolveURL(cleanUrl);
-        videoId = endpoint?.payload?.videoId;
+      if (!ytdl.validateURL(cleanUrl)) {
+        throw new Error('Invalid YouTube URL.');
       }
 
-      if (!videoId) {
-        throw new Error('Could not resolve a YouTube video id from the provided URL.');
-      }
-
-      const clientFallbacks = ['IOS', 'ANDROID', 'WEB_EMBEDDED', 'WEB'];
-      let info = null;
-      let lastGetInfoError = null;
-
-      for (const client of clientFallbacks) {
-        try {
-          info = await youtube.getInfo(videoId, client);
-          break;
-        } catch (clientErr) {
-          lastGetInfoError = clientErr;
-        }
-      }
-
-      if (!info) {
-        throw (lastGetInfoError || new Error('Failed to get video info from YouTube.'));
-      }
-
-      const streamingData = info.streaming_data;
-      const allFormats = [
-        ...(streamingData?.formats || []),
-        ...(streamingData?.adaptive_formats || [])
-      ];
-
-      const audioCandidates = allFormats
-        .filter((format) => (
-          format?.has_audio &&
-          (!format?.has_video) &&
-          (typeof format?.url === 'string' || typeof format?.signature_cipher === 'string' || typeof format?.cipher === 'string')
-        ))
-        .sort((left, right) => (right?.bitrate || 0) - (left?.bitrate || 0));
-
-      const fallbackAudioCandidates = allFormats
-        .filter((format) => (
-          format?.has_audio &&
-          (typeof format?.url === 'string' || typeof format?.signature_cipher === 'string' || typeof format?.cipher === 'string')
-        ))
-        .sort((left, right) => (right?.bitrate || 0) - (left?.bitrate || 0));
-
-      const selectedFormat = audioCandidates[0] || fallbackAudioCandidates[0];
-
-      if (!selectedFormat?.itag) {
-        throw new Error('No playable decipherable audio format found for this video.');
-      }
-
-      const audioStream = await info.download({
-        itag: selectedFormat.itag
+      stream = ytdl(cleanUrl, {
+        filter: 'audioonly',
+        quality: 'highestaudio',
+        highWaterMark: 1 << 25,
       });
-
-      stream = Readable.fromWeb(audioStream);
     } catch (err) {
-      throw new Error(`Failed to create audio stream: ${err?.info?.reason || err.message}`);
+      throw new Error(`Failed to create audio stream: ${err?.message || err}`);
     }
 
     const resource = createAudioResource(stream);
