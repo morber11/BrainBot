@@ -15,10 +15,8 @@ const handleMilk = require('./handlers/handleMilk');
 const handleJigsaw = require('./handlers/handleJigsaw');
 const handleRaven = require('./handlers/handleRaven');
 const handleMentalDespair = require('./handlers/handleMentalDespair');
+const handleInSpace = require('./handlers/handleInSpace');
 const handleMarioJudah = require('./handlers/handleMarioJudah');
-
-// similar logic used in ask-util
-// consisder making more generic later
 
 module.exports = {
     name: 'messageCreate',
@@ -27,16 +25,13 @@ module.exports = {
             return;
         }
 
-        // some of these rely on msg content (for example - what guild they are in) 
-        // so we'll handle .toLowerCase() inside the handlers
-        // consider changing later
         const handlers = [
             handleBasicReactResponse,
             handleMilk,
             handleJigsaw,
-                handleRaven,
-                handleMentalDespair,
-                handleAsking,
+            handleRaven,
+            handleMentalDespair,
+            handleAsking,
             handleInSpace,
             handleMarioJudah,
         ];
@@ -46,25 +41,3 @@ module.exports = {
         }
     }
 }
-
-
-
-
-
-async function handleInSpace(message) {
-    try {
-        const msgContent = message.content.toLowerCase();
-
-        if (!msgContent.includes('in space')) return;
-
-        const count = mathUtil.getRandomInt(6) + 5;
-        const phrase = 'in space no one can hear you in space';
-        const response = Array(count).fill(phrase).join(' ');
-
-        await message.reply(response);
-    } catch (err) {
-        logger.error(err, { handler: 'handleInSpace' });
-    }
-}
-
-
