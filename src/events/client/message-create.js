@@ -6,10 +6,10 @@ const Member = require('../../dal/models/member.js');
 const Keyword = require('../../dal/models/keyword.js');
 const CustomUrl = require('../../dal/models/custom-url.js');
 const stringUtility = require('../../utils/string-util.js');
-const ask = require('../../utils/ask-util.js');
 const logger = require('../../utils/logger.js');
 const mathUtil = require('../../utils/math-util.js');
 const statsUtil = require('../../utils/stats-util.js');
+const handleAsking = require('./handlers/handleAsking');
 
 const lastRavenByGuild = new Map();
 // similar logic used in ask-util
@@ -212,21 +212,7 @@ async function parseMentalDespairKeywords(message) {
     }
 }
 
-async function handleAsking(message) {
-    try {
-        if (!message.guild) return;
 
-        await ask.chanceToSend(message);
-    } catch (err) {
-        logger.error(err, {
-            guildId: message.guildId,
-            channelId: message.channelId,
-            messageId: message.id,
-            authorId: message.author.id,
-            handler: 'handleAsking'
-        });
-    }
-}
 
 async function handleInSpace(message) {
     try {
