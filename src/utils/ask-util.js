@@ -4,11 +4,13 @@ const logger = require('./logger.js');
 
 //const COOLDOWN_MS = 1000 // debug
 const COOLDOWN_MS = 48 * 60 * 60 * 1000;
-const CHANCE = 10000;
+const CHANCE = 20000;
 const LONG_MESSAGE_THRESHOLD = 70;
 
 const cooldownGuilds = new Set();
-const lastTriggerTimestamps = new Map();
+// similar logic used in message-create event
+// consisder making more generic later
+const lastTriggerTimestamps = new Map(); 
 
 function shouldReply(guildId) {
     const now = Date.now();
