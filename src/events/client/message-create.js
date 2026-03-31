@@ -13,12 +13,11 @@ const handleAsking = require('./handlers/handleAsking');
 const handleBasicReactResponse = require('./handlers/handleBasicReactResponse');
 const handleMilk = require('./handlers/handleMilk');
 const handleJigsaw = require('./handlers/handleJigsaw');
+const handleRaven = require('./handlers/handleRaven');
+const handleMarioJudah = require('./handlers/handleMarioJudah');
 
-const lastRavenByGuild = new Map();
 // similar logic used in ask-util
 // consisder making more generic later
-const lastMissTheRageByGuild = new Map();
-const MISS_THE_RAGE_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 
 module.exports = {
     name: 'messageCreate',
@@ -47,32 +46,6 @@ module.exports = {
     }
 }
 
-
-
-async function handleRaven(message) {
-    try {
-        const msgContent = message.content.toLowerCase();
-        if (!msgContent.includes("lost a life")) return;
-
-        const ravenImages = ['raven-1.gif', 'raven-2.gif', 'raven-3.gif'];
-
-        const guildKey = message.guildId || 'dm';
-        const lastForGuild = lastRavenByGuild.get(guildKey);
-
-        const choices = lastForGuild ? ravenImages.filter(img => img !== lastForGuild) : ravenImages;
-        const selection = choices[Math.floor(Math.random() * choices.length)];
-
-        lastRavenByGuild.set(guildKey, selection);
-
-        const dir = pathUtility.getMediaFilePath(__dirname, 'images', selection);
-
-        await statsUtil.incrementStat(CONSTANTS.STATS.RAVEN, CONSTANTS.STATS.RAVEN_FRIENDLY);
-        await message.reply({ files: [dir] });
-
-    } catch (err) {
-        logger.error(err, { handler: 'handleRaven' });
-    }
-}
 
 async function handleMentalDespair(message) {
     try {
@@ -170,37 +143,4 @@ async function handleInSpace(message) {
     }
 }
 
-async function handleMarioJudah(message) {
-    try {
-        const msgContent = message.content.toLowerCase();
-
-        const match = msgContent.match(/\bi miss\s+(\S+)/);
-
-        if (!match) return;
-
-        const guildKey = message.guildId || `dm:${message.author.id}`;
-
-        const isDev = process.env.NODE_ENV === 'development';
-        if (!isDev) {
-            const last = lastMissTheRageByGuild.get(guildKey) || 0;
-            if (Date.now() - last < MISS_THE_RAGE_COOLDOWN_MS) return;
-        }
-
-        const chance = isDev ? 100 : 20;
-        if (!isDev && mathUtil.getRandomInt(100) >= chance) return;
-
-        lastMissTheRageByGuild.set(guildKey, Date.now());
-
-        await statsUtil.incrementSystemStat(CONSTANTS.STATS.MARIO_JUDAH_MISS_THE_RAGE, CONSTANTS.STATS.MARIO_JUDAH_MISS_THE_RAGE_FRIENDLY);
-        await message.reply('i miss the rage');
-    } catch (err) {
-        logger.error(err, {
-            guildId: message.guildId,
-            channelId: message.channelId,
-            messageId: message.id,
-            authorId: message.author.id,
-            handler: 'handleMarioJudah'
-        });
-    }
-}
 
