@@ -14,6 +14,7 @@ const handleBasicReactResponse = require('./handlers/handleBasicReactResponse');
 const handleMilk = require('./handlers/handleMilk');
 const handleJigsaw = require('./handlers/handleJigsaw');
 const handleRaven = require('./handlers/handleRaven');
+const handleMentalDespair = require('./handlers/handleMentalDespair');
 const handleMarioJudah = require('./handlers/handleMarioJudah');
 
 // similar logic used in ask-util
@@ -33,9 +34,9 @@ module.exports = {
             handleBasicReactResponse,
             handleMilk,
             handleJigsaw,
-            handleRaven,
-            handleMentalDespair,
-            handleAsking,
+                handleRaven,
+                handleMentalDespair,
+                handleAsking,
             handleInSpace,
             handleMarioJudah,
         ];
@@ -47,83 +48,6 @@ module.exports = {
 }
 
 
-async function handleMentalDespair(message) {
-    try {
-        await parseMentalDespairKeywords(message);
-
-        const currentDespair = await Member.findOne({
-            attributes: ['despairCount'],
-            where: {
-                id: message.author.id,
-            }
-        });
-
-        if (!currentDespair)
-            return;
-
-        if (currentDespair.despairCount >= CONSTANTS.POINT_VALUES.MAX_DESPAIR) {
-            const urls = await CustomUrl.findAll({
-                attributes: ['url'],
-                where: { type: 'despair' },
-                raw: true
-            });
-
-            const el = stringUtility.selectRandomFromArray(urls);
-
-            await message.reply(`Your despair is too high! \n${el.url}`);
-        }
-    } catch (err) {
-        logger.error(err, {
-            guildId: message.guildId,
-            channelId: message.channelId,
-            messageId: message.id,
-            authorId: message.author.id,
-            handler: 'handleMentalDespair'
-        });
-    }
-}
-
-async function parseMentalDespairKeywords(message) {
-    const messageContent = message.content.toLowerCase();
-
-    const keywords = await Keyword.findAll({
-        attributes: ['name', 'value'],
-        where: { type: 'despair' },
-        raw: true
-    });
-
-    const keywordsMap = new Set(keywords.map((k) => k.name));
-
-    let despairCount = 0;
-    messageContent.split(" ").forEach((w) => {
-        if (keywordsMap.has(w)) {
-            var kw = keywords.find(x => x.name === w)
-            despairCount += kw.value != null ? kw.value : 1
-        }
-
-
-    });
-
-    if (despairCount != 0) {
-        const [member, created] = await Member.findOrCreate({
-            where: {
-                id: message.author.id,
-            }
-        });
-
-        if (!created) {
-            const newCount = member.despairCount + despairCount;
-
-            await Member.update({
-                name: message.author.username,
-                despairCount: newCount > 0 ? newCount : 0,
-                updatedAt: new Date(),
-            },
-                { where: { id: member.id } }
-            );
-        }
-    }
-}
 
 
 
