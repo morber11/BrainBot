@@ -10,6 +10,7 @@ const logger = require('../../utils/logger.js');
 const mathUtil = require('../../utils/math-util.js');
 const statsUtil = require('../../utils/stats-util.js');
 const handleAsking = require('./handlers/handleAsking');
+const handleBasicReactResponse = require('./handlers/handleBasicReactResponse');
 
 const lastRavenByGuild = new Map();
 // similar logic used in ask-util
@@ -41,43 +42,6 @@ module.exports = {
         for (const handler of handlers) {
             await handler(message);
         }
-    }
-}
-
-async function handleBasicReactResponse(message) {
-    try {
-        const msgContent = message.content.toLowerCase();
-
-        if (msgContent.includes("brain")) {
-            message.react(CONSTANTS.EMOJI.BRAIN)
-            await statsUtil.incrementStat(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
-        }
-
-        if (msgContent.includes(CONSTANTS.EMOJI.BRAIN)) {
-            message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_B);
-            message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_R);
-            message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_A);
-            message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_I);
-            message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_N);
-            await statsUtil.incrementStat(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
-        }
-
-        const re = new RegExp("^umm*");
-        if (re.test(msgContent))
-            message.react(CONSTANTS.EMOJI.THINKING);
-
-        // we dont need i18n, we only need one spanish word
-        if (msgContent.includes("maricon") || msgContent.includes("maricón"))
-            message.react(CONSTANTS.EMOJI.ONE_HUNDRED);
-
-    } catch (err) {
-        logger.error(err, {
-            guildId: message.guildId,
-            channelId: message.channelId,
-            messageId: message.id,
-            authorId: message.author.id,
-            handler: 'handleBasicReactResponse'
-        });
     }
 }
 
