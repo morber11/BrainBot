@@ -3,7 +3,8 @@ const CONSTANTS = require('../../../utils/constants.js');
 const statsUtil = require('../../../utils/stats-util.js');
 const logger = require('../../../utils/logger.js');
 
-const patriotAct = (client) => new cron.CronJob(CONSTANTS.CRON.PATRIOT_ACT, async () => {
+const patriotAct = (client, tz) => {
+    return new cron.CronJob(CONSTANTS.CRON.PATRIOT_ACT, async () => {
     try {
         // add a small delay so the bot doesn't automatically post it at the exact time - give people some time to react
         const delay = CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD;
@@ -43,6 +44,7 @@ const patriotAct = (client) => new cron.CronJob(CONSTANTS.CRON.PATRIOT_ACT, asyn
     } catch (error) {
         logger.error('Error fetching servers or sending message:', error);
     }
-});
+    }, null, false, tz);
+};
 
 module.exports = patriotAct;
