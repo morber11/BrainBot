@@ -2,7 +2,7 @@ const cron = require('cron');
 const CONSTANTS = require('../../../utils/constants.js');
 const logger = require('../../../utils/logger.js');
 
-const debug = (client) => new cron.CronJob(CONSTANTS.CRON.DEBUG, async () => {
+const debug = (client, tz) => new cron.CronJob(CONSTANTS.CRON.DEBUG, async () => {
     try {
         // this has backticks, single quotes AND double quotes!
         for (const guild of client.guilds.cache.values()) {
@@ -13,6 +13,6 @@ const debug = (client) => new cron.CronJob(CONSTANTS.CRON.DEBUG, async () => {
     } catch (error) {
         logger.error('Error while fetching servers or sending messages:', error);
     }
-});
+}, null, false, tz); //onComplete callback=null, start=false, timezone=tz
 
 module.exports = debug;
