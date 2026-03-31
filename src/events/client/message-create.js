@@ -11,6 +11,7 @@ const mathUtil = require('../../utils/math-util.js');
 const statsUtil = require('../../utils/stats-util.js');
 const handleAsking = require('./handlers/handleAsking');
 const handleBasicReactResponse = require('./handlers/handleBasicReactResponse');
+const handleMilk = require('./handlers/handleMilk');
 
 const lastRavenByGuild = new Map();
 // similar logic used in ask-util
@@ -45,19 +46,7 @@ module.exports = {
     }
 }
 
-async function handleMilk(message) {
-    try {
-        const msgContent = message.content.toLowerCase();
-        if (!(msgContent.includes("milk") || msgContent.includes(CONSTANTS.EMOJI.MILK))) return;
 
-        const dir = pathUtility.getMediaFilePath(__dirname, 'audio', 'milk03.mp3');
-
-        await statsUtil.incrementStat(CONSTANTS.STATS.MILK, CONSTANTS.STATS.MILK_FRIENDLY);
-        await message.reply({ files: [dir] });
-    } catch (err) {
-        logger.error(err, { handler: 'handleMilk' });
-    }
-}
 
 async function handleJigsaw(message) {
     try {
