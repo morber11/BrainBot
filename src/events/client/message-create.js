@@ -12,6 +12,7 @@ const statsUtil = require('../../utils/stats-util.js');
 const handleAsking = require('./handlers/handleAsking');
 const handleBasicReactResponse = require('./handlers/handleBasicReactResponse');
 const handleMilk = require('./handlers/handleMilk');
+const handleJigsaw = require('./handlers/handleJigsaw');
 
 const lastRavenByGuild = new Map();
 // similar logic used in ask-util
@@ -47,20 +48,6 @@ module.exports = {
 }
 
 
-
-async function handleJigsaw(message) {
-    try {
-        const msgContent = message.content.toLowerCase();
-        if (!msgContent.includes("make your choice")) return;
-
-        const dir = pathUtility.getMediaFilePath(__dirname, 'images', 'jigsaw.jpg');
-
-        await statsUtil.incrementStat(CONSTANTS.STATS.JIGSAW, CONSTANTS.STATS.JIGSAW_FRIENDLY);
-        await message.reply({ files: [dir] });
-    } catch (err) {
-        logger.error(err, { handler: 'handleJigsaw' });
-    }
-}
 
 async function handleRaven(message) {
     try {
