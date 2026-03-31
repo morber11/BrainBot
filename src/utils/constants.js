@@ -46,6 +46,8 @@ const CONSTANTS = {
         USER_STATS_FRIENDLY: "queried stats",
         FACT_OR_FICTION: "fact_or_fiction",
         FACT_OR_FICTION_FRIENDLY: "figured it out",
+        MARIO_JUDAH_MISS_THE_RAGE: "mario_judah_miss_the_rage",
+        MARIO_JUDAH_MISS_THE_RAGE_FRIENDLY: "missed rage",
     },
     COMMANDS: {
         PATRIOT_ACT: "patriot_act",
