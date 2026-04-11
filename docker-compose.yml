@@ -6,10 +6,7 @@ services:
     env_file: .env
     restart: unless-stopped
     volumes:
-      - brainbot-db:/app/src/dal/database
+      - ./src/dal/database:/app/src/dal/database:rw
     environment:
       - NODE_ENV=production
 
-volumes:
-  brainbot-db:
-    driver: local
