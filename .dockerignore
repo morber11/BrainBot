@@ -4,9 +4,8 @@ npm-debug.log
 .env
 /dist
 /build
-src/dal/database/*.sqlite
-src/dal/database/*.sqlite3
 coverage
 tests
 .vscode
 .idea
+
