@@ -9,6 +9,8 @@ const CONSTANTS = {
         THINKING: "\uD83E\uDD14",
         ONE_HUNDRED: "\uD83D\uDCAF",
         MILK: "🥛",
+        SALUTE: "\u{1FAE1}",
+        SALUTE_EMOJI: ":saluting_face:"
     },
     BRAIN: {
         MAX_BRAINS: 330,
@@ -29,6 +31,8 @@ const CONSTANTS = {
     STATS: {
         PATRIOT_ACT: "patriot_act",
         PATRIOT_ACT_FRIENDLY: "salutes given",
+        SALUTES_GIVEN: "salutes_given",
+        SALUTES_GIVEN_FRIENDLY: "country pride shown",
         RAVEN: "raven",
         RAVEN_FRIENDLY: "lives lost",
         MILK: "milk",
