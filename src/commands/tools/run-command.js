@@ -11,13 +11,19 @@ module.exports = {
             option.setName('action')
                 .setDescription('Action to perform')
                 .setRequired(true)
+        )
+        .addIntegerOption(option =>
+            option.setName('delay')
+                .setDescription('Delay in milliseconds before running the action (0 for no delay) - used for CRONs')
+                .setRequired(false)
         ),
     devOnly: true,
     async execute(interaction, client) {
         const action = interaction.options.getString('action');
 
         if (action === CONSTANTS.COMMANDS.PATRIOT_ACT) {
-            const job = patriotAct(client);
+            const delay = interaction.options.getInteger('delay');
+            const job = patriotAct(client, undefined, delay);
             job.fireOnTick();
             await interaction.reply('activating patriot');
             return;

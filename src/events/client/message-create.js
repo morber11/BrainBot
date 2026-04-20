@@ -1,5 +1,6 @@
 const handleAsking = require('./handlers/handleAsking');
 const handleBasicReactResponse = require('./handlers/handleBasicReactResponse');
+const handlePatriotSalute = require('./handlers/handlePatriotSalute');
 const handleMilk = require('./handlers/handleMilk');
 const handleJigsaw = require('./handlers/handleJigsaw');
 const handleRaven = require('./handlers/handleRaven');
@@ -15,6 +16,7 @@ module.exports = {
         }
 
         const handlers = [
+            handlePatriotSalute,
             handleBasicReactResponse,
             handleMilk,
             handleJigsaw,
