@@ -41,6 +41,8 @@ async function handlePatriotReaction(reaction, user) {
     );
 }
 
+// bit of YAGNI but in case we want to add further ones later, they can exist as
+// separate handlers
 const handlers = [handlePatriotReaction];
 
 module.exports = {
