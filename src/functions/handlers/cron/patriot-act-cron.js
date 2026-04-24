@@ -7,6 +7,10 @@ const responseWindowUtil = require('../../../utils/response-window-util.js');
 const patriotAct = (client, tz, delayMs = CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD) => {
     return new cron.CronJob(CONSTANTS.CRON.PATRIOT_ACT, async () => {
         try {
+            // start the response window first as we want to rack if ANYONE posts
+            // from 19:16 -> 19:17 instead of from the delay to 19:17+delay time
+            responseWindowUtil.start(guild.id, 60000); // one minute
+            
             // add a small delay so the bot doesn't automatically post it at the exact time - give people some time to react
             if (delayMs > 0) {
                 await new Promise(resolve => setTimeout(resolve, delayMs));
@@ -34,7 +38,6 @@ const patriotAct = (client, tz, delayMs = CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIO
 
                 if (targetChannel) {
                     await targetChannel.send('o7');
-                    responseWindowUtil.start(guild.id, 60000); // one minute
                     try {
                         await statsUtil.incrementSystemStat(CONSTANTS.STATS.PATRIOT_ACT);
                     } catch (e) {
