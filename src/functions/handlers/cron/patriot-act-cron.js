@@ -9,8 +9,15 @@ const patriotAct = (client, tz, delayMs = CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIO
         try {
             // start the response window first as we want to rack if ANYONE posts
             // from 19:16 -> 19:17 instead of from the delay to 19:17+delay time
-            responseWindowUtil.start(guild.id, 60000); // one minute
-            
+            // disgusting double for loop so we set the window before the delay
+            for (const guild of client.guilds.cache.values()) {
+                try {
+                    responseWindowUtil.start(guild.id, 60000); // one minute
+                } catch (e) {
+                    logger.error('Failed to start response window for guild:', guild.id, e);
+                }
+            }
+
             // add a small delay so the bot doesn't automatically post it at the exact time - give people some time to react
             if (delayMs > 0) {
                 await new Promise(resolve => setTimeout(resolve, delayMs));
