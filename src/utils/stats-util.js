@@ -1,43 +1,3 @@
-const Stat = require('../dal/models/stat.js');
-const UserStat = require('../dal/models/user-stat.js');
-const logger = require('./logger.js');
-
-async function incrementSystemStat(statKey, friendlyName = null, sortOrder = 100) {
-    try {
-        const [statRow] = await Stat.findOrCreate({
-            where: { stat: statKey },
-            defaults: { count: 0, friendly_name: friendlyName || statKey, sort_order: sortOrder },
-        });
-        await statRow.increment('count');
-
-        return statRow;
-    } catch (err) {
-        logger.error(`Failed to increment system stat ${statKey}:`, err);
-        return null;
-    }
-}
-
-async function incrementUserStat(userId, statKey, friendlyName = null) {
-    try {
-        const [row, created] = await UserStat.findOrCreate({
-            where: { userId: userId, stat: statKey },
-            defaults: { count: 0, user_friendly_name: friendlyName || '' },
-        });
-
-        if (!created && friendlyName && row.user_friendly_name !== friendlyName) {
-            await UserStat.update({ user_friendly_name: friendlyName }, { where: { id: row.id } });
-            row.user_friendly_name = friendlyName;
-        }
-
-        await row.increment('count');
-
-        return row;
-    } catch (err) {
-        logger.error(`Failed to increment user stat ${statKey} for user ${userId}:`, err);
-        return null;
-    }
-}
-
 function buildTable(entries) {
     const header = { label: 'Command', value: 'Times run' };
     const maxLabel = Math.max(header.label.length, ...entries.map(e => e.label.length));
@@ -71,9 +31,6 @@ function generateStatsTable(entries) {
 }
 
 module.exports = {
-    incrementSystemStat,
-    incrementUserStat,
-    incrementStat: incrementSystemStat,
     buildTable,
     addStatEntry,
     generateStatsTable,

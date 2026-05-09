@@ -1,6 +1,6 @@
-const Member = require('../../../dal/models/member.js');
-const Keyword = require('../../../dal/models/keyword.js');
-const CustomUrl = require('../../../dal/models/custom-url.js');
+const memberService = require('../../../services/member-service.js');
+const keywordService = require('../../../services/keyword-service.js');
+const customUrlService = require('../../../services/custom-url-service.js');
 const stringUtility = require('../../../utils/string-util.js');
 const CONSTANTS = require('../../../utils/constants.js');
 const logger = require('../../../utils/logger.js');
@@ -9,21 +9,14 @@ module.exports = async function handleMentalDespair(message) {
     try {
         await parseMentalDespairKeywords(message);
 
-        const currentDespair = await Member.findOne({
+        const currentDespair = await memberService.findOne(message.author.id, {
             attributes: ['despairCount'],
-            where: {
-                id: message.author.id,
-            }
         });
 
         if (!currentDespair) return;
 
         if (currentDespair.despairCount >= CONSTANTS.POINT_VALUES.MAX_DESPAIR) {
-            const urls = await CustomUrl.findAll({
-                attributes: ['url'],
-                where: { type: 'despair' },
-                raw: true
-            });
+            const urls = await customUrlService.findAllByType('despair', ['url']);
 
             const el = stringUtility.selectRandomFromArray(urls);
 
@@ -43,11 +36,7 @@ module.exports = async function handleMentalDespair(message) {
 async function parseMentalDespairKeywords(message) {
     const messageContent = message.content.toLowerCase();
 
-    const keywords = await Keyword.findAll({
-        attributes: ['name', 'value'],
-        where: { type: 'despair' },
-        raw: true
-    });
+    const keywords = await keywordService.findAllByType('despair', ['name', 'value']);
 
     const keywordsMap = new Set(keywords.map((k) => k.name));
 
@@ -60,22 +49,16 @@ async function parseMentalDespairKeywords(message) {
     });
 
     if (despairCount != 0) {
-        const [member, created] = await Member.findOrCreate({
-            where: {
-                id: message.author.id,
-            }
-        });
+        const [member, created] = await memberService.findOrCreate(message.author.id);
 
         if (!created) {
             const newCount = member.despairCount + despairCount;
 
-            await Member.update({
+            await memberService.update(member.id, {
                 name: message.author.username,
                 despairCount: newCount > 0 ? newCount : 0,
                 updatedAt: new Date(),
-            },
-                { where: { id: member.id } }
-            );
+            });
         }
     }
 }

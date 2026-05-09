@@ -1,7 +1,7 @@
 const path = require('node:path');
 const pathUtility = require('../../../utils/path-util.js');
 const CONSTANTS = require('../../../utils/constants.js');
-const statsUtil = require('../../../utils/stats-util.js');
+const statService = require('../../../services/system-stat-service.js');
 const logger = require('../../../utils/logger.js');
 
 const lastRavenByGuild = new Map();
@@ -23,7 +23,7 @@ module.exports = async function handleRaven(message) {
 
         const dir = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'images', selection);
 
-        await statsUtil.incrementStat(CONSTANTS.STATS.RAVEN, CONSTANTS.STATS.RAVEN_FRIENDLY);
+        await statService.incrementSystemStat(CONSTANTS.STATS.RAVEN, CONSTANTS.STATS.RAVEN_FRIENDLY);
         await message.reply({ files: [dir] });
 
     } catch (err) {

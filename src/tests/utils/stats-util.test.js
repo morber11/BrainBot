@@ -1,57 +1,31 @@
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
+const statsUtil = require('../../utils/stats-util.js');
 
 describe('stats-util', () => {
-    let statsUtil;
-    let StatStub;
-    let UserStatStub;
+    it('addStatEntry handles stat/count and label/value shapes', () => {
+        const a = statsUtil.addStatEntry({ stat: 'alpha', count: 3 });
+        const b = statsUtil.addStatEntry({ label: 'beta', value: 7 });
 
-    beforeEach(() => {
-        StatStub = { findOrCreate: sinon.stub() };
-        UserStatStub = { findOrCreate: sinon.stub(), update: sinon.stub() };
-
-        statsUtil = proxyquire('../../utils/stats-util.js', {
-            '../dal/models/stat.js': StatStub,
-            '../dal/models/user-stat.js': UserStatStub,
-            './logger.js': { error: sinon.stub() },
-        });
+        expect(a).to.deep.equal({ label: 'alpha', value: '3' });
+        expect(b).to.deep.equal({ label: 'beta', value: '7' });
     });
 
-    it('incrementSystemStat should findOrCreate and increment count', async () => {
-        const mockRow = { increment: sinon.stub() };
-        StatStub.findOrCreate.resolves([mockRow]);
-
-        const res = await statsUtil.incrementSystemStat('test_stat', 'friendly', 5);
-
-        expect(StatStub.findOrCreate).to.have.been.calledWith({
-            where: { stat: 'test_stat' },
-            defaults: { count: 0, friendly_name: 'friendly', sort_order: 5 },
-        });
-        expect(mockRow.increment).to.have.been.calledWith('count');
-        expect(res).to.equal(mockRow);
+    it('addStatEntry returns null for null input', () => {
+        const res = statsUtil.addStatEntry(null);
+        expect(res).to.equal(null);
     });
 
-    it('incrementUserStat should create row with friendly name and increment', async () => {
-        const mockRow = { increment: sinon.stub(), id: 1, user_friendly_name: '' };
-        UserStatStub.findOrCreate.resolves([mockRow, true]);
+    it('generateStatsTable produces a table string', () => {
+        const entries = [
+            statsUtil.addStatEntry({ stat: 'one', count: 1 }),
+            statsUtil.addStatEntry({ stat: 'two', count: 22 }),
+        ];
 
-        const res = await statsUtil.incrementUserStat('user1', 'brain', 'Brain Friendly');
+        const table = statsUtil.generateStatsTable(entries);
 
-        expect(UserStatStub.findOrCreate).to.have.been.calledWith({
-            where: { userId: 'user1', stat: 'brain' },
-            defaults: { count: 0, user_friendly_name: 'Brain Friendly' },
-        });
-        expect(mockRow.increment).to.have.been.calledWith('count');
-        expect(res).to.equal(mockRow);
-    });
-
-    it('incrementUserStat should update friendly name when existing row differs', async () => {
-        const mockRow = { increment: sinon.stub(), id: 2, user_friendly_name: '' };
-        UserStatStub.findOrCreate.resolves([mockRow, false]);
-
-        await statsUtil.incrementUserStat('user2', 'brain', 'New Friendly');
-
-        expect(UserStatStub.update).to.have.been.calledWith({ user_friendly_name: 'New Friendly' }, { where: { id: mockRow.id } });
-        expect(mockRow.increment).to.have.been.calledWith('count');
+        expect(table).to.be.a('string');
+        expect(table).to.include('Command');
+        expect(table).to.include('Times run');
+        expect(table).to.include('one');
+        expect(table).to.include('22');
     });
 });

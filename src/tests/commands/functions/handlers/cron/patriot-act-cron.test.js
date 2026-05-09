@@ -20,7 +20,7 @@ describe('patriot act', () => {
         loggerStub = { error: sinon.stub(), info: sinon.stub() };
 
         patriotAct = proxyquire('../../../../../functions/handlers/cron/patriot-act-cron', {
-            '../../../utils/stats-util.js': statsUtilStub,
+            '../../../services/system-stat-service.js': statsUtilStub,
             '../../../utils/logger.js': loggerStub,
             '../../../utils/response-window-util.js': responseWindowUtilStub,
         });

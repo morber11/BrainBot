@@ -5,7 +5,7 @@ const proxyquire = require('proxyquire');
 describe('Fact or Fictionator Command', () => {
     let mockCommandInteraction;
     let mathRandomStub;
-    let FactOrFictionStub;
+    let FactOrFictionServiceStub;
     let cryptUtilStub;
     let pathUtilityStub;
     let constantsStub;
@@ -15,14 +15,14 @@ describe('Fact or Fictionator Command', () => {
     beforeEach(() => {
         mathRandomStub = sinon.stub(Math, 'random').returns(1.5 / 999);
 
-        FactOrFictionStub = { findOrCreate: sinon.stub(), update: sinon.stub() };
+        FactOrFictionServiceStub = { findOrCreate: sinon.stub(), update: sinon.stub() };
         cryptUtilStub = { getHash: sinon.stub() };
         pathUtilityStub = { getMediaFilePath: sinon.stub() };
         constantsStub = {};
         stringUtilityStub = { selectRandomFromArray: sinon.stub() };
 
         factOrFictionatorCommand = proxyquire('../../commands/simple-text-commands/fact-or-fiction-creator.js', {
-            '../../dal/models/fact-or-fiction.js': FactOrFictionStub,
+            '../../services/fact-or-fiction-service.js': FactOrFictionServiceStub,
             '../../utils/crypt-util.js': cryptUtilStub,
             '../../utils/path-util.js': pathUtilityStub,
             '../../utils/constants.js': constantsStub,
@@ -59,7 +59,7 @@ describe('Fact or Fictionator Command', () => {
 
         mockCommandInteraction.options.getString.returns(url);
         cryptUtilStub.getHash.resolves('hashed_value');
-        FactOrFictionStub.findOrCreate.resolves([mockFactOrFictionEntry, false]);
+        FactOrFictionServiceStub.findOrCreate.resolves([mockFactOrFictionEntry, false]);
         stringUtilityStub.selectRandomFromArray.returns({ response: expectedResponse });
         pathUtilityStub.getMediaFilePath.returns(expectedAttachmentPath);
 
@@ -81,14 +81,14 @@ describe('Fact or Fictionator Command', () => {
 
         const mockFactOrFictionEntry = { dataValues: { value: null }, id: 2 };
 
-        FactOrFictionStub.findOrCreate.resolves([mockFactOrFictionEntry, true]);
+        FactOrFictionServiceStub.findOrCreate.resolves([mockFactOrFictionEntry, true]);
 
         stringUtilityStub.selectRandomFromArray.returns({ response: 'fiction' });
         pathUtilityStub.getMediaFilePath.returns('path/to/fiction.gif');
 
         await factOrFictionatorCommand.execute(mockCommandInteraction);
 
-        sinon.assert.calledWith(FactOrFictionStub.update, { value: constantsStub.FACT_OR_FICTION.VALUES.FICTION }, { where: { id: 2 } });
+        sinon.assert.calledWith(FactOrFictionServiceStub.update, 2, constantsStub.FACT_OR_FICTION.VALUES.FICTION);
 
         expect(mockCommandInteraction.deferReply).to.have.been.called;
         expect(mockCommandInteraction.editReply).to.have.been.calledWith({
@@ -104,7 +104,7 @@ describe('Fact or Fictionator Command', () => {
 
         const mockFactOrFictionEntry = { dataValues: { value: constantsStub.FACT_OR_FICTION.VALUES.FICTION }, id: 3 };
 
-        FactOrFictionStub.findOrCreate.resolves([mockFactOrFictionEntry, false]);
+        FactOrFictionServiceStub.findOrCreate.resolves([mockFactOrFictionEntry, false]);
         stringUtilityStub.selectRandomFromArray.returns({ response: 'fiction' });
         pathUtilityStub.getMediaFilePath.returns('path/to/fiction.gif');
 

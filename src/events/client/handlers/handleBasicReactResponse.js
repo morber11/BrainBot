@@ -1,5 +1,5 @@
 const CONSTANTS = require('../../../utils/constants.js');
-const statsUtil = require('../../../utils/stats-util.js');
+const statService = require('../../../services/system-stat-service.js');
 const logger = require('../../../utils/logger.js');
 
 module.exports = async function handleBasicReactResponse(message) {
@@ -8,7 +8,7 @@ module.exports = async function handleBasicReactResponse(message) {
 
         if (msgContent.includes("brain")) {
             await message.react(CONSTANTS.EMOJI.BRAIN);
-            await statsUtil.incrementStat(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
+            await statService.incrementSystemStat(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
         }
 
         if (msgContent.includes(CONSTANTS.EMOJI.BRAIN)) {
@@ -17,7 +17,7 @@ module.exports = async function handleBasicReactResponse(message) {
             await message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_A);
             await message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_I);
             await message.react(CONSTANTS.EMOJI.REGIONAL_SIGN_N);
-            await statsUtil.incrementStat(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
+            await statService.incrementSystemStat(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
         }
 
         const re = new RegExp("^umm*");

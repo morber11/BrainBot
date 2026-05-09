@@ -4,22 +4,21 @@ const CONSTANTS = require('../../../../../utils/constants');
 
 describe('decrement despair', () => {
     let cronJob;
-    let MemberStub;
+    let MemberServiceStub;
 
     beforeEach(() => {
-        MemberStub = { findAll: sinon.stub(), update: sinon.stub() };
+        MemberServiceStub = { findAll: sinon.stub(), update: sinon.stub() };
         cronJob = proxyquire('../../../../../functions/handlers/cron/decrement-despair-cron', {
-            '../../../dal/models/member': MemberStub,
+            '../../../services/member-service': MemberServiceStub,
         });
     });
-
     it('should decrement despairCount for members with positive despairCount', async () => {
         const mockMembers = [
             { id: 1, despairCount: 5, increment: sinon.stub() },
             { id: 2, despairCount: 3, increment: sinon.stub() },
         ];
 
-        MemberStub.findAll.resolves(mockMembers);
+        MemberServiceStub.findAll.resolves(mockMembers);
 
         await cronJob.fireOnTick();
 
@@ -38,25 +37,25 @@ describe('decrement despair', () => {
             { id: 4, despairCount: -5, increment: sinon.stub() },
         ];
 
-        MemberStub.findAll.resolves(mockMembers);
+        MemberServiceStub.findAll.resolves(mockMembers);
 
         await cronJob.fireOnTick();
 
         mockMembers.forEach((member) => {
             if (member.despairCount < 0) {
-                sinon.assert.calledWith(MemberStub.update, {
+                sinon.assert.calledWith(MemberServiceStub.update, member.id, sinon.match({
                     despairCount: 0,
                     updatedAt: sinon.match.date,
-                }, { where: { id: member.id } });
+                }));
             }
         });
     });
 
     it('should handle no members found gracefully', async () => {
-        MemberStub.findAll.resolves([]);
+        MemberServiceStub.findAll.resolves([]);
 
         await cronJob.fireOnTick();
 
-        sinon.assert.notCalled(MemberStub.update);
+        sinon.assert.notCalled(MemberServiceStub.update);
     });
 });

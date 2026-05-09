@@ -3,14 +3,14 @@ const proxyquire = require('proxyquire');
 
 describe('Despair Command', () => {
     let mockCommandInteraction;
-    let MemberStub;
+    let MemberServiceStub;
     let despairCommand;
 
     beforeEach(() => {
-        MemberStub = { findOrCreate: sinon.stub(), update: sinon.stub() };
+        MemberServiceStub = { findOrCreate: sinon.stub(), update: sinon.stub() };
 
         despairCommand = proxyquire('../../commands/simple-text-commands/despair.js', {
-            '../../dal/models/member.js': MemberStub,
+            '../../services/member-service.js': MemberServiceStub,
         });
 
         mockCommandInteraction = {
@@ -24,7 +24,7 @@ describe('Despair Command', () => {
     });
 
     it('should create a new member if not exists and reply with despair  count', async () => {
-        MemberStub.findOrCreate.resolves([{ dataValues: { despairCount: 0 } }, true]);
+        MemberServiceStub.findOrCreate.resolves([{ dataValues: { despairCount: 0 } }, true]);
 
         await despairCommand.execute(mockCommandInteraction);
 
@@ -33,16 +33,13 @@ describe('Despair Command', () => {
     });
 
     it('should update an existing member and reply with despair count', async () => {
-        MemberStub.findOrCreate.resolves([{ dataValues: { despairCount: 5 } }, false]);
-        MemberStub.update.resolves([1]);
+        MemberServiceStub.findOrCreate.resolves([{ dataValues: { despairCount: 5 } }, false]);
+        MemberServiceStub.update.resolves([1]);
 
         await despairCommand.execute(mockCommandInteraction);
 
         expect(mockCommandInteraction.deferReply).to.have.been.called;
         expect(mockCommandInteraction.editReply).to.have.been.calledWith('Your mental despair is: 5');
-        expect(MemberStub.update).to.have.been.calledWith(
-            { name: 'testUser' },
-            { where: { id: '123' } }
-        );
+        expect(MemberServiceStub.update).to.have.been.calledWith('123', { name: 'testUser' });
     });
 });

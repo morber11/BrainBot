@@ -1,4 +1,4 @@
-const ask = require('../../../utils/ask-util.js');
+const ask = require('../../../services/ask-service.js');
 const logger = require('../../../utils/logger.js');
 
 module.exports = async function handleAsking(message) {

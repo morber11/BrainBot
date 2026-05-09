@@ -3,16 +3,16 @@ const proxyquire = require('proxyquire');
 
 describe('Dysphoria Command', () => {
     let mockCommandInteraction;
-    let CustomUrlStub;
+    let CustomUrlServiceStub;
     let stringUtilityStub;
     let dysphoriaCommand;
 
     beforeEach(() => {
-        CustomUrlStub = { findAll: sinon.stub() };
+        CustomUrlServiceStub = { findAllByType: sinon.stub() };
         stringUtilityStub = { selectRandomFromArray: sinon.stub() };
 
         dysphoriaCommand = proxyquire('../../commands/simple-text-commands/dysphoria.js', {
-            '../../dal/models/custom-url.js': CustomUrlStub,
+            '../../services/custom-url-service.js': CustomUrlServiceStub,
             '../../utils/string-util.js': stringUtilityStub,
         });
 
@@ -24,7 +24,7 @@ describe('Dysphoria Command', () => {
 
     it('should reply with a URL when URLs are available', async () => {
         const urls = [{ url: 'https://www.w3schools.com/js/' }, { url: 'https://google.com/' }];
-        CustomUrlStub.findAll.resolves(urls);
+        CustomUrlServiceStub.findAllByType.resolves(urls);
         stringUtilityStub.selectRandomFromArray.returns(urls[0]);
 
         await dysphoriaCommand.execute(mockCommandInteraction);
@@ -34,7 +34,7 @@ describe('Dysphoria Command', () => {
     });
 
     it('should handle when no URLs are available', async () => {
-        CustomUrlStub.findAll.resolves([]);
+        CustomUrlServiceStub.findAllByType.resolves([]);
 
         await dysphoriaCommand.execute(mockCommandInteraction);
 
@@ -43,7 +43,7 @@ describe('Dysphoria Command', () => {
     });
 
     it('should handle errors', async () => {
-        CustomUrlStub.findAll.rejects(new Error("Oh no an error"));
+        CustomUrlServiceStub.findAllByType.rejects(new Error("Oh no an error"));
 
         await dysphoriaCommand.execute(mockCommandInteraction);
 

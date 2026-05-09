@@ -1,35 +1,8 @@
-const statsUtil = require('./stats-util.js');
-const CONSTANTS = require('./constants.js');
-const logger = require('./logger.js');
+const statService = require('./system-stat-service.js');
+const CONSTANTS = require('../utils/constants.js');
+const logger = require('../utils/logger.js');
 
-//const COOLDOWN_MS = 1000 // debug
-const COOLDOWN_MS = 48 * 60 * 60 * 1000;
-const CHANCE = 20000;
 const LONG_MESSAGE_THRESHOLD = 70;
-
-const cooldownGuilds = new Set();
-// similar logic used in message-create event
-// consisder making more generic later
-const lastTriggerTimestamps = new Map(); 
-
-function shouldReply(guildId) {
-    const now = Date.now();
-
-    if (cooldownGuilds.has(guildId)) {
-        const last = lastTriggerTimestamps.get(guildId) || 0;
-        if (now - last < COOLDOWN_MS) return false;
-        cooldownGuilds.delete(guildId);
-    }
-
-    //if (true) { // for dev purposes
-    if (Math.floor(Math.random() * CHANCE) === 0) {
-        cooldownGuilds.add(guildId);
-        lastTriggerTimestamps.set(guildId, now);
-        return true;
-    }
-
-    return false;
-}
 
 function getAskText(messageOrInteraction) {
     const original = (messageOrInteraction && (
@@ -73,15 +46,41 @@ function getAskText(messageOrInteraction) {
     return "i didn't ask";
 }
 
+//const COOLDOWN_MS = 1000 // debug
+const COOLDOWN_MS = 48 * 60 * 60 * 1000;
+const CHANCE = 20000;
+
+const cooldownGuilds = new Set();
+// similar logic used in message-create event
+// consisder making more generic later
+const lastTriggerTimestamps = new Map();
+
+function shouldReply(guildId) {
+    const now = Date.now();
+
+    if (cooldownGuilds.has(guildId)) {
+        const last = lastTriggerTimestamps.get(guildId) || 0;
+        if (now - last < COOLDOWN_MS) return false;
+        cooldownGuilds.delete(guildId);
+    }
+
+    if (Math.floor(Math.random() * CHANCE) === 0) {
+        cooldownGuilds.add(guildId);
+        lastTriggerTimestamps.set(guildId, now);
+        return true;
+    }
+
+    return false;
+}
+
 async function chanceToSend(messageOrInteraction) {
-    // this check is slightly redundant but it's so we can ensure we get the guildId
     const guildId = messageOrInteraction.guildId || (messageOrInteraction.guild && messageOrInteraction.guild.id);
     if (!guildId) return false;
 
     if (!shouldReply(guildId)) return false;
 
     try {
-        await statsUtil.incrementSystemStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
+        await statService.incrementSystemStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
 
         const text = getAskText(messageOrInteraction);
         if (!text) return false;
@@ -96,7 +95,7 @@ async function chanceToSend(messageOrInteraction) {
 
 async function forceSend(messageOrInteraction) {
     try {
-        await statsUtil.incrementSystemStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
+        await statService.incrementSystemStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
         const text = getAskText(messageOrInteraction);
         await messageOrInteraction.reply(text);
 

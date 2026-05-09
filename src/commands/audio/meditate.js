@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { playAudioInVoiceChannel } = require('../../utils/voice-chat-util');
-const urlUtility = require('../../utils/custom-url-util.js');
+const customUrlService = require('../../services/custom-url-service.js');
 const stringUtility = require('../../utils/string-util.js');
 const logger = require('../../utils/logger.js');
 
@@ -11,7 +11,7 @@ module.exports = {
     deprecated: true,
     async execute(interaction) {
         try {
-            const urls = await urlUtility.getUrls('meditate');
+            const urls = await customUrlService.getUrls('meditate');
 
             if (urls.length === 0) {
                 await interaction.reply('No URLs found.');
