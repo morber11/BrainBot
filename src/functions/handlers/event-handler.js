@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const logger = require('../../utils/logger.js');
 
 module.exports = (client) => {
     client.handleEvents = async () => {
@@ -13,7 +14,15 @@ module.exports = (client) => {
 
             if (folder === 'client') {
                 eventFiles.forEach(file => {
-                    const event = require(path.join(eventFilesPath, file));
+                    const eventPath = path.join(eventFilesPath, file);
+                    
+                    let event;
+                    try {
+                        event = require(eventPath);
+                    } catch (err) {
+                        logger.error(`Failed to load event ${file} from ${eventPath}:`, err);
+                        throw err;
+                    }
 
                     if (event.once) {
                         client.once(event.name, (...args) => event.execute(...args, client));

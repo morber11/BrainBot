@@ -31,7 +31,13 @@ async function run() {
             const migrationPath = path.join(migrationsDir, file);
             logger.info(`Running migration: ${file}`);
 
-            const migration = require(migrationPath);
+            let migration;
+            try {
+                migration = require(migrationPath);
+            } catch (err) {
+                logger.error(`Failed to load migration ${file} from ${migrationPath}:`, err);
+                throw err;
+            }
 
             if (migration && typeof migration.Up === 'function') {
                 try {

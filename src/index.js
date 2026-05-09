@@ -42,8 +42,15 @@ const commandFolders = fs.readdirSync('./src/commands');
                 .readdirSync(`./src/functions/${folder}`)
                 .filter(file => file.endsWith('.js'));
 
-            for (const file of funcFiles)
-                require(`./functions/${folder}/${file}`)(client);
+            for (const file of funcFiles) {
+                const funcPath = `./functions/${folder}/${file}`;
+                try {
+                    require(funcPath)(client);
+                } catch (err) {
+                    logger.error(`Failed to load function ${funcPath}:`, err);
+                    throw err;
+                }
+            }
         }
 
         client.handleEvents();
