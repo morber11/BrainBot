@@ -8,11 +8,11 @@ describe('handleBasicReactResponse handler', () => {
     let loggerStub;
 
     beforeEach(() => {
-        statsStub = { incrementStat: sinon.stub().resolves() };
+        statsStub = { incrementSystemStat: sinon.stub().resolves() };
         loggerStub = { error: sinon.stub() };
 
         handleBasicReactResponse = proxyquire('../../../../events/client/handlers/handleBasicReactResponse.js', {
-            '../../../utils/stats-util.js': statsStub,
+            '../../../services/user-stat-service.js': statsStub,
             '../../../utils/logger.js': loggerStub,
         });
     });
@@ -24,7 +24,7 @@ describe('handleBasicReactResponse handler', () => {
         await handleBasicReactResponse(message);
 
         expect(message.react).to.have.been.calledWith(CONSTANTS.EMOJI.BRAIN);
-        expect(statsStub.incrementStat).to.have.been.calledWith(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
+        expect(statsStub.incrementSystemStat).to.have.been.calledWith(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
     });
 
     it('reacts with regional signs when content includes brain emoji', async () => {
@@ -35,7 +35,7 @@ describe('handleBasicReactResponse handler', () => {
 
         expect(message.react).to.have.been.calledWith(CONSTANTS.EMOJI.REGIONAL_SIGN_B);
         expect(message.react).to.have.been.calledWith(CONSTANTS.EMOJI.REGIONAL_SIGN_R);
-        expect(statsStub.incrementStat).to.have.been.calledWith(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
+        expect(statsStub.incrementSystemStat).to.have.been.calledWith(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
     });
 
     it('reacts with thinking emoji when text starts with umm', async () => {

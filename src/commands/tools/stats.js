@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const UserStat = require('../../dal/models/user-stat.js');
 const statsUtil = require('../../utils/stats-util.js');
+const userStatService = require('../../services/user-stat-service.js');
 const CONSTANTS = require('../../utils/constants.js');
 
 
@@ -12,7 +13,7 @@ module.exports = {
         const userId = interaction.user && interaction.user.id;
         if (!userId) return interaction.reply('Unable to determine user.');
 
-        await statsUtil.incrementUserStat(userId, CONSTANTS.STATS.USER_STATS, CONSTANTS.STATS.USER_STATS_FRIENDLY);
+        await userStatService.incrementUserStat(userId, CONSTANTS.STATS.USER_STATS, CONSTANTS.STATS.USER_STATS_FRIENDLY);
 
         const rows = await UserStat.findAll({ where: { userId }, order: [['count', 'DESC']] });
 

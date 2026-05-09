@@ -1,6 +1,6 @@
 const cron = require('cron');
 const CONSTANTS = require('../../../utils/constants.js');
-const statsUtil = require('../../../utils/stats-util.js');
+const userStatService = require('../../../services/user-stat-service.js');
 const logger = require('../../../utils/logger.js');
 const responseWindowUtil = require('../../../utils/response-window-util.js');
 
@@ -46,7 +46,7 @@ const patriotAct = (client, tz, delayMs = CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIO
                 if (targetChannel) {
                     await targetChannel.send('o7');
                     try {
-                        await statsUtil.incrementSystemStat(CONSTANTS.STATS.PATRIOT_ACT);
+                        await userStatService.incrementSystemStat(CONSTANTS.STATS.PATRIOT_ACT);
                     } catch (e) {
                         logger.error('Failed to update patriot act stat:', e);
                     }

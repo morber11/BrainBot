@@ -9,12 +9,12 @@ describe('handleJigsaw handler', () => {
     let loggerStub;
 
     beforeEach(() => {
-        statsStub = { incrementStat: sinon.stub().resolves() };
+        statsStub = { incrementSystemStat: sinon.stub().resolves() };
         pathStub = { getMediaFilePath: sinon.stub().returns('fake/path/jigsaw.jpg') };
         loggerStub = { error: sinon.stub() };
 
         handleJigsaw = proxyquire('../../../../events/client/handlers/handleJigsaw.js', {
-            '../../../utils/stats-util.js': statsStub,
+            '../../../services/user-stat-service.js': statsStub,
             '../../../utils/path-util.js': pathStub,
             '../../../utils/logger.js': loggerStub,
         });
@@ -25,7 +25,7 @@ describe('handleJigsaw handler', () => {
 
         await handleJigsaw(message);
 
-        expect(statsStub.incrementStat).to.have.been.calledWith(CONSTANTS.STATS.JIGSAW, CONSTANTS.STATS.JIGSAW_FRIENDLY);
+        expect(statsStub.incrementSystemStat).to.have.been.calledWith(CONSTANTS.STATS.JIGSAW, CONSTANTS.STATS.JIGSAW_FRIENDLY);
         expect(message.reply).to.have.been.calledWith({ files: ['fake/path/jigsaw.jpg'] });
     });
 

@@ -1,5 +1,5 @@
 const mathUtil = require('../../../utils/math-util.js');
-const statsUtil = require('../../../utils/stats-util.js');
+const userStatService = require('../../../services/user-stat-service.js');
 const logger = require('../../../utils/logger.js');
 const CONSTANTS = require('../../../utils/constants.js');
 
@@ -28,7 +28,7 @@ module.exports = async function handleMarioJudah(message) {
 
         lastMissTheRageByGuild.set(guildKey, Date.now());
 
-        await statsUtil.incrementSystemStat(CONSTANTS.STATS.MARIO_JUDAH_MISS_THE_RAGE, CONSTANTS.STATS.MARIO_JUDAH_MISS_THE_RAGE_FRIENDLY);
+        await userStatService.incrementSystemStat(CONSTANTS.STATS.MARIO_JUDAH_MISS_THE_RAGE, CONSTANTS.STATS.MARIO_JUDAH_MISS_THE_RAGE_FRIENDLY);
         await message.reply('i miss the rage');
     } catch (err) {
         logger.error(err, {

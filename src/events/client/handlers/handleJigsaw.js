@@ -1,7 +1,7 @@
 const path = require('node:path');
 const pathUtility = require('../../../utils/path-util.js');
 const CONSTANTS = require('../../../utils/constants.js');
-const statsUtil = require('../../../utils/stats-util.js');
+const userStatService = require('../../../services/user-stat-service.js');
 const logger = require('../../../utils/logger.js');
 
 module.exports = async function handleJigsaw(message) {
@@ -11,7 +11,7 @@ module.exports = async function handleJigsaw(message) {
 
         const dir = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'images', 'jigsaw.jpg');
 
-        await statsUtil.incrementStat(CONSTANTS.STATS.JIGSAW, CONSTANTS.STATS.JIGSAW_FRIENDLY);
+        await userStatService.incrementSystemStat(CONSTANTS.STATS.JIGSAW, CONSTANTS.STATS.JIGSAW_FRIENDLY);
         await message.reply({ files: [dir] });
     } catch (err) {
         logger.error(err, { handler: 'handleJigsaw' });

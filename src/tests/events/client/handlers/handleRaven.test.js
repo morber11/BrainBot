@@ -9,12 +9,12 @@ describe('handleRaven handler', () => {
     let loggerStub;
 
     beforeEach(() => {
-        statsStub = { incrementStat: sinon.stub().resolves() };
+        statsStub = { incrementSystemStat: sinon.stub().resolves() };
         pathStub = { getMediaFilePath: sinon.stub().returns('fake/path/raven-1.gif') };
         loggerStub = { error: sinon.stub() };
 
         handleRaven = proxyquire('../../../../events/client/handlers/handleRaven.js', {
-            '../../../utils/stats-util.js': statsStub,
+            '../../../services/user-stat-service.js': statsStub,
             '../../../utils/path-util.js': pathStub,
             '../../../utils/logger.js': loggerStub,
         });
@@ -25,7 +25,7 @@ describe('handleRaven handler', () => {
 
         await handleRaven(message);
 
-        expect(statsStub.incrementStat).to.have.been.calledWith(CONSTANTS.STATS.RAVEN, CONSTANTS.STATS.RAVEN_FRIENDLY);
+        expect(statsStub.incrementSystemStat).to.have.been.calledWith(CONSTANTS.STATS.RAVEN, CONSTANTS.STATS.RAVEN_FRIENDLY);
         expect(message.reply).to.have.been.calledWith({ files: ['fake/path/raven-1.gif'] });
     });
 

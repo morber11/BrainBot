@@ -14,7 +14,7 @@ describe('handlePatriotSalute handler', () => {
         loggerStub = { error: sinon.stub() };
 
         handlePatriotSalute = proxyquire('../../../../events/client/handlers/handlePatriotSalute.js', {
-            '../../../utils/stats-util.js': statsStub,
+            '../../../services/user-stat-service.js': statsStub,
             '../../../utils/logger.js': loggerStub,
             '../../../utils/response-window-util.js': responseWindowUtilStub,
         });

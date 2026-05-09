@@ -14,7 +14,7 @@ describe('messageReactionAdd event handler', () => {
         loggerStub = { error: sinon.stub() };
 
         handler = proxyquire('../../../events/client/message-reaction-add.js', {
-            '../../utils/stats-util.js': statsStub,
+            '../../services/user-stat-service.js': statsStub,
             '../../utils/logger.js': loggerStub,
             '../../utils/response-window-util.js': responseWindowUtilStub,
         });
