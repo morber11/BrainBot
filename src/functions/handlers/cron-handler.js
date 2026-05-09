@@ -3,6 +3,7 @@ const patriotAct = require('./cron/patriot-act-cron');
 const debug = require('./cron/debug-cron');
 const logger = require('../../utils/logger.js');
 const { isValidTimeZone } = require('../../utils/timezone-util.js');
+const env = require('../../utils/env.js');
 
 module.exports = (client) => {
     client.handleCrons = async () => {
@@ -19,7 +20,7 @@ module.exports = (client) => {
         patriotAct(client, TIMEZONE).start();
 
         // debug only crons go here
-        if (process.env.NODE_ENV === 'development') {
+        if (env.isDev) {
             debug(client, TIMEZONE).start();
         }
     };

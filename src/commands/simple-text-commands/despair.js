@@ -10,7 +10,7 @@ module.exports = {
 
         const { id, username } = interaction.user;
 
-        var [member, created] = await memberService.findOrCreate(id);
+        const [member, created] = await memberService.findOrCreate(id);
 
         if (!created) {
             await memberService.update(id, {

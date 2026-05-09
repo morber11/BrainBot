@@ -2,6 +2,7 @@ const mathUtil = require('../../../utils/math-util.js');
 const statService = require('../../../services/system-stat-service.js');
 const logger = require('../../../utils/logger.js');
 const CONSTANTS = require('../../../utils/constants.js');
+const env = require('../../../utils/env.js');
 
 const lastMissTheRageByGuild = new Map();
 const MISS_THE_RAGE_COOLDOWN_MS = 6 * 60 * 60 * 1000;
@@ -17,14 +18,13 @@ module.exports = async function handleMarioJudah(message) {
 
         const guildKey = message.guildId || `dm:${message.author.id}`;
 
-        const isDev = process.env.NODE_ENV === 'development';
-        if (!isDev) {
+        if (!env.isDev) {
             const last = lastMissTheRageByGuild.get(guildKey) || 0;
             if (Date.now() - last < MISS_THE_RAGE_COOLDOWN_MS) return;
         }
 
-        const chance = isDev ? 100 : 20;
-        if (!isDev && mathUtil.getRandomInt(100) >= chance) return;
+        const chance = env.isDev ? 100 : 20;
+        if (!env.isDev && mathUtil.getRandomInt(100) >= chance) return;
 
         lastMissTheRageByGuild.set(guildKey, Date.now());
 

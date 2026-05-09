@@ -7,6 +7,7 @@ const { Routes } = require('discord-api-types/v9');
 const CONSTANTS = require('../../utils/constants.js');
 const { BOT_TOKEN } = process.env;
 const logger = require('../../utils/logger.js');
+const env = require('../../utils/env.js');
 
 module.exports = (client) => {
     client.handleCommands = async (commandFolders) => {
@@ -25,7 +26,15 @@ module.exports = (client) => {
 
             if (Array.isArray(commandFiles)) {
                 commandFiles.forEach(file => {
-                    const command = require(path.join(commandFilesPath, file));
+                    const commandPath = path.join(commandFilesPath, file);
+
+                    let command;
+                    try {
+                        command = require(commandPath);
+                    } catch (err) {
+                        logger.error(`Failed to load command ${file} from ${commandFilesPath}:`, err);
+                        throw err;
+                    }
 
                     if (!command || !command.data || !command.data.name) {
                         logger.info(`Skipping file without command data: ${file}`);
@@ -38,8 +47,8 @@ module.exports = (client) => {
                     }
 
                     // this order does matter for short circuiting
-                    if (process.env.NODE_ENV && command.devOnly && process.env.NODE_ENV !== 'development') {
-                        logger.info(`Skipping dev-only command: ${command.data.name} (NODE_ENV=${process.env.NODE_ENV})`);
+                    if (env.isSet && command.devOnly && !env.isDev) {
+                        logger.info(`Skipping dev-only command: ${command.data.name} (NODE_ENV=${env.NODE_ENV})`);
                         return;
                     }
 
