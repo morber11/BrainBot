@@ -1,9 +1,10 @@
 const fs = require('fs');
 const path = require('path');
+const logger = require('../../utils/logger.js');
 
 async function run() {
     try {
-        console.log('Starting migrations...');
+        logger.info('Starting migrations...');
 
         const migrationsDir = path.join(__dirname, '..', 'migrations');
         const migrationFiles = fs.readdirSync(migrationsDir)
@@ -16,19 +17,19 @@ async function run() {
                 if (a.order !== b.order) {
                     return a.order - b.order;
                 }
-                
+
                 return a.file.localeCompare(b.file);
             })
             .map(x => x.file);
 
         if (migrationFiles.length === 0) {
-            console.log('No migration files found.');
+            logger.info('No migration files found.');
             return;
         }
 
         for (const file of migrationFiles) {
             const migrationPath = path.join(migrationsDir, file);
-            console.log(`Running migration: ${file}`);
+            logger.info(`Running migration: ${file}`);
 
             const migration = require(migrationPath);
 
@@ -36,17 +37,17 @@ async function run() {
                 try {
                     await migration.Up();
                 } catch (err) {
-                    console.error(`Migration ${file} failed:`, err);
-                    throw err; // will be caught by outer catch to exit non-zero
+                    logger.error(`Migration ${file} failed:`, err);
+                    throw err;
                 }
             } else {
-                console.warn(`Skipping ${file}: no Up() export found.`);
+                logger.warn(`Skipping ${file}: no Up() export found.`);
             }
         }
 
-        console.log('Migrations complete');
+        logger.info('Migrations complete');
     } catch (err) {
-        console.error('Error during migrations:', err);
+        logger.error('Error during migrations:', err);
         process.exit(1);
     }
 }

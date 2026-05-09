@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { BOT_TOKEN } = process.env;
-const { Client, Events, Collection, GatewayIntentBits, ActivityType } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, ActivityType } = require('discord.js');
 const fs = require('node:fs');
 const database = require('./dal/database/database.js');
 const retryOperation = require('./utils/retry.js');

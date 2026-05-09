@@ -1,19 +1,20 @@
 const database = require('./database.js');
-const Guild = require('../models/guild.js');
-const Member = require('../models/member.js');
-const Keyword = require('../models/keyword.js');
-const CustomUrl = require('../models/custom-url.js');
-const FactOrFiction = require('../models/fact-or-fiction.js');
-const Stat = require('../models/stat.js');
+require('../models/guild.js');
+require('../models/member.js');
+require('../models/keyword.js');
+require('../models/custom-url.js');
+require('../models/fact-or-fiction.js');
+require('../models/stat.js');
+const logger = require('../../utils/logger.js');
 
-console.log("beginning sync");
+logger.info('beginning sync');
 
 async function syncDatabase() {
     try {
-        await database.sync({force: true});
-        console.log("done");
-    } catch(err) {
-        console.error("An error occurred: ", err);
+        await database.sync({ force: true });
+        logger.info('done');
+    } catch (err) {
+        logger.error('An error occurred:', err);
     }
 }
 

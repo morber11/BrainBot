@@ -1,0 +1,49 @@
+{
+    "env": {
+        "node": true,
+        "es2022": true,
+        "mocha": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 2022
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+        "no-console": [
+            "error",
+            {
+                "allow": [
+                    "warn",
+                    "error",
+                    "info"
+                ]
+            }
+        ],
+        "no-unused-vars": [
+            "warn",
+            {
+                "argsIgnorePattern": "^_"
+            }
+        ],
+        "prefer-const": "error",
+        "eqeqeq": [
+            "error",
+            "smart"
+        ]
+    },
+    "globals": {
+        "expect": "readonly",
+        "sinon": "readonly",
+        "proxyquire": "readonly"
+    },
+    "overrides": [
+        {
+            "files": [
+                "src/utils/logger.js"
+            ],
+            "rules": {
+                "no-console": "off"
+            }
+        }
+    ]
+}

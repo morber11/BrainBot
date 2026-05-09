@@ -41,14 +41,14 @@ async function parseMentalDespairKeywords(message) {
     const keywordsMap = new Set(keywords.map((k) => k.name));
 
     let despairCount = 0;
-    messageContent.split(" ").forEach((w) => {
+    messageContent.split(' ').forEach((w) => {
         if (keywordsMap.has(w)) {
-            var kw = keywords.find(x => x.name === w)
-            despairCount += kw.value != null ? kw.value : 1
+            const kw = keywords.find((x) => x.name === w);
+            despairCount += kw.value !== null && kw.value !== undefined ? kw.value : 1;
         }
     });
 
-    if (despairCount != 0) {
+    if (despairCount !== 0) {
         const [member, created] = await memberService.findOrCreate(message.author.id);
 
         if (!created) {
