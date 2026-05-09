@@ -5,6 +5,9 @@ async function findAllByType(type, attributes) {
     return CustomUrl.findAll({ raw: true, where: { type }, attributes });
 }
 
+// this will only return url, nothing else
+// hence why we sometimes use findAllByType
+// when we need specific details such as the value
 async function getUrls(type) {
     try {
         return await findAllByType(type, ['url']);
