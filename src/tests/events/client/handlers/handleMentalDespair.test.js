@@ -5,7 +5,7 @@ const CONSTANTS = require('../../../../utils/constants.js');
 describe('handleMentalDespair handler', () => {
     let handleMentalDespair;
     let MemberServiceStub;
-    let KeywordStub;
+    let KeywordServiceStub;
     let CustomUrlStub;
     let stringUtilStub;
     let loggerStub;
@@ -17,14 +17,14 @@ describe('handleMentalDespair handler', () => {
             update: sinon.stub().resolves()
         };
 
-        KeywordStub = { findAll: sinon.stub().resolves([]) };
+        KeywordServiceStub = { findAllByType: sinon.stub().resolves([]) };
         CustomUrlStub = { findAllByType: sinon.stub().resolves([]) };
         stringUtilStub = { selectRandomFromArray: sinon.stub() };
         loggerStub = { error: sinon.stub() };
 
         handleMentalDespair = proxyquire('../../../../events/client/handlers/handleMentalDespair.js', {
             '../../../services/member-service.js': MemberServiceStub,
-            '../../../dal/models/keyword.js': KeywordStub,
+            '../../../services/keyword-service.js': KeywordServiceStub,
             '../../../services/custom-url-service.js': CustomUrlStub,
             '../../../utils/string-util.js': stringUtilStub,
             '../../../utils/logger.js': loggerStub,
@@ -32,7 +32,7 @@ describe('handleMentalDespair handler', () => {
     });
 
     it('updates member despair count when keywords present', async () => {
-        KeywordStub.findAll.resolves([{ name: 'sad', value: 2 }]);
+        KeywordServiceStub.findAllByType.resolves([{ name: 'sad', value: 2 }]);
         MemberServiceStub.findOrCreate.resolves([{ id: 'u1', despairCount: 1 }, false]);
         MemberServiceStub.findOne.resolves({ despairCount: 1 });
 

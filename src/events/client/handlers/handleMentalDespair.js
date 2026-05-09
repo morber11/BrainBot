@@ -1,5 +1,5 @@
 const memberService = require('../../../services/member-service.js');
-const Keyword = require('../../../dal/models/keyword.js');
+const keywordService = require('../../../services/keyword-service.js');
 const customUrlService = require('../../../services/custom-url-service.js');
 const stringUtility = require('../../../utils/string-util.js');
 const CONSTANTS = require('../../../utils/constants.js');
@@ -36,11 +36,7 @@ module.exports = async function handleMentalDespair(message) {
 async function parseMentalDespairKeywords(message) {
     const messageContent = message.content.toLowerCase();
 
-    const keywords = await Keyword.findAll({
-        attributes: ['name', 'value'],
-        where: { type: 'despair' },
-        raw: true
-    });
+    const keywords = await keywordService.findAllByType('despair', ['name', 'value']);
 
     const keywordsMap = new Set(keywords.map((k) => k.name));
 
