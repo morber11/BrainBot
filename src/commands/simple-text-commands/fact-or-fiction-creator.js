@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
-const FactOrFiction = require('../../dal/models/fact-or-fiction.js');
+const factOrFictionService = require('../../services/fact-or-fiction-service.js');
 const cryptUtil = require('../../utils/crypt-util.js');
 const pathUtility = require('../../utils/path-util.js');
 const CONSTANTS = require('../../utils/constants.js');
@@ -25,11 +25,7 @@ module.exports = {
             const url = interaction.options.getString('url');
             const hash = await cryptUtil.getHash(url);
 
-            const [factOrFictionEntry, created] = await FactOrFiction.findOrCreate({
-                where: {
-                    entryHash: hash,
-                }
-            });
+            const [factOrFictionEntry, created] = await factOrFictionService.findOrCreate(hash);
 
             let value = factOrFictionEntry.dataValues.value;
 
@@ -39,10 +35,7 @@ module.exports = {
                     ? CONSTANTS.FACT_OR_FICTION.VALUES.FACT
                     : CONSTANTS.FACT_OR_FICTION.VALUES.FICTION;
 
-                await FactOrFiction.update(
-                    { value: result },
-                    { where: { id: factOrFictionEntry.id } }
-                );
+                await factOrFictionService.update(factOrFictionEntry.id, result);
 
                 value = result;
             }
