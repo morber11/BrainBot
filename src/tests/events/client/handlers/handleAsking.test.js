@@ -11,14 +11,14 @@ describe('handleAsking handler', () => {
         loggerStub = { error: sinon.stub() };
 
         handleAsking = proxyquire('../../../../events/client/handlers/handleAsking.js', {
-            '../../../utils/ask-util.js': askStub,
+            '../../../services/ask-service.js': askStub,
             '../../../utils/logger.js': loggerStub,
         });
     });
 
     it('calls ask.chanceToSend when message has guild', async () => {
         const message = { guild: { id: 'g1' }, guildId: 'g1', channelId: 'c1', id: 'm1', author: { id: 'u1' } };
-        
+
         await handleAsking(message);
         expect(askStub.chanceToSend).to.have.been.calledWith(message);
     });

@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const patriotAct = require('../../functions/handlers/cron/patriot-act-cron');
 const CONSTANTS = require('../../utils/constants.js');
-const ask = require('../../utils/ask-util.js');
+const ask = require('../../services/ask-service.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
