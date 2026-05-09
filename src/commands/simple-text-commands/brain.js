@@ -13,13 +13,13 @@ module.exports = {
                 .setMaxLength(3)
         ),
     async execute(interaction) {
-        var numBrains = interaction.options.getString('brains');
-        var message = '';
+        let numBrains = interaction.options.getString('brains');
+        let message = '';
 
         if (stringUtility.isNumeric(numBrains)) {
             numBrains = Math.min(Math.max(parseInt(numBrains, 10) || 0, 0), CONSTANTS.BRAIN.MAX_BRAINS);
 
-            for (var i = 0; i < numBrains; ++i) {
+            for (let i = 0; i < numBrains; ++i) {
                 message += 'brain ';
             }
         } else {
