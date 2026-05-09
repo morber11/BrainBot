@@ -1,6 +1,6 @@
 const Member = require('../../../dal/models/member.js');
 const Keyword = require('../../../dal/models/keyword.js');
-const CustomUrl = require('../../../dal/models/custom-url.js');
+const customUrlService = require('../../../services/custom-url-service.js');
 const stringUtility = require('../../../utils/string-util.js');
 const CONSTANTS = require('../../../utils/constants.js');
 const logger = require('../../../utils/logger.js');
@@ -19,11 +19,7 @@ module.exports = async function handleMentalDespair(message) {
         if (!currentDespair) return;
 
         if (currentDespair.despairCount >= CONSTANTS.POINT_VALUES.MAX_DESPAIR) {
-            const urls = await CustomUrl.findAll({
-                attributes: ['url'],
-                where: { type: 'despair' },
-                raw: true
-            });
+            const urls = await customUrlService.findAllByType('despair', ['url']);
 
             const el = stringUtility.selectRandomFromArray(urls);
 

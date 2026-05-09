@@ -18,14 +18,14 @@ describe('handleMentalDespair handler', () => {
         };
 
         KeywordStub = { findAll: sinon.stub().resolves([]) };
-        CustomUrlStub = { findAll: sinon.stub().resolves([]) };
+        CustomUrlStub = { findAllByType: sinon.stub().resolves([]) };
         stringUtilStub = { selectRandomFromArray: sinon.stub() };
         loggerStub = { error: sinon.stub() };
 
         handleMentalDespair = proxyquire('../../../../events/client/handlers/handleMentalDespair.js', {
             '../../../dal/models/member.js': MemberStub,
             '../../../dal/models/keyword.js': KeywordStub,
-            '../../../dal/models/custom-url.js': CustomUrlStub,
+            '../../../services/custom-url-service.js': CustomUrlStub,
             '../../../utils/string-util.js': stringUtilStub,
             '../../../utils/logger.js': loggerStub,
         });
@@ -46,20 +46,20 @@ describe('handleMentalDespair handler', () => {
 
     it('replies with a despair URL when count exceeds limit', async () => {
         MemberStub.findOne.resolves({ despairCount: CONSTANTS.POINT_VALUES.MAX_DESPAIR });
-        CustomUrlStub.findAll.resolves([{ url: 'http://a' }, { url: 'http://b' }]);
+        CustomUrlStub.findAllByType.resolves([{ url: 'http://a' }, { url: 'http://b' }]);
         stringUtilStub.selectRandomFromArray.returns({ url: 'http://a' });
 
         const message = { content: 'nothing', author: { id: 'u2' }, reply: sinon.stub().resolves() };
 
         await handleMentalDespair(message);
 
-        expect(CustomUrlStub.findAll).to.have.been.calledWith({ attributes: ['url'], where: { type: 'despair' }, raw: true });
+        expect(CustomUrlStub.findAllByType).to.have.been.calledWith('despair', ['url']);
         expect(message.reply).to.have.been.calledWith(`Your despair is too high! \nhttp://a`);
     });
 
     it('logs errors when message.reply throws', async () => {
         MemberStub.findOne.resolves({ despairCount: CONSTANTS.POINT_VALUES.MAX_DESPAIR });
-        CustomUrlStub.findAll.resolves([{ url: 'http://a' }]);
+        CustomUrlStub.findAllByType.resolves([{ url: 'http://a' }]);
         stringUtilStub.selectRandomFromArray.returns({ url: 'http://a' });
 
         const message = { content: 's', author: { id: 'u3' }, guildId: 'g3', channelId: 'c3', id: 'm3', reply: sinon.stub().rejects(new Error('fail')) };
