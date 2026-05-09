@@ -14,7 +14,7 @@ describe('handleRaven handler', () => {
         loggerStub = { error: sinon.stub() };
 
         handleRaven = proxyquire('../../../../events/client/handlers/handleRaven.js', {
-            '../../../services/user-stat-service.js': statsStub,
+            '../../../services/system-stat-service.js': statsStub,
             '../../../utils/path-util.js': pathStub,
             '../../../utils/logger.js': loggerStub,
         });

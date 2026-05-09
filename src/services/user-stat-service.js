@@ -1,5 +1,4 @@
 const UserStat = require('../dal/models/user-stat.js');
-const Stat = require('../dal/models/stat.js');
 const logger = require('../utils/logger.js');
 
 async function findAllByUser(userId, attributes = null, order = null) {
@@ -37,27 +36,10 @@ async function incrementUserStat(userId, statKey, friendlyName = null) {
     }
 }
 
-async function incrementSystemStat(statKey, friendlyName = null, sortOrder = 100) {
-    try {
-        const [statRow] = await Stat.findOrCreate({
-            where: { stat: statKey },
-            defaults: { count: 0, friendly_name: friendlyName || statKey, sort_order: sortOrder },
-        });
-
-        await statRow.increment('count');
-
-        return statRow;
-    } catch (err) {
-        logger.error(`Failed to increment system stat ${statKey}:`, err);
-        return null;
-    }
-}
-
 module.exports = {
     findAllByUser,
     findOrCreate,
     findOneByUserAndStat,
     updateById,
     incrementUserStat,
-    incrementSystemStat,
 };

@@ -1,7 +1,7 @@
 const path = require('node:path');
 const pathUtility = require('../../../utils/path-util.js');
 const CONSTANTS = require('../../../utils/constants.js');
-const userStatService = require('../../../services/user-stat-service.js');
+const statService = require('../../../services/system-stat-service.js');
 const logger = require('../../../utils/logger.js');
 
 module.exports = async function handleMilk(message) {
@@ -11,7 +11,7 @@ module.exports = async function handleMilk(message) {
 
         const dir = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'audio', 'milk03.mp3');
 
-        await userStatService.incrementSystemStat(CONSTANTS.STATS.MILK, CONSTANTS.STATS.MILK_FRIENDLY);
+        await statService.incrementSystemStat(CONSTANTS.STATS.MILK, CONSTANTS.STATS.MILK_FRIENDLY);
         await message.reply({ files: [dir] });
     } catch (err) {
         logger.error(err, { handler: 'handleMilk' });

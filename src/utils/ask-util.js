@@ -1,4 +1,4 @@
-const userStatService = require('../services/user-stat-service.js');
+const statService = require('../services/system-stat-service.js');
 const CONSTANTS = require('./constants.js');
 const logger = require('./logger.js');
 
@@ -81,7 +81,7 @@ async function chanceToSend(messageOrInteraction) {
     if (!shouldReply(guildId)) return false;
 
     try {
-        await userStatService.incrementSystemStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
+        await statService.incrementSystemStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
 
         const text = getAskText(messageOrInteraction);
         if (!text) return false;
@@ -96,7 +96,7 @@ async function chanceToSend(messageOrInteraction) {
 
 async function forceSend(messageOrInteraction) {
     try {
-        await userStatService.incrementSystemStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
+        await statService.incrementSystemStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
         const text = getAskText(messageOrInteraction);
         await messageOrInteraction.reply(text);
 

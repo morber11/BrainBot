@@ -14,7 +14,7 @@ describe('handleJigsaw handler', () => {
         loggerStub = { error: sinon.stub() };
 
         handleJigsaw = proxyquire('../../../../events/client/handlers/handleJigsaw.js', {
-            '../../../services/user-stat-service.js': statsStub,
+            '../../../services/system-stat-service.js': statsStub,
             '../../../utils/path-util.js': pathStub,
             '../../../utils/logger.js': loggerStub,
         });

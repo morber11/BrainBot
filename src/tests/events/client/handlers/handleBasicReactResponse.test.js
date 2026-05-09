@@ -12,7 +12,7 @@ describe('handleBasicReactResponse handler', () => {
         loggerStub = { error: sinon.stub() };
 
         handleBasicReactResponse = proxyquire('../../../../events/client/handlers/handleBasicReactResponse.js', {
-            '../../../services/user-stat-service.js': statsStub,
+            '../../../services/system-stat-service.js': statsStub,
             '../../../utils/logger.js': loggerStub,
         });
     });

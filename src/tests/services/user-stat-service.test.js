@@ -86,14 +86,4 @@ describe('user-stat-service', () => {
         expect(res).to.equal(row);
     });
 
-    it('incrementSystemStat should findOrCreate and increment count', async () => {
-        const statRow = { id: 5, increment: sinon.stub().resolves() };
-        StatStub.findOrCreate.resolves([statRow, true]);
-
-        const res = await userStatService.incrementSystemStat('test_stat', 'friendly', 5);
-
-        expect(StatStub.findOrCreate).to.have.been.calledWith({ where: { stat: 'test_stat' }, defaults: { count: 0, friendly_name: 'friendly', sort_order: 5 } });
-        expect(statRow.increment).to.have.been.calledWith('count');
-        expect(res).to.equal(statRow);
-    });
 });
