@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const Member = require('../../dal/models/member.js');
+const memberService = require('../../services/member-service.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -10,18 +10,12 @@ module.exports = {
 
         const { id, username } = interaction.user;
 
-        var [member, created] = await Member.findOrCreate({
-            where: {
-                id: id,
-            }
-        });
+        var [member, created] = await memberService.findOrCreate(id);
 
         if (!created) {
-            await Member.update({
+            await memberService.update(id, {
                 name: username,
-            },
-                { where: { id: id } }
-            );
+            });
         }
 
         await interaction.editReply(`Your mental despair is: ${member.dataValues.despairCount}`);

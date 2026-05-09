@@ -63,7 +63,7 @@ describe('custom-url-service', () => {
         expect(rows).to.include(one);
     });
 
-    it('findOrCreateUrl returns model result and forwards attrs', async () => {
+    it('findOrCreateUrl returns model result', async () => {
         const attrs = { value: 'x', type: 'jimcarrey' };
         const dbRes = [{ dataValues: attrs }, true];
         CustomUrlStub.findOrCreate.resolves(dbRes);

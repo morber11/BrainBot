@@ -1,9 +1,9 @@
 const cron = require('cron');
-const Member = require('../../../dal/models/member.js');
+const memberService = require('../../../services/member-service.js');
 const CONSTANTS = require('../../../utils/constants.js');
 
 const decrementDespair = new cron.CronJob(CONSTANTS.CRON.HANDLE_DESPAIR, async () => {
-    const members = await Member.findAll();
+    const members = await memberService.findAll();
 
     members.forEach(async (member) => {
         const { despairCount, id } = member;
@@ -14,10 +14,10 @@ const decrementDespair = new cron.CronJob(CONSTANTS.CRON.HANDLE_DESPAIR, async (
         }
 
         if (despairCount < 0) {
-            await Member.update(
-                { despairCount: 0, updatedAt: new Date() },
-                { where: { id } }
-            );
+            await memberService.update(id, {
+                despairCount: 0,
+                updatedAt: new Date(),
+            });
         }
     });
 });

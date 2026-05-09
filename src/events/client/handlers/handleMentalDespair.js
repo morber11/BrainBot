@@ -1,4 +1,4 @@
-const Member = require('../../../dal/models/member.js');
+const memberService = require('../../../services/member-service.js');
 const Keyword = require('../../../dal/models/keyword.js');
 const customUrlService = require('../../../services/custom-url-service.js');
 const stringUtility = require('../../../utils/string-util.js');
@@ -9,11 +9,8 @@ module.exports = async function handleMentalDespair(message) {
     try {
         await parseMentalDespairKeywords(message);
 
-        const currentDespair = await Member.findOne({
+        const currentDespair = await memberService.findOne(message.author.id, {
             attributes: ['despairCount'],
-            where: {
-                id: message.author.id,
-            }
         });
 
         if (!currentDespair) return;
@@ -56,22 +53,16 @@ async function parseMentalDespairKeywords(message) {
     });
 
     if (despairCount != 0) {
-        const [member, created] = await Member.findOrCreate({
-            where: {
-                id: message.author.id,
-            }
-        });
+        const [member, created] = await memberService.findOrCreate(message.author.id);
 
         if (!created) {
             const newCount = member.despairCount + despairCount;
 
-            await Member.update({
+            await memberService.update(member.id, {
                 name: message.author.username,
                 despairCount: newCount > 0 ? newCount : 0,
                 updatedAt: new Date(),
-            },
-                { where: { id: member.id } }
-            );
+            });
         }
     }
 }

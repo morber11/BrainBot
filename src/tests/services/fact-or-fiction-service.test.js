@@ -16,7 +16,7 @@ describe('fact-or-fiction-service', () => {
         });
     });
 
-    it('findOrCreate forwards the entryHash', async () => {
+    it('should findOrCreate the entryHash', async () => {
         const dbRes = [{ id: 1, dataValues: { value: 'fact' } }, false];
         FactOrFictionStub.findOrCreate.resolves(dbRes);
 
@@ -26,7 +26,7 @@ describe('fact-or-fiction-service', () => {
         expect(res).to.equal(dbRes);
     });
 
-    it('update forwards id and value', async () => {
+    it('should update id and value', async () => {
         const dbRes = [1];
         FactOrFictionStub.update.resolves(dbRes);
 
