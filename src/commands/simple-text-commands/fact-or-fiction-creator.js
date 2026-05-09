@@ -30,8 +30,8 @@ module.exports = {
             let value = factOrFictionEntry.dataValues.value;
 
             if (created) {
-                let rand = mathUtil.getRandomInt(999);
-                let result = rand % 2 === 0
+                const rand = mathUtil.getRandomInt(999);
+                const result = rand % 2 === 0
                     ? CONSTANTS.FACT_OR_FICTION.VALUES.FACT
                     : CONSTANTS.FACT_OR_FICTION.VALUES.FICTION;
 

@@ -30,7 +30,7 @@ module.exports = {
         }
 
         if (action === CONSTANTS.COMMANDS.DIDNT_ASK) {
-            const sent = await ask.forceSend(interaction);
+            await ask.forceSend(interaction);
             if (!interaction.replied && !interaction.deferred) {
                 await interaction.reply('force sent');
             }
