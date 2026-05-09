@@ -27,6 +27,24 @@ describe('custom-url-service', () => {
         expect(res).to.equal(rows);
     });
 
+    it('getUrls returns rows for a given type', async () => {
+        const rows = [{ url: 'u' }];
+        CustomUrlStub.findAll.resolves(rows);
+
+        const res = await customUrlService.getUrls('meditate');
+
+        expect(CustomUrlStub.findAll).to.have.been.calledOnce;
+        expect(res).to.equal(rows);
+    });
+
+    it('getUrls returns empty array on error', async () => {
+        CustomUrlStub.findAll.rejects(new Error('boom'));
+
+        const res = await customUrlService.getUrls('meditate');
+
+        expect(res).to.deep.equal([]);
+    });
+
     it('createUrl creates and returns record', async () => {
         const attrs = { value: 'x', type: 'jimcarrey' };
         const created = { id: 1, ...attrs };

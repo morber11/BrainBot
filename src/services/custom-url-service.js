@@ -1,7 +1,17 @@
 const CustomUrl = require('../dal/models/custom-url.js');
+const logger = require('../utils/logger.js');
 
 async function findAllByType(type, attributes) {
     return CustomUrl.findAll({ raw: true, where: { type }, attributes });
+}
+
+async function getUrls(type) {
+    try {
+        return await findAllByType(type, ['url']);
+    } catch (err) {
+        logger.error(err);
+        return [];
+    }
 }
 
 async function findRandomUrl(type) {
@@ -17,4 +27,4 @@ async function createUrl(attrs) {
     return CustomUrl.create(attrs);
 }
 
-module.exports = { findAllByType, findRandomUrl, findOrCreateUrl, createUrl };
+module.exports = { findAllByType, getUrls, findRandomUrl, findOrCreateUrl, createUrl };
