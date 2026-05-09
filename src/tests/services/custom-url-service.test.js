@@ -3,6 +3,7 @@ const proxyquire = require('proxyquire');
 
 describe('custom-url-service', () => {
     let CustomUrlStub;
+    let loggerStub;
     let customUrlService;
 
     beforeEach(() => {
@@ -12,8 +13,11 @@ describe('custom-url-service', () => {
             create: sinon.stub()
         };
 
+        loggerStub = { error: sinon.stub() };
+
         customUrlService = proxyquire('../../services/custom-url-service.js', {
-            '../dal/models/custom-url.js': CustomUrlStub
+            '../dal/models/custom-url.js': CustomUrlStub,
+            '../utils/logger.js': loggerStub,
         });
     });
 
