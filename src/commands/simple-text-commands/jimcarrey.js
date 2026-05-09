@@ -1,15 +1,11 @@
 const { SlashCommandBuilder } = require('discord.js');
-const CustomUrl = require('../../dal/models/custom-url.js');
+const customUrlService = require('../../services/custom-url-service.js');
 const stringUtility = require('../../utils/string-util.js');
 const logger = require('../../utils/logger.js');
 
 async function getUrls() {
     try {
-        const urls = await CustomUrl.findAll({
-            attributes: ['value', 'url'],
-            where: { type: 'jimcarrey' },
-            raw: true
-        });
+        const urls = await customUrlService.findAllByType('jimcarrey', ['value', 'url']);
         return urls;
     } catch (error) {
         logger.error(error);

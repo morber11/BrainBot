@@ -8,11 +8,11 @@ describe('Jim Carrey Command', () => {
     let jimCarreyCommand;
 
     beforeEach(() => {
-        CustomUrlStub = { findAll: sinon.stub() };
+        CustomUrlStub = { findAllByType: sinon.stub() };
         stringUtilityStub = { selectRandomFromArray: sinon.stub() };
 
         jimCarreyCommand = proxyquire('../../commands/simple-text-commands/jimcarrey.js', {
-            '../../dal/models/custom-url.js': CustomUrlStub,
+            '../../services/custom-url-service.js': CustomUrlStub,
             '../../utils/string-util.js': stringUtilityStub,
         });
 
@@ -24,7 +24,7 @@ describe('Jim Carrey Command', () => {
 
     it('should reply with a Jim Carrey image when URLs are available', async () => {
         const urls = [{ value: '123', url: 'https://www.w3schools.com/js/jc.jpg' }, { value: '456', url: 'https://www.w3schools.com/js/not-jc.jpg' }];
-        CustomUrlStub.findAll.resolves(urls);
+        CustomUrlStub.findAllByType.resolves(urls);
         stringUtilityStub.selectRandomFromArray.returns(urls[0]);
 
         await jimCarreyCommand.execute(mockCommandInteraction);
@@ -34,7 +34,7 @@ describe('Jim Carrey Command', () => {
     });
 
     it('should handle when no URLs are available', async () => {
-        CustomUrlStub.findAll.resolves([]);
+        CustomUrlStub.findAllByType.resolves([]);
 
         await jimCarreyCommand.execute(mockCommandInteraction);
 
@@ -43,7 +43,7 @@ describe('Jim Carrey Command', () => {
     });
 
     it('should handle errors', async () => {
-        CustomUrlStub.findAll.rejects(new Error('Oh no an error'));
+        CustomUrlStub.findAllByType.rejects(new Error('Oh no an error'));
 
         await jimCarreyCommand.execute(mockCommandInteraction);
 
