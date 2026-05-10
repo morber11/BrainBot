@@ -9,7 +9,7 @@ module.exports = async function handleJigsaw(message) {
         const msgContent = message.content.toLowerCase();
         if (!msgContent.includes("make your choice")) return;
 
-        const dir = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'images', 'jigsaw.jpg');
+        const dir = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'images', 'jigsaw/jigsaw.jpg');
 
         await statService.incrementSystemStat(CONSTANTS.STATS.JIGSAW, CONSTANTS.STATS.JIGSAW_FRIENDLY);
         await message.reply({ files: [dir] });

@@ -11,7 +11,7 @@ module.exports = async function handleRaven(message) {
         const msgContent = message.content.toLowerCase();
         if (!msgContent.includes("lost a life")) return;
 
-        const ravenImages = ['raven-1.gif', 'raven-2.gif', 'raven-3.gif'];
+        const ravenImages = ['raven/raven-1.gif', 'raven/raven-2.gif', 'raven/raven-3.gif'];
 
         const guildKey = message.guildId || 'dm';
         const lastForGuild = lastRavenByGuild.get(guildKey);
