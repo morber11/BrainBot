@@ -4,6 +4,7 @@ const CONSTANTS = require('../../utils/constants.js');
 const userStatService = require('../../services/user-stat-service.js');
 const statService = require('../../services/system-stat-service.js');
 const logger = require('../../utils/logger.js');
+const pathUtility = require('../../utils/path-util.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -47,7 +48,17 @@ module.exports = {
                 'gun'
             ]);
 
-            await interaction.editReply(`Go Go Gadget ${el}!`);
+            const messageText = `Go Go Gadget ${el}!`;
+
+            const baseName = el.toLowerCase().replace(/\s+/g, '-');
+            const imgPath = pathUtility.getMediaFilePath(__dirname, 'images', `gadgets/${baseName}.jpg`);
+            
+            try {
+                await interaction.editReply({ content: messageText, files: [imgPath] });
+            } catch (err) {
+                logger.warn(err, { handler: 'gadget', stage: 'attach-image' });
+                await interaction.editReply(messageText);
+            }
 
             const userId = interaction.user && interaction.user.id;
             await userStatService.incrementUserStat(userId, CONSTANTS.STATS.GADGET, CONSTANTS.STATS.GADGET_FRIENDLY);
