@@ -70,7 +70,7 @@ async function playAudioInVoiceChannel(interaction, url) {
                 highWaterMark: 1 << 25,
             });
         } catch (err) {
-            throw new Error(`Failed to create audio stream: ${err?.message || err}`);
+            throw new Error('Failed to create audio stream', { cause: err });
         }
 
         const resource = createAudioResource(stream);
@@ -145,7 +145,7 @@ async function playAudioInVoiceChannel(interaction, url) {
 
         return;
     } catch (error) {
-        throw new Error(`Failed to join or play in voice channel: ${error.message}`);
+        throw new Error('Failed to join or play in voice channel', { cause: error });
     }
 }
 
