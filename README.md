@@ -26,3 +26,4 @@ Run the entire test suite (Mocha/Chai/Sinon/Proxyquire) with:
 ```bash
 npm test
 ```
+
