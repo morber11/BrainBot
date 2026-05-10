@@ -40,7 +40,7 @@ module.exports = {
                 value = result;
             }
             const dir = pathUtility.getMediaFilePath(__dirname, 'images',
-                value === CONSTANTS.FACT_OR_FICTION.VALUES.FACT ? 'fact.gif' : 'fiction.gif');
+                value === CONSTANTS.FACT_OR_FICTION.VALUES.FACT ? 'fact/fact.gif' : 'fiction/fiction.gif');
 
             const attachment = new AttachmentBuilder(dir);
 
