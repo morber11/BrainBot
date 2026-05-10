@@ -9,7 +9,9 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
 
-
+        // consider moving urls out of the db and instead directly having the images like
+        // we have with gadget/raven/jigsaw
+        // this will also mean we don't need to deal with dead links
         const urls = await customUrlService.findAllByType('jimcarrey', ['value', 'url']).catch(() => []);
 
         if (urls.length === 0) {
