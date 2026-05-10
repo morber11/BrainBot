@@ -10,7 +10,7 @@ module.exports = async function retryOperation(operation, retries = 5, delay = 5
                     logger.warn(`Database is locked. Retrying (${attempt}/${retries})...`);
                     await new Promise(res => setTimeout(res, delay));
                 } else {
-                    throw new Error('Operation failed after multiple retries: ' + error.message);
+                    throw new Error(`Operation failed after ${retries} retries: ${error?.message || error}`, { cause: error });
                 }
             } else {
                 throw error;
