@@ -30,6 +30,20 @@ module.exports = {
                 { id: 12, phrase: 'Fine work, William!', file: '12.jpg' },
                 { id: 13, phrase: 'Ten damn years... wasted', file: '13.jpg' },
                 { id: 14, phrase: 'I\'m coming for you, Malkin!', file: '14.jpg' },
+                { id: 15, phrase: 'The Ward residence?', file: '15.jpg' },
+                { id: 16, phrase: 'I understand there\'s a seventh son of a seventh son that lives here', file: '16.jpg' },
+                { id: 17, phrase: 'Do not say there is not, for I know\nthat there is. I\'m in a hurry.', file: '17.jpg' },
+                { id: 18, phrase: 'Bit hungry as well', file: '18.jpg' },
+                { id: 19, phrase: 'My compliments to the cook', file: '19.jpg' },
+                { id: 20, phrase: 'So... which one is the seventh?', file: '20.jpg' },
+                { id: 21, phrase: 'What is your name, boy?', file: '21.jpg' },
+                { id: 22, phrase: 'So, the dealing has begun', file: '22.jpg' },
+                { id: 23, phrase: 'Tis a noble profession', file: '23.jpg' },
+                { id: 24, phrase: 'He is a bit scrawny for a seventh son', file: '24.jpg' },
+                { id: 25, phrase: 'Alas, good lady, that is a vow I cannot make', file: '25.jpg' },
+                { id: 26, phrase: 'It is near impossible to battle demons with wet feet. Here. This is to get your boots fixed', file: '26.jpg' },
+                { id: 27, phrase: 'Provisions. Liquids... needed to ward off evil spirits', file: '27.jpg' },
+                { id: 28, phrase: 'Lest I forget, pick up grease, salt, flour and bacon', file: '28.jpg' },
             ];
 
             const guildKey = interaction.guildId || 'dm';
