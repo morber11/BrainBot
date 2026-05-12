@@ -15,6 +15,8 @@ module.exports = {
     async execute(interaction) {
         try {
 
+            // it isn't really needed to add to the database
+            // since this will always be static content
             const items = [
                 { id: 1, phrase: 'There is a ringing in my ear', file: '1.jpg' },
                 { id: 2, phrase: 'You may note I am presently not dealing with the otherworldly', file: '2.jpg' },
@@ -32,7 +34,7 @@ module.exports = {
                 { id: 14, phrase: 'I\'m coming for you, Malkin!', file: '14.jpg' },
                 { id: 15, phrase: 'The Ward residence?', file: '15.jpg' },
                 { id: 16, phrase: 'I understand there\'s a seventh son of a seventh son that lives here', file: '16.jpg' },
-                { id: 17, phrase: 'Do not say there is not, for I know\nthat there is. I\'m in a hurry.', file: '17.jpg' },
+                { id: 17, phrase: 'Do not say there is not, for I know that there is. I\'m in a hurry.', file: '17.jpg' },
                 { id: 18, phrase: 'Bit hungry as well', file: '18.jpg' },
                 { id: 19, phrase: 'My compliments to the cook', file: '19.jpg' },
                 { id: 20, phrase: 'So... which one is the seventh?', file: '20.jpg' },
@@ -44,6 +46,28 @@ module.exports = {
                 { id: 26, phrase: 'It is near impossible to battle demons with wet feet. Here. This is to get your boots fixed', file: '26.jpg' },
                 { id: 27, phrase: 'Provisions. Liquids... needed to ward off evil spirits', file: '27.jpg' },
                 { id: 28, phrase: 'Lest I forget, pick up grease, salt, flour and bacon', file: '28.jpg' },
+                { id: 29, phrase: 'Do not dally, Mr. Ward', file: '29.jpg' },
+                { id: 30, phrase: 'When you address me, address me as Master Gregory', file: '30.jpg' },
+                { id: 31, phrase: 'Wrong question. Wrong questions get wrong answers', file: '31.jpg' },
+                { id: 32, phrase: 'It is just a ghast.Level-six creature. These woods are filled with them', file: '32.jpg' },
+                { id: 33, phrase: 'Try not to upset it. It should leave you alone', file: '33.jpg' },
+                { id: 34, phrase: 'What do you know of what a Spook actually does?', file: '34.jpg' },
+                { id: 35, phrase: 'Your answer... it fills me with confidence', file: '35.jpg' },
+                { id: 36, phrase: 'We tend the creatures of the dark.Some are less harmful, such as ghasts. The most dangerous,such as witches we trap or kill', file: '36.jpg' },
+                { id: 37, phrase: 'My last apprentice wrote this all down', file: '37.jpg' },
+                { id: 38, phrase: 'William Bradley was the finest apprentice I\'ve ever had', file: '38.jpg' },
+                { id: 39, phrase: 'He died at the hands of Mother Malkin', file: '39.jpg' },
+                { id: 40, phrase: 'You live in a world now where legend and nightmare are real', file: '40.jpg' },
+                { id: 41, phrase: 'Malkin is alive. We journey to her fortress in Pendle Mountain, where she no doubt hides', file: '41.jpg' },
+                { id: 42, phrase: 'Mr. Ward. Mr. Ward. Mr. Ward!', file: '42.jpg' },
+                { id: 43, phrase: 'You passed out', file: '43.jpg' },
+                { id: 44, phrase: 'You have spells, boy. What kind?', file: '44.jpg' },
+                { id: 45, phrase: 'Could be useful. Not the passing out part, of course, but the visions perhaps.', file: '45.jpg' },
+                { id: 46, phrase: 'You mean who? This is Tusk. Loyal as he is ugly.', file: '46.jpg' },
+                { id: 47, phrase: 'These things that you see in your visions. Can you alter them or are they fixed?', file: '47.jpg' },
+                { id: 48, phrase: 'With a little help, most of life\'s curses can be a gift', file: '48.jpg' },
+                { id: 49, phrase: 'There are my beauties. Returned as I knew they would. Tender them, Tusk', file: '49.jpg' },
+                { id: 50, phrase: 'Home sweet home', file: '50.jpg' },
             ];
 
             const guildKey = interaction.guildId || 'dm';
@@ -60,7 +84,7 @@ module.exports = {
 
             const updated = lastSpooksByGuild.get(guildKey) || [];
             updated.push(selected.id);
-            while (updated.length > 3) {
+            while (updated.length > 10) {
                 updated.shift();
             }
 
