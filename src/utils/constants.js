@@ -46,6 +46,8 @@ const CONSTANTS = {
         ASK_FRIENDLY: "times i asked",
         GADGET: "gadget",
         GADGET_FRIENDLY: "gadgets used",
+        SPOOKS_WISDOM: "spooks_wisdom",
+        SPOOKS_WISDOM_FRIENDLY: "received wisdom from master gregory",
         USER_STATS: "queried_stats",
         USER_STATS_FRIENDLY: "queried stats",
         FACT_OR_FICTION: "fact_or_fiction",
