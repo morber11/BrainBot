@@ -21,6 +21,8 @@ module.exports = {
             // most of these were generated with an ffmpeg wrapper - subscreen
             // https://github.com/morber11/subscreen
             // when not appropriate, manual screenshots were taken
+            // initially i was going for greatest hits so some dialog from the opening scene may
+            // be missing
             const items = [
                 { id: 1, phrase: 'There is a ringing in my ear', file: 'spookswisdom-1.jpg' },
                 { id: 2, phrase: 'You may note I am presently not dealing with the otherworldly', file: 'spookswisdom-2.jpg' },
@@ -211,6 +213,9 @@ module.exports = {
                 { id: 187, phrase: 'Your destiny', file: 'spookswisdom-187.jpg' },
             ];
 
+            // TODO: consider adding a once per day limit
+            // to reference the best line
+            // "You must never have more than one sip of this a day"
             const guildKey = interaction.guildId || 'dm';
             const lastForGuild = lastSpooksByGuild.get(guildKey) || [];
 
