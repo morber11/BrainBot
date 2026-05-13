@@ -8,6 +8,7 @@ const statService = require('../../services/system-stat-service.js');
 
 const lastSpooksByGuild = new Map();
 
+// spoilers for a terrible adaption of a great book - Seventh Son (2014)
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('spookswisdom')
@@ -188,6 +189,23 @@ module.exports = {
                 { id: 168, phrase: 'Now tell me she\'s innocent', file: '168.jpg' },
                 { id: 169, phrase: 'I cannot lose this one', file: '169.jpg' },
                 { id: 170, phrase: 'Tom! Tom, the staff!', file: '170.jpg' },
+                { id: 171, phrase: 'No...', file: '171.jpg' },
+                { id: 172, phrase: 'You fight me as a dragon, not as a man. Have you no honor?', file: '172.jpg' },
+                { id: 173, phrase: 'Should have stayed a dragon', file: '173.jpg' },
+                { id: 174, phrase: 'Alone. I do this alone', file: '174.jpg' },
+                { id: 175, phrase: 'I did love you once', file: '175.jpg' },
+                { id: 176, phrase: 'Gone. As my hatred is', file: '176.jpg' },
+                { id: 177, phrase: 'In the old days there was a ceremony. Flags. Magnificent horns. Could be a bit silly with just the two of us', file: '177.jpg' },
+                { id: 178, phrase: 'Mysterium tremendum et fascinans', file: '178.jpg' },
+                { id: 179, phrase: 'The time has come, Master Ward', file: '179.jpg' },
+                { id: 180, phrase: 'Forgive me. Perhaps I was not clear. \'Tis I who ride.', file: '180.jpg' },
+                { id: 181, phrase: 'This is your home now. I trust you will take care of it', file: '181.jpg' },
+                { id: 182, phrase: 'And Tusk. Yes, old friend', file: '182.jpg' },
+                { id: 183, phrase: 'Wrong question. Wrong questions get wrong answers', file: '183.jpg' },
+                { id: 184, phrase: 'Tusk, give us a hand', file: '184.jpg' },
+                { id: 185, phrase: 'Do you remember all I taught you? Ignore it', file: '185.jpg' },
+                { id: 186, phrase: 'The rules, Tom... do not be bound by them. Use them in your own way. Live your own life', file: '186.jpg' },
+                { id: 187, phrase: 'Your destiny', file: '187.jpg' },
             ];
 
             const guildKey = interaction.guildId || 'dm';
