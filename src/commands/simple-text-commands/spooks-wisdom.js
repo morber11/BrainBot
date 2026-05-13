@@ -69,6 +69,19 @@ module.exports = {
                 { id: 49, phrase: 'With a little help, most of life\'s curses can be a gift', file: '49.jpg' },
                 { id: 50, phrase: 'There are my beauties. Returned as I knew they would. Tender them, Tusk', file: '50.jpg' },
                 { id: 51, phrase: 'Home sweet home', file: '51.jpg' },
+                { id: 52, phrase: 'We must arm ourselves for the journey to Pendle Mountain. Come, Mr. Ward', file: '52.jpg' },
+                { id: 53, phrase: 'That is a very old tapestry', file: '53.jpg' },
+                { id: 54, phrase: 'They all died or were turned to darkness', file: '54.jpg' },
+                { id: 55, phrase: 'When you deal with dark, dark gets in you', file: '55.jpg' },
+                { id: 56, phrase: 'Thank you for reminding me', file: '56.jpg' },
+                { id: 57, phrase: 'Ten years... for my last apprentice. But with you, I have less than one week', file: '57.jpg' },
+                { id: 58, phrase: 'That is when the blood moon will be full', file: '58.jpg' },
+                { id: 59, phrase: 'Happens once a century. The last time, it was followed by years of war', file: '59.jpg' },
+                { id: 60, phrase: 'Witches laid waste to cities.The world is still recovering', file: '60.jpg' },
+                { id: 61, phrase: 'If we do not stop Mother Malkin... before the next red moon sets...', file: '61.jpg' },
+                { id: 62, phrase: 'Enough. No more questions. We leave at dawn. Stay in your chamber', file: '62.jpg' },
+                { id: 63, phrase: 'No time. We must get to Pendle Mountain before Malkin assembles her minions', file: '63.jpg' },
+                { id: 64, phrase: 'There are witches that need killing. Fucking witches', file: '64.jpg' }, // i still struggle to believe this is a real line in the movie
             ];
 
             const guildKey = interaction.guildId || 'dm';
