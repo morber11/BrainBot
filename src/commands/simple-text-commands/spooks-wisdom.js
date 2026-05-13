@@ -21,8 +21,6 @@ module.exports = {
             // most of these were generated with an ffmpeg wrapper - subscreen
             // https://github.com/morber11/subscreen
             // when not appropriate, manual screenshots were taken
-            // initially i was going for greatest hits so some dialog from the opening scene may
-            // be missing
             const items = [
                 { id: 1, phrase: 'There is a ringing in my ear', file: 'spookswisdom-1.jpg' },
                 { id: 2, phrase: 'You may note I am presently not dealing with the otherworldly', file: 'spookswisdom-2.jpg' },
@@ -32,7 +30,7 @@ module.exports = {
                 { id: 6, phrase: 'The trick is not defeating him with the cup. The trick is not to spill', file: 'spookswisdom-6.jpg' },
                 { id: 7, phrase: 'Why did you not tell me the bells are ringing', file: 'spookswisdom-7.jpg' },
                 { id: 8, phrase: 'Come to me', file: 'spookswisdom-8.jpg' },
-                { id: 9, phrase: 'Shut your eyes', file: 'spookswisdom-9.jpg' },
+                { id: 9, phrase: 'Shut your eyes. Do not be in awe of her. It will only empower her', file: 'spookswisdom-9.jpg' },
                 { id: 10, phrase: 'We will work together', file: 'spookswisdom-10.jpg' },
                 { id: 11, phrase: 'Let the silver do its work', file: 'spookswisdom-11.jpg' },
                 { id: 12, phrase: 'Fine work, William!', file: 'spookswisdom-12.jpg' },
@@ -211,6 +209,11 @@ module.exports = {
                 { id: 185, phrase: 'Do you remember all I taught you? Ignore it', file: 'spookswisdom-185.jpg' },
                 { id: 186, phrase: 'The rules, Tom... do not be bound by them. Use them in your own way. Live your own life', file: 'spookswisdom-186.jpg' },
                 { id: 187, phrase: 'Your destiny', file: 'spookswisdom-187.jpg' },
+                // backfill missing lines from the opening scene
+                { id: 188, phrase: 'Hatchet. Silverbane. Longbow', file: 'spookswisdom-188.jpg' },
+                { id: 189, phrase: 'We\'ll need the silver net', file: 'spookswisdom-189.jpg' },
+                { id: 190, phrase: 'How long has she been like this?', file: 'spookswisdom-190.jpg' },
+                { id: 191, phrase: 'If it is really you, then show yourself. Leave this innocent child', file: 'spookswisdom-191.jpg' },
             ];
 
             // TODO: consider adding a once per day limit
