@@ -18,6 +18,9 @@ module.exports = {
 
             // it isn't really needed to add to the database
             // since this will always be static content
+            // most of these were generated with an ffmpeg wrapper - subscreen
+            // https://github.com/morber11/subscreen
+            // when not appropriate, manual screenshots were taken
             const items = [
                 { id: 1, phrase: 'There is a ringing in my ear', file: 'spookswisdom-1.jpg' },
                 { id: 2, phrase: 'You may note I am presently not dealing with the otherworldly', file: 'spookswisdom-2.jpg' },
