@@ -1,5 +1,6 @@
 const decrementDespair = require('./cron/decrement-despair-cron');
 const patriotAct = require('./cron/patriot-act-cron');
+const reminderPoller = require('./cron/reminder-poller');
 const debug = require('./cron/debug-cron');
 const logger = require('../../utils/logger.js');
 const { isValidTimeZone } = require('../../utils/timezone-util.js');
@@ -18,6 +19,7 @@ module.exports = (client) => {
 
         decrementDespair.start();
         patriotAct(client, TIMEZONE).start();
+        reminderPoller(client, TIMEZONE).start();
 
         // debug only crons go here
         if (env.isDev) {

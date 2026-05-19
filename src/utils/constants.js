@@ -27,6 +27,10 @@ const CONSTANTS = {
         PATRIOT_ACT: "16 19 * * *",
         PATRIOT_ACT_DELAY_PERIOD: 30000,
         DEBUG: "* * * * *",
+        REMINDER_POLL: "*/5 * * * *",
+    },
+    REMINDER: {
+        DEFAULT_ALERT_MINUTES: 15,
     },
     STATS: {
         PATRIOT_ACT: "patriot_act",
