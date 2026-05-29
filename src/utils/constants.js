@@ -58,6 +58,8 @@ const CONSTANTS = {
         FACT_OR_FICTION_FRIENDLY: "figured it out",
         MARIO_JUDAH_MISS_THE_RAGE: "mario_judah_miss_the_rage",
         MARIO_JUDAH_MISS_THE_RAGE_FRIENDLY: "missed rage",
+        BANE: "bane",
+        BANE_FRIENDLY: "Bane is the scariest guy I've ever seen in my life",
     },
     COMMANDS: {
         PATRIOT_ACT: "patriot_act",
