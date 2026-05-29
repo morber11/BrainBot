@@ -7,6 +7,7 @@ const handleRaven = require('./handlers/handleRaven');
 const handleMentalDespair = require('./handlers/handleMentalDespair');
 const handleInSpace = require('./handlers/handleInSpace');
 const handleMarioJudah = require('./handlers/handleMarioJudah');
+const handleBane = require('./handlers/handleBane');
 
 module.exports = {
     name: 'messageCreate',
@@ -25,6 +26,7 @@ module.exports = {
             handleAsking,
             handleInSpace,
             handleMarioJudah,
+            handleBane,
         ];
 
         for (const handler of handlers) {
