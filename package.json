@@ -1,6 +1,6 @@
 {
     "name": "brain-bot",
-    "version": "2.5.0",
+    "version": "2.6.0",
     "description": "Brain Brain Brain Brain Brain Brain",
     "main": "./src/index.js",
     "scripts": {
