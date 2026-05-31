@@ -22,7 +22,7 @@ module.exports = async function handleBane(message) {
             if (Date.now() - last < BANE_COOLDOWN_MS) return;
         }
 
-        const chance = env.isDev ? 100 : 20;
+        const chance = env.isDev ? 100 : 50;
         
         if (!env.isDev && mathUtil.getRandomInt(100) >= chance) return;
 
