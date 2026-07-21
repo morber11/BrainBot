@@ -18,6 +18,9 @@
     },
     "author": "morber",
     "license": "ISC",
+    "overrides": {
+        "uuid": "^11.1.1"
+    },
     "dependencies": {
         "@discordjs/voice": "^0.19.2",
         "@distube/ytdl-core": "^4.16.12",
