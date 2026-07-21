@@ -1,6 +1,6 @@
 {
     "name": "brain-bot",
-    "version": "2.6.2",
+    "version": "2.6.3",
     "description": "Brain Brain Brain Brain Brain Brain",
     "main": "./src/index.js",
     "scripts": {
@@ -18,6 +18,9 @@
     },
     "author": "morber",
     "license": "ISC",
+    "overrides": {
+        "uuid": "^11.1.1"
+    },
     "dependencies": {
         "@discordjs/voice": "^0.19.2",
         "@distube/ytdl-core": "^4.16.12",
