@@ -4,6 +4,23 @@ const logger = require('../utils/logger.js');
 
 const LONG_MESSAGE_THRESHOLD = 70;
 
+// statements
+const LEADING_QUESTION_WORD_REGEX = /^(?:what|who|whom|whose|which|where|when|why|how)\b/i;
+const LEADING_AUX_VERB_REGEX = /^(?:do|does|did|is|are|am|was|were|can|could|will|would|should|shall|may|might|must|have|has|had)\b/i;
+// catches question words in the middle of sentences
+const QUESTION_WORD_PLUS_AUX_REGEX = /\b(?:what|who|whom|whose|which|where|when|why|how)\s+(?:do|does|did|is|are|am|was|were|can|could|will|would|should|shall|may|might|must|have|has|had)\b/i;
+const LEADING_MENTION_REGEX = /^(?:@\S+|<\S+>)\s*/g;
+
+function isQuestion(content) {
+    // ignore leading @mentions
+    const withoutMentions = content.trim().replace(LEADING_MENTION_REGEX, '');
+
+    return withoutMentions.endsWith('?')
+        || LEADING_QUESTION_WORD_REGEX.test(withoutMentions)
+        || LEADING_AUX_VERB_REGEX.test(withoutMentions)
+        || QUESTION_WORD_PLUS_AUX_REGEX.test(withoutMentions);
+}
+
 function getAskText(messageOrInteraction) {
     const original = (messageOrInteraction && (
         messageOrInteraction.content ||
@@ -13,6 +30,7 @@ function getAskText(messageOrInteraction) {
     const content = original.toLowerCase();
 
     if (content.includes("i didn't ask")) return null;
+    if (isQuestion(content)) return null;
 
     const trimmed = original.trim();
     const isLong = trimmed.length > LONG_MESSAGE_THRESHOLD;
