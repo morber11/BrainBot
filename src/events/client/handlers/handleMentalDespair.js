@@ -1,6 +1,7 @@
 const memberService = require('../../../services/member-service.js');
 const keywordService = require('../../../services/keyword-service.js');
 const customUrlService = require('../../../services/custom-url-service.js');
+const despairScoreService = require('../../../services/despair-score-service.js');
 const stringUtility = require('../../../utils/string-util.js');
 const CONSTANTS = require('../../../utils/constants.js');
 const logger = require('../../../utils/logger.js');
@@ -34,29 +35,25 @@ module.exports = async function handleMentalDespair(message) {
 };
 
 async function parseMentalDespairKeywords(message) {
-    const messageContent = message.content.toLowerCase();
-
     const keywords = await keywordService.findAllByType('despair', ['name', 'value']);
-
-    const keywordsMap = new Set(keywords.map((k) => k.name));
-
-    let despairCount = 0;
-    messageContent.split(' ').forEach((w) => {
-        if (keywordsMap.has(w)) {
-            const kw = keywords.find((x) => x.name === w);
-            despairCount += kw.value !== null && kw.value !== undefined ? kw.value : 1;
-        }
+    const change = despairScoreService.calculateDespairChange({
+        content: message.content,
+        keywords,
+        currentCount: 0,
     });
 
-    if (despairCount !== 0) {
+    if (change.delta !== 0) {
         const [member, created] = await memberService.findOrCreate(message.author.id);
 
         if (!created) {
-            const newCount = member.despairCount + despairCount;
+            const updatedDespair = despairScoreService.calculateNextDespairCount({
+                currentCount: member.despairCount,
+                delta: change.delta,
+            });
 
             await memberService.update(member.id, {
                 name: message.author.username,
-                despairCount: newCount > 0 ? newCount : 0,
+                despairCount: updatedDespair.nextCount,
                 updatedAt: new Date(),
             });
         }

@@ -24,16 +24,19 @@ module.exports = {
         const message = interaction.options.getString('message');
 
         const now = new Date();
-        const remindAt = reminderHelper.getReminderTime(timeInput, now);
+        const alertOffsetMinutes = CONSTANTS.REMINDER.DEFAULT_ALERT_MINUTES;
+        const schedule = reminderHelper.createReminderSchedule({ timeInput, now, alertOffsetMinutes });
 
 
-        if (!remindAt) {
+        if (!schedule) {
             await interaction.reply({
                 content: 'Please provide a valid future time. Format like so: "3h, 30m, 60 minutes, etc..." or use an ISO date string',
                 ephemeral: true,
             });
             return;
         }
+
+        const { remindAt, alertAt } = schedule;
 
         if (remindAt <= now) {
             await interaction.reply({
@@ -42,9 +45,6 @@ module.exports = {
             });
             return;
         }
-
-        const alertOffsetMinutes = CONSTANTS.REMINDER.DEFAULT_ALERT_MINUTES;
-        const alertAt = new Date(remindAt.getTime() - alertOffsetMinutes * 60 * 1000);
 
         await reminderService.createReminder({
             guildId: interaction.guildId,

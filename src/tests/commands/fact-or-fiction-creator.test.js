@@ -6,27 +6,30 @@ describe('Fact or Fictionator Command', () => {
     let mockCommandInteraction;
     let mathRandomStub;
     let FactOrFictionServiceStub;
+    let factOrFictionOutcomeServiceStub;
     let cryptUtilStub;
     let pathUtilityStub;
+    let userStatServiceStub;
     let constantsStub;
-    let stringUtilityStub;
     let factOrFictionatorCommand;
 
     beforeEach(() => {
         mathRandomStub = sinon.stub(Math, 'random').returns(1.5 / 999);
 
         FactOrFictionServiceStub = { findOrCreate: sinon.stub(), update: sinon.stub() };
+        factOrFictionOutcomeServiceStub = { resolveFactOrFictionOutcome: sinon.stub() };
         cryptUtilStub = { getHash: sinon.stub() };
         pathUtilityStub = { getMediaFilePath: sinon.stub() };
+        userStatServiceStub = { incrementUserStat: sinon.stub().resolves() };
         constantsStub = {};
-        stringUtilityStub = { selectRandomFromArray: sinon.stub() };
 
         factOrFictionatorCommand = proxyquire('../../commands/simple-text-commands/fact-or-fiction-creator.js', {
             '../../services/fact-or-fiction-service.js': FactOrFictionServiceStub,
+            '../../services/fact-or-fiction-outcome-service.js': factOrFictionOutcomeServiceStub,
             '../../utils/crypt-util.js': cryptUtilStub,
             '../../utils/path-util.js': pathUtilityStub,
+            '../../services/user-stat-service.js': userStatServiceStub,
             '../../utils/constants.js': constantsStub,
-            '../../utils/string-util.js': stringUtilityStub,
         });
 
         mockCommandInteraction = {
@@ -34,6 +37,7 @@ describe('Fact or Fictionator Command', () => {
             deferReply: sinon.stub(),
             editReply: sinon.stub(),
             reply: sinon.stub(),
+            user: { id: 'user-1' },
         };
 
         constantsStub.FACT_OR_FICTION = {
@@ -42,6 +46,10 @@ describe('Fact or Fictionator Command', () => {
                 { category: 'fact', response: 'fact' },
                 { category: 'fiction', response: 'fiction' },
             ],
+        };
+        constantsStub.STATS = {
+            FACT_OR_FICTION: 'fact_or_fiction',
+            FACT_OR_FICTION_FRIENDLY: 'figured it out',
         };
     });
 
@@ -58,9 +66,13 @@ describe('Fact or Fictionator Command', () => {
         const mockFactOrFictionEntry = { dataValues: { value: constantsStub.FACT_OR_FICTION.VALUES.FACT }, id: 1 };
 
         mockCommandInteraction.options.getString.returns(url);
-        cryptUtilStub.getHash.resolves('hashed_value');
+        cryptUtilStub.getHash.returns({ hash: 'hashed_value' });
         FactOrFictionServiceStub.findOrCreate.resolves([mockFactOrFictionEntry, false]);
-        stringUtilityStub.selectRandomFromArray.returns({ response: expectedResponse });
+        factOrFictionOutcomeServiceStub.resolveFactOrFictionOutcome.returns({
+            value: constantsStub.FACT_OR_FICTION.VALUES.FACT,
+            response: expectedResponse,
+            shouldPersistValue: false,
+        });
         pathUtilityStub.getMediaFilePath.returns(expectedAttachmentPath);
 
         await factOrFictionatorCommand.execute(mockCommandInteraction);
@@ -72,18 +84,27 @@ describe('Fact or Fictionator Command', () => {
             content: expectedContent,
             files: [sinon.match.instanceOf(AttachmentBuilder)],
         });
+        expect(userStatServiceStub.incrementUserStat).to.have.been.calledWith(
+            'user-1',
+            constantsStub.STATS.FACT_OR_FICTION,
+            constantsStub.STATS.FACT_OR_FICTION_FRIENDLY
+        );
     });
 
     it('should create a new fact or fiction entry if one does not exist and return a response with attachment', async () => {
         const url = 'https://www.google.com/';
         mockCommandInteraction.options.getString.returns(url);
-        cryptUtilStub.getHash.resolves('new_hashed_value');
+        cryptUtilStub.getHash.returns({ hash: 'new_hashed_value' });
 
         const mockFactOrFictionEntry = { dataValues: { value: null }, id: 2 };
 
         FactOrFictionServiceStub.findOrCreate.resolves([mockFactOrFictionEntry, true]);
 
-        stringUtilityStub.selectRandomFromArray.returns({ response: 'fiction' });
+        factOrFictionOutcomeServiceStub.resolveFactOrFictionOutcome.returns({
+            value: constantsStub.FACT_OR_FICTION.VALUES.FICTION,
+            response: 'fiction',
+            shouldPersistValue: true,
+        });
         pathUtilityStub.getMediaFilePath.returns('path/to/fiction.gif');
 
         await factOrFictionatorCommand.execute(mockCommandInteraction);
@@ -100,12 +121,16 @@ describe('Fact or Fictionator Command', () => {
     it('should reply with a fact or fiction result if the entry already exists', async () => {
         const url = 'https://en.wikipedia.org/wiki/Beyond_Belief:_Fact_or_Fiction';
         mockCommandInteraction.options.getString.returns(url);
-        cryptUtilStub.getHash.resolves('existing_hashed_value');
+        cryptUtilStub.getHash.returns({ hash: 'existing_hashed_value' });
 
         const mockFactOrFictionEntry = { dataValues: { value: constantsStub.FACT_OR_FICTION.VALUES.FICTION }, id: 3 };
 
         FactOrFictionServiceStub.findOrCreate.resolves([mockFactOrFictionEntry, false]);
-        stringUtilityStub.selectRandomFromArray.returns({ response: 'fiction' });
+        factOrFictionOutcomeServiceStub.resolveFactOrFictionOutcome.returns({
+            value: constantsStub.FACT_OR_FICTION.VALUES.FICTION,
+            response: 'fiction',
+            shouldPersistValue: false,
+        });
         pathUtilityStub.getMediaFilePath.returns('path/to/fiction.gif');
 
         await factOrFictionatorCommand.execute(mockCommandInteraction);
@@ -119,7 +144,7 @@ describe('Fact or Fictionator Command', () => {
 
     it('should handle errors', async () => {
         const errorMessage = 'Something went wrong during processing';
-        cryptUtilStub.getHash.rejects(new Error(errorMessage));
+        cryptUtilStub.getHash.throws(new Error(errorMessage));
 
         await factOrFictionatorCommand.execute(mockCommandInteraction);
 
