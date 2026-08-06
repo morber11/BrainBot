@@ -80,6 +80,17 @@ function getReminderTime(timeInput, now) {
     return parseDuration(timeInput, now) || parseIso(timeInput);
 }
 
+function createReminderSchedule({ timeInput, now, alertOffsetMinutes }) {
+    const remindAt = getReminderTime(timeInput, now);
+
+    if (!remindAt) return null;
+
+    return {
+        remindAt,
+        alertAt: new Date(remindAt.getTime() - alertOffsetMinutes * 60 * 1000),
+    };
+}
+
 function formatReminderTime(date) {
     return new Intl.DateTimeFormat('en-IE', { // not sure how i feel about hardcoding en-IE but works for now
         dateStyle: 'medium',
@@ -92,5 +103,6 @@ module.exports = {
     parseIso,
     getReminderTime,
     getContextualDefaultReminderTime,
+    createReminderSchedule,
     formatReminderTime,
 };

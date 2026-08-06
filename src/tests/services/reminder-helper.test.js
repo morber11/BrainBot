@@ -45,4 +45,26 @@ describe('reminder-helper', () => {
         expect(formatted).to.be.a('string');
         expect(formatted.length).to.be.greaterThan(0);
     });
+
+    it('creates a reminder schedule with alert time', () => {
+        const now = new Date('2026-05-19T00:00:00Z');
+        const result = reminderHelper.createReminderSchedule({
+            timeInput: '1h',
+            now,
+            alertOffsetMinutes: 15,
+        });
+
+        expect(result.remindAt.toISOString()).to.equal('2026-05-19T01:00:00.000Z');
+        expect(result.alertAt.toISOString()).to.equal('2026-05-19T00:45:00.000Z');
+    });
+
+    it('returns null for invalid reminder schedules', () => {
+        const result = reminderHelper.createReminderSchedule({
+            timeInput: 'bad-time',
+            now: new Date('2026-05-19T00:00:00Z'),
+            alertOffsetMinutes: 15,
+        });
+
+        expect(result).to.equal(null);
+    });
 });
