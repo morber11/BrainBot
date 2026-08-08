@@ -3,13 +3,13 @@ const proxyquire = require('proxyquire');
 
 describe('Stats Command', () => {
     let statsCommand;
-    let StatStub;
+    let systemStatQueryStub;
     let mockInteraction;
 
     beforeEach(() => {
-        StatStub = { findAll: sinon.stub() };
+        systemStatQueryStub = { findAll: sinon.stub() };
         statsCommand = proxyquire('../../../commands/tools/system-stats.js', {
-            '../../dal/models/stat.js': StatStub,
+            '../../services/system-stat-query-service.js': systemStatQueryStub,
         });
 
         mockInteraction = {
@@ -22,7 +22,7 @@ describe('Stats Command', () => {
             { stat: 'patriot_act', count: 5, friendly_name: "times i've saluted" },
             { stat: 'other', count: 2, friendly_name: '' },
         ];
-        StatStub.findAll.resolves(sampleRows);
+        systemStatQueryStub.findAll.resolves(sampleRows);
 
         await statsCommand.execute(mockInteraction);
 
