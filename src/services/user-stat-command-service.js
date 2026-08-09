@@ -13,7 +13,7 @@ async function incrementUserStat(userId, statKey, friendlyName = null) {
             row.user_friendly_name = friendlyName;
         }
 
-        await row.increment('count');
+        await UserStat.increment('count', { where: { id: row.id } });
 
         return row;
     } catch (err) {
