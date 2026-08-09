@@ -1,5 +1,5 @@
 const mathUtil = require('../../../utils/math-util.js');
-const statService = require('../../../services/system-stat-service.js');
+const statService = require('../../../services/system-stat-command-service.js');
 const logger = require('../../../utils/logger.js');
 const CONSTANTS = require('../../../utils/constants.js');
 const env = require('../../../utils/env.js');

@@ -1,13 +1,12 @@
 const Stat = require('../dal/models/stat.js');
 const logger = require('../utils/logger.js');
 
-async function findOrCreate(statKey, defaults = {}) {
-    return Stat.findOrCreate({ where: { stat: statKey }, defaults });
-}
-
 async function incrementSystemStat(statKey, friendlyName = null, sortOrder = 100) {
     try {
-        const [statRow] = await findOrCreate(statKey, { count: 0, friendly_name: friendlyName || statKey, sort_order: sortOrder });
+        const [statRow] = await Stat.findOrCreate({
+            where: { stat: statKey },
+            defaults: { count: 0, friendly_name: friendlyName || statKey, sort_order: sortOrder },
+        });
         await statRow.increment('count');
         return statRow;
     } catch (err) {
@@ -16,4 +15,4 @@ async function incrementSystemStat(statKey, friendlyName = null, sortOrder = 100
     }
 }
 
-module.exports = { findOrCreate, incrementSystemStat };
+module.exports = { incrementSystemStat };

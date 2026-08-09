@@ -16,7 +16,7 @@ describe('handleBane handler', () => {
         loggerStub = { error: sinon.stub() };
 
         handleBane = proxyquire('../../../../events/client/handlers/handleBane.js', {
-            '../../../services/system-stat-service.js': statsStub,
+            '../../../services/system-stat-command-service.js': statsStub,
             '../../../utils/math-util.js': mathStub,
             '../../../utils/path-util.js': pathStub,
             '../../../utils/logger.js': loggerStub,
@@ -60,7 +60,7 @@ describe('handleBane handler', () => {
         mathStub.getRandomInt.returns(99);
 
         handleBane = proxyquire('../../../../events/client/handlers/handleBane.js', {
-            '../../../services/system-stat-service.js': statsStub,
+            '../../../services/system-stat-command-service.js': statsStub,
             '../../../utils/math-util.js': mathStub,
             '../../../utils/path-util.js': pathStub,
             '../../../utils/logger.js': loggerStub,

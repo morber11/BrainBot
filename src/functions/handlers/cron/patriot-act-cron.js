@@ -1,6 +1,6 @@
 const cron = require('cron');
 const CONSTANTS = require('../../../utils/constants.js');
-const statService = require('../../../services/system-stat-service.js');
+const statService = require('../../../services/system-stat-command-service.js');
 const logger = require('../../../utils/logger.js');
 const responseWindowUtil = require('../../../utils/response-window-util.js');
 

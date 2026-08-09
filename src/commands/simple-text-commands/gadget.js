@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const stringUtility = require('../../utils/string-util.js');
 const CONSTANTS = require('../../utils/constants.js');
-const userStatService = require('../../services/user-stat-service.js');
-const statService = require('../../services/system-stat-service.js');
+const userStatCommandService = require('../../services/user-stat-command-service.js');
+const statService = require('../../services/system-stat-command-service.js');
 const logger = require('../../utils/logger.js');
 const pathUtility = require('../../utils/path-util.js');
 
@@ -61,7 +61,7 @@ module.exports = {
             }
 
             const userId = interaction.user && interaction.user.id;
-            await userStatService.incrementUserStat(userId, CONSTANTS.STATS.GADGET, CONSTANTS.STATS.GADGET_FRIENDLY);
+            await userStatCommandService.incrementUserStat(userId, CONSTANTS.STATS.GADGET, CONSTANTS.STATS.GADGET_FRIENDLY);
             await statService.incrementSystemStat(CONSTANTS.STATS.GADGET, CONSTANTS.STATS.GADGET_FRIENDLY);
         } catch (error) {
             logger.error(error);

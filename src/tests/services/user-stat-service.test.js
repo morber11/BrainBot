@@ -3,7 +3,6 @@ const proxyquire = require('proxyquire');
 
 describe('user-stat-service', () => {
     let UserStatStub;
-    let StatStub;
     let userStatService;
 
     beforeEach(() => {
@@ -14,13 +13,8 @@ describe('user-stat-service', () => {
             update: sinon.stub(),
         };
 
-        StatStub = {
-            findOrCreate: sinon.stub(),
-        };
-
         userStatService = proxyquire('../../services/user-stat-service.js', {
             '../dal/models/user-stat.js': UserStatStub,
-            '../dal/models/stat.js': StatStub,
         });
     });
 
@@ -61,29 +55,6 @@ describe('user-stat-service', () => {
 
         expect(UserStatStub.update).to.have.been.calledWith({ user_friendly_name: 'X' }, { where: { id: 3 } });
         expect(res).to.deep.equal([1]);
-    });
-
-    it('incrementUserStat should create row with friendly name and increment', async () => {
-        const row = { id: 10, increment: sinon.stub().resolves() };
-        UserStatStub.findOrCreate.resolves([row, true]);
-
-        const res = await userStatService.incrementUserStat('user1', 'brain', 'Brain Friendly');
-
-        expect(UserStatStub.findOrCreate).to.have.been.calledWith({ where: { userId: 'user1', stat: 'brain' }, defaults: { count: 0, user_friendly_name: 'Brain Friendly' } });
-        expect(row.increment).to.have.been.calledWith('count');
-        expect(res).to.equal(row);
-    });
-
-    it('incrementUserStat should update friendly name when existing row differs', async () => {
-        const row = { id: 11, user_friendly_name: 'Old', increment: sinon.stub().resolves() };
-        UserStatStub.findOrCreate.resolves([row, false]);
-        UserStatStub.update.resolves([1]);
-
-        const res = await userStatService.incrementUserStat('user2', 'brain', 'New Friendly');
-
-        expect(UserStatStub.update).to.have.been.calledWith({ user_friendly_name: 'New Friendly' }, { where: { id: 11 } });
-        expect(row.increment).to.have.been.calledWith('count');
-        expect(res).to.equal(row);
     });
 
 });

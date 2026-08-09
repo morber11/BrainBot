@@ -6,7 +6,7 @@ const pathUtility = require('../../utils/path-util.js');
 const CONSTANTS = require('../../utils/constants.js');
 const mathUtil = require('../../utils/math-util.js');
 const logger = require('../../utils/logger.js');
-const userStatService = require('../../services/user-stat-service.js');
+const userStatCommandService = require('../../services/user-stat-command-service.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -51,7 +51,7 @@ module.exports = {
             });
 
             const userId = interaction.user && interaction.user.id;
-            await userStatService.incrementUserStat(userId, CONSTANTS.STATS.FACT_OR_FICTION, CONSTANTS.STATS.FACT_OR_FICTION_FRIENDLY);
+            await userStatCommandService.incrementUserStat(userId, CONSTANTS.STATS.FACT_OR_FICTION, CONSTANTS.STATS.FACT_OR_FICTION_FRIENDLY);
         }
         catch (error) {
             logger.error('An error occurred.:', error);

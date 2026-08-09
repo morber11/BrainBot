@@ -6,7 +6,7 @@ describe('ask-service', () => {
 
     beforeEach(() => {
         askService = proxyquire('../../services/ask-service.js', {
-            './system-stat-service.js': { incrementSystemStat: sinon.stub() },
+            './system-stat-command-service.js': { incrementSystemStat: sinon.stub() },
             '../utils/logger.js': { error: sinon.stub() },
         });
     });
