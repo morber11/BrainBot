@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const reminderService = require('../../services/reminder-service.js');
+const reminderCommandService = require('../../services/reminder-command-service.js');
 const reminderHelper = require('../../services/reminder-helper.js');
 const CONSTANTS = require('../../utils/constants.js');
 
@@ -46,7 +46,7 @@ module.exports = {
             return;
         }
 
-        await reminderService.createReminder({
+        await reminderCommandService.createReminder({
             guildId: interaction.guildId,
             channelId: interaction.channelId,
             creatorId: interaction.user.id,

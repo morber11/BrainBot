@@ -12,7 +12,7 @@ describe('Remind-me command', () => {
         };
 
         remindMeCommand = proxyquire('../../commands/tools/remind-me.js', {
-            '../../services/reminder-service.js': reminderServiceStub,
+            '../../services/reminder-command-service.js': reminderServiceStub,
         });
 
         mockInteraction = {
