@@ -7,6 +7,7 @@ async function findAdvanceDueReminders(cutoffTime) {
         where: {
             alertSent: false,
             complete: false,
+            advanceSendingAt: { [Sequelize.Op.is]: null },
             alertAt: { [Sequelize.Op.lte]: cutoffTime },
         },
     });
@@ -17,6 +18,7 @@ async function findFinalDueReminders(cutoffTime) {
         raw: true,
         where: {
             complete: false,
+            reminderSendingAt: { [Sequelize.Op.is]: null },
             remindAt: { [Sequelize.Op.lte]: cutoffTime },
         },
     });

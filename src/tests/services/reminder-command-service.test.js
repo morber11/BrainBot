@@ -33,7 +33,7 @@ describe('reminder-command-service', () => {
         const result = await reminderCommandService.markAlertsSent([1, 2]);
 
         expect(ReminderStub.update).to.have.been.calledWith(
-            { alertSent: true },
+            { alertSent: true, advanceSendingAt: null },
             { where: { id: [1, 2], alertSent: false } }
         );
         expect(result).to.deep.equal([1]);
@@ -45,7 +45,7 @@ describe('reminder-command-service', () => {
         const result = await reminderCommandService.markComplete([3]);
 
         expect(ReminderStub.update).to.have.been.calledWith(
-            { complete: true },
+            { complete: true, reminderSendingAt: null },
             { where: { id: [3], complete: false } }
         );
         expect(result).to.deep.equal([2]);

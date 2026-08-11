@@ -24,6 +24,7 @@ describe('reminder-query-service', () => {
         expect(options.raw).to.be.true;
         expect(options.where.alertSent).to.equal(false);
         expect(options.where.complete).to.equal(false);
+        expect(options.where.advanceSendingAt).to.deep.equal({ [Sequelize.Op.is]: null });
         expect(options.where.alertAt).to.deep.equal({ [Sequelize.Op.lte]: now });
         expect(result).to.equal(rows);
     });
@@ -38,6 +39,7 @@ describe('reminder-query-service', () => {
 
         expect(options.raw).to.be.true;
         expect(options.where.complete).to.equal(false);
+        expect(options.where.reminderSendingAt).to.deep.equal({ [Sequelize.Op.is]: null });
         expect(options.where.remindAt).to.deep.equal({ [Sequelize.Op.lte]: now });
         expect(result).to.equal(rows);
     });
