@@ -1,4 +1,4 @@
-const statService = require('./system-stat-service.js');
+const statService = require('./system-stat-command-service.js');
 const askResponseService = require('./ask-response-service.js');
 const CONSTANTS = require('../utils/constants.js');
 const logger = require('../utils/logger.js');

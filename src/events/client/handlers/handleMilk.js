@@ -1,7 +1,7 @@
 const path = require('node:path');
 const pathUtility = require('../../../utils/path-util.js');
 const CONSTANTS = require('../../../utils/constants.js');
-const statService = require('../../../services/system-stat-service.js');
+const statService = require('../../../services/system-stat-command-service.js');
 const logger = require('../../../utils/logger.js');
 
 module.exports = async function handleMilk(message) {

@@ -28,7 +28,7 @@ describe('Fact or Fictionator Command', () => {
             '../../services/fact-or-fiction-outcome-service.js': factOrFictionOutcomeServiceStub,
             '../../utils/crypt-util.js': cryptUtilStub,
             '../../utils/path-util.js': pathUtilityStub,
-            '../../services/user-stat-service.js': userStatServiceStub,
+            '../../services/user-stat-command-service.js': userStatServiceStub,
             '../../utils/constants.js': constantsStub,
         });
 

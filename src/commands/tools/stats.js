@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const statsUtil = require('../../utils/stats-util.js');
-const userStatService = require('../../services/user-stat-service.js');
+const userStatQuery = require('../../services/user-stat-query-service.js');
+const userStatCommandService = require('../../services/user-stat-command-service.js');
 const CONSTANTS = require('../../utils/constants.js');
 
 
@@ -12,9 +13,9 @@ module.exports = {
         const userId = interaction.user && interaction.user.id;
         if (!userId) return interaction.reply('Unable to determine user.');
 
-        await userStatService.incrementUserStat(userId, CONSTANTS.STATS.USER_STATS, CONSTANTS.STATS.USER_STATS_FRIENDLY);
+        await userStatCommandService.incrementUserStat(userId, CONSTANTS.STATS.USER_STATS, CONSTANTS.STATS.USER_STATS_FRIENDLY);
 
-        const rows = await userStatService.findAllByUser(userId, null, [['count', 'DESC']]);
+        const rows = await userStatQuery.findAll(userId, [['count', 'DESC']]);
 
         if (!rows || rows.length === 0) {
             return interaction.reply('You have no recorded statistics yet.');

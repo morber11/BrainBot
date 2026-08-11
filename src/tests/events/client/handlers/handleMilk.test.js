@@ -14,7 +14,7 @@ describe('handleMilk handler', () => {
         loggerStub = { error: sinon.stub() };
 
         handleMilk = proxyquire('../../../../events/client/handlers/handleMilk.js', {
-            '../../../services/system-stat-service.js': statsStub,
+            '../../../services/system-stat-command-service.js': statsStub,
             '../../../utils/path-util.js': pathStub,
             '../../../utils/logger.js': loggerStub,
         });

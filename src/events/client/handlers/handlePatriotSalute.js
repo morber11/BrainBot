@@ -1,5 +1,5 @@
 const CONSTANTS = require('../../../utils/constants.js');
-const userStatService = require('../../../services/user-stat-service.js');
+const userStatCommandService = require('../../../services/user-stat-command-service.js');
 const logger = require('../../../utils/logger.js');
 const responseWindowUtil = require('../../../utils/response-window-util.js');
 
@@ -27,7 +27,7 @@ module.exports = async (message) => {
             return;
         }
 
-        await userStatService.incrementUserStat(
+        await userStatCommandService.incrementUserStat(
             message.author.id,
             CONSTANTS.STATS.SALUTES_GIVEN,
             CONSTANTS.STATS.SALUTES_GIVEN_FRIENDLY

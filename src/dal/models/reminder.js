@@ -45,6 +45,14 @@ const Reminder = database.define('reminder', {
         allowNull: false,
         defaultValue: false,
     },
+    advanceSendingAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+    },
+    reminderSendingAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+    },
     complete: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

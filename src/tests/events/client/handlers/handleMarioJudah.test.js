@@ -14,7 +14,7 @@ describe('handleMarioJudah handler', () => {
         loggerStub = { error: sinon.stub() };
 
         handleMarioJudah = proxyquire('../../../../events/client/handlers/handleMarioJudah.js', {
-            '../../../services/system-stat-service.js': statsStub,
+            '../../../services/system-stat-command-service.js': statsStub,
             '../../../utils/math-util.js': mathStub,
             '../../../utils/logger.js': loggerStub,
         });
@@ -57,7 +57,7 @@ describe('handleMarioJudah handler', () => {
         mathStub.getRandomInt.returns(99);
 
         handleMarioJudah = proxyquire('../../../../events/client/handlers/handleMarioJudah.js', {
-            '../../../services/system-stat-service.js': statsStub,
+            '../../../services/system-stat-command-service.js': statsStub,
             '../../../utils/math-util.js': mathStub,
             '../../../utils/logger.js': loggerStub,
         });

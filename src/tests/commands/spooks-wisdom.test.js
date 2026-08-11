@@ -18,8 +18,8 @@ describe('Spooks-wisdom Command', () => {
         spookswisdomCommand = proxyquire('../../commands/simple-text-commands/spooks-wisdom.js', {
             '../../utils/string-util.js': stringUtilityStub,
             '../../utils/path-util.js': pathUtilityStub,
-            '../../services/system-stat-service.js': statsStub,
-            '../../services/user-stat-service.js': userStatsStub,
+            '../../services/system-stat-command-service.js': statsStub,
+            '../../services/user-stat-command-service.js': userStatsStub,
         });
 
         mockCommandInteraction = {

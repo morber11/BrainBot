@@ -1,5 +1,5 @@
 const CONSTANTS = require('../../utils/constants.js');
-const userStatService = require('../../services/user-stat-service.js');
+const userStatCommandService = require('../../services/user-stat-command-service.js');
 const logger = require('../../utils/logger.js');
 const responseWindowUtil = require('../../utils/response-window-util.js');
 
@@ -34,7 +34,7 @@ async function handlePatriotReaction(reaction, user) {
         return;
     }
 
-    await userStatService.incrementUserStat(
+    await userStatCommandService.incrementUserStat(
         user.id,
         CONSTANTS.STATS.SALUTES_GIVEN,
         CONSTANTS.STATS.SALUTES_GIVEN_FRIENDLY
