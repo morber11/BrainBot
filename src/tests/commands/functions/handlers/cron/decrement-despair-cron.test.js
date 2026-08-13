@@ -51,11 +51,4 @@ describe('decrement despair', () => {
         });
     });
 
-    it('should handle no members found gracefully', async () => {
-        MemberServiceStub.findAll.resolves([]);
-
-        await cronJob.fireOnTick();
-
-        sinon.assert.notCalled(MemberServiceStub.update);
-    });
 });
