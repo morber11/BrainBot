@@ -28,7 +28,7 @@ describe('Play command', () => {
         await playCommand.execute(interaction);
 
         expect(interaction.reply).to.have.been.calledWith({
-            content: 'Invalid or unsupported URL. Please provide a valid YouTube URL.',
+            content: 'Invalid or unsupported URL. Please provide a valid YouTube URL',
             ephemeral: true,
         });
         expect(playAudioInVoiceChannel).not.to.have.been.called;
