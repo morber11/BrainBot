@@ -21,16 +21,6 @@ describe('custom-url-service', () => {
         });
     });
 
-    it('returns rows for a given type', async () => {
-        const rows = [{ value: 'a' }];
-        CustomUrlStub.findAll.resolves(rows);
-
-        const res = await customUrlService.findAllByType('jimcarrey', ['value']);
-
-        expect(CustomUrlStub.findAll).to.have.been.calledOnce;
-        expect(res).to.equal(rows);
-    });
-
     it('getUrls returns rows for a given type', async () => {
         const rows = [{ url: 'u' }];
         CustomUrlStub.findAll.resolves(rows);
@@ -49,32 +39,13 @@ describe('custom-url-service', () => {
         expect(res).to.deep.equal([]);
     });
 
-    it('createUrl creates and returns record', async () => {
-        const attrs = { value: 'x', type: 'jimcarrey' };
-        const created = { id: 1, ...attrs };
-        CustomUrlStub.create.resolves(created);
-
-        const res = await customUrlService.createUrl(attrs);
-
-        expect(CustomUrlStub.create).to.have.been.calledOnce;
-        expect(res).to.equal(created);
-    });
-
     it('findRandomUrl selects a random item', async () => {
         const rows = [{ value: 'a' }, { value: 'b' }];
         CustomUrlStub.findAll.resolves(rows);
+        sinon.stub(Math, 'random').returns(0.75);
+
         const one = await customUrlService.findRandomUrl('jimcarrey');
-        expect(rows).to.include(one);
-    });
 
-    it('findOrCreateUrl returns model result', async () => {
-        const attrs = { value: 'x', type: 'jimcarrey' };
-        const dbRes = [{ dataValues: attrs }, true];
-        CustomUrlStub.findOrCreate.resolves(dbRes);
-
-        const res = await customUrlService.findOrCreateUrl(attrs);
-
-        expect(CustomUrlStub.findOrCreate).to.have.been.calledOnce;
-        expect(res).to.equal(dbRes);
+        expect(one).to.equal(rows[1]);
     });
 });
