@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const database = require('./dal/database/database.js');
 const retryOperation = require('./utils/retry.js');
 const logger = require('./utils/logger.js');
+const { ensureYtDlpAvailable } = require('./services/youtube-audio-service.js');
 
 const client = new Client({
     presence: {
@@ -31,6 +32,8 @@ const commandFolders = fs.readdirSync('./src/commands');
 
 (async function init() {
     try {
+        await ensureYtDlpAvailable();
+        logger.info('yt-dlp is available.');
         logger.info('Checking database connection...');
         await retryOperation(() => database.authenticate(), 5, 1000);
         logger.info('Database connection established.');

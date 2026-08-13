@@ -5,6 +5,18 @@ Requires GLIBC 2.36
 
 ## Setup & Build
 
+### YouTube playback
+
+The `/play` and other audio commands use ``yt-dlp` to extract the audio from a Youtube vdieo. Docker installs the pinned yt-dlp release automatically. For local dev, install the current [yt-dlp release](https://github.com/yt-dlp/yt-dlp/releases) and either make the executable available on `PATH`:
+
+```bash
+yt-dlp --version
+```
+
+or set `YT_DLP_COMMAND` in `.env` to the executable path, for example `YT_DLP_COMMAND=C:/tools/yt-dlp.exe`
+
+I will consider expanding to other services like soundcloud later
+
 1. **Install dependencies**
    ```bash
    npm install

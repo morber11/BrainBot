@@ -6,7 +6,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('waterphone')
         .setDescription('WAAAAAAAAAAAAAAAAAAAAAAAAAAA'),
-    deprecated: true,
     async execute(interaction) {
         const url = 'https://www.youtube.com/watch?v=WJIP2C9v654';
 

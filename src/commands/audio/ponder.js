@@ -6,7 +6,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('ponder')
         .setDescription('when you want to brain'),
-    deprecated: true,
     async execute(interaction) {
         const url = 'https://www.youtube.com/watch?v=AXqMnPyx73E';
 
