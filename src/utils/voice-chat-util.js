@@ -25,30 +25,191 @@ function isValidAudioUrl(url) {
     }
 }
 
+function clearIdleTimer(entry) {
+    if (entry.idleTimer) {
+        clearTimeout(entry.idleTimer);
+        entry.idleTimer = null;
+    }
+}
+
 function cleanupVoiceConnection(guildId) {
     const entry = activeConnections.get(guildId);
     if (!entry) return;
 
     activeConnections.delete(guildId);
+    clearIdleTimer(entry);
 
+    if (entry.audioProcess) {
+        try { entry.audioProcess.kill(); } catch (err) { /* ignore */ }
+    }
+
+    try { entry.player.stop(true); } catch (err) { /* ignore */ }
+    try { entry.connection.destroy(); } catch (err) { /* ignore */ }
+
+    logger.info(`Cleaned up voice connection for guild ${guildId}`);
+}
+
+function scheduleCleanup(guildId, entry) {
+    clearIdleTimer(entry);
+    entry.idleTimer = setTimeout(() => cleanupVoiceConnection(guildId), DEFAULT_IDLE_TIMEOUT_MS);
+}
+
+function isActiveVoiceEntry(guildId, entry) {
+    return activeConnections.get(guildId) === entry;
+}
+
+function finishCurrentTrack(guildId, entry) {
+    if (!isActiveVoiceEntry(guildId, entry) || !entry.currentUrl) return;
+
+    const audioProcess = entry.audioProcess;
+    entry.audioProcess = null;
+    entry.currentUrl = null;
+
+    if (audioProcess) {
+        try { audioProcess.kill(); } catch (err) { /* ignore */ }
+    }
+
+    try { entry.player.stop(true); } catch (err) { /* ignore */ }
+    startNextTrack(guildId, entry);
+}
+
+function waitForAudioStream(audioProcess) {
+    return new Promise((resolve, reject) => {
+        let errorOutput = '';
+
+        function removeListeners() {
+            audioProcess.stdout.off('data', onData);
+            audioProcess.stderr.off('data', onErrorOutput);
+            audioProcess.off('error', onError);
+            audioProcess.off('close', onClose);
+        }
+
+        function onData() {
+            removeListeners();
+            resolve();
+        }
+
+        function onError(error) {
+            removeListeners();
+            reject(error);
+        }
+
+        function onErrorOutput(chunk) {
+            errorOutput += chunk;
+        }
+
+        function onClose(code) {
+            removeListeners();
+            reject(new Error(`yt-dlp exited with code ${code}: ${errorOutput.trim()}`));
+        }
+
+        audioProcess.stdout.once('data', onData);
+        audioProcess.stderr.on('data', onErrorOutput);
+        audioProcess.once('error', onError);
+        audioProcess.once('close', onClose);
+    });
+}
+
+function monitorAudioProcess(guildId, entry, audioProcess) {
+    let errorOutput = '';
+    audioProcess.stderr.on('data', (chunk) => {
+        errorOutput += chunk;
+    });
+
+    audioProcess.on('error', (error) => {
+        if (!isActiveVoiceEntry(guildId, entry)) return;
+        if (entry.audioProcess !== audioProcess) return;
+
+        logger.error(`yt-dlp process error for guild ${guildId}:`, error);
+        finishCurrentTrack(guildId, entry);
+    });
+
+    audioProcess.on('close', (code) => {
+        if (code === 0) return;
+        if (!isActiveVoiceEntry(guildId, entry)) return;
+        if (entry.audioProcess !== audioProcess) return;
+
+        logger.error(`yt-dlp exited with code ${code} for guild ${guildId}: ${errorOutput.trim()}`);
+        finishCurrentTrack(guildId, entry);
+    });
+}
+
+async function startTrack(guildId, entry, url) {
+    let audioProcess;
     try {
-        if (entry.idleTimer) {
-            clearTimeout(entry.idleTimer);
-            entry.idleTimer = null;
+        const cleanUrl = url.trim().replace(/['"]+$/, '');
+        audioProcess = createYouTubeAudioStream(cleanUrl);
+        const resource = createAudioResource(audioProcess.stdout, { inputType: StreamType.WebmOpus });
+
+        entry.audioProcess = audioProcess;
+        entry.currentUrl = url;
+
+        const audioReady = waitForAudioStream(audioProcess);
+        entry.player.play(resource);
+
+        await audioReady;
+        monitorAudioProcess(guildId, entry, audioProcess);
+    } catch (error) {
+        if (entry.audioProcess === audioProcess) {
+            entry.audioProcess = null;
+            entry.currentUrl = null;
         }
 
-        if (entry.audioProcess) {
-            try { entry.audioProcess.kill(); } catch (err) { /* ignore */ }
-        }
-
-        try { entry.player.stop(true); } catch (err) { /* ignore */ }
-        try { entry.connection.destroy(); } catch (err) { /* ignore */ }
-    } finally {
-        logger.info(`Cleaned up voice connection for guild ${guildId}`);
+        throw error;
     }
 }
 
-async function playAudioInVoiceChannel(interaction, url) {
+async function startNextTrack(guildId, entry) {
+    if (!isActiveVoiceEntry(guildId, entry) || entry.currentUrl) return false;
+
+    const url = entry.queue.shift();
+    if (!url) {
+        scheduleCleanup(guildId, entry);
+        return false;
+    }
+
+    clearIdleTimer(entry);
+    try {
+        await startTrack(guildId, entry, url);
+        return true;
+    } catch (error) {
+        logger.error(`Failed to start audio for guild ${guildId}:`, error);
+        return startNextTrack(guildId, entry);
+    }
+}
+
+
+function createVoiceEntry(guildId, channelId, adapterCreator) {
+    const connection = joinVoiceChannel({ channelId, guildId, adapterCreator });
+    const player = createAudioPlayer();
+    const entry = {
+        connection,
+        player,
+        audioProcess: null,
+        currentUrl: null,
+        queue: [],
+        idleTimer: null,
+    };
+
+    player.on('stateChange', (oldState, newState) => {
+        if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
+            finishCurrentTrack(guildId, entry);
+        } else if (newState.status === AudioPlayerStatus.Playing) {
+            clearIdleTimer(entry);
+        }
+    });
+
+    player.on('error', (error) => {
+        logger.error(`Audio player error for guild ${guildId}:`, error);
+        finishCurrentTrack(guildId, entry);
+    });
+
+    connection.subscribe(player);
+    activeConnections.set(guildId, entry);
+    return entry;
+}
+
+async function playAudioInVoiceChannel(interaction, url, { playNext = false } = {}) {
     try {
         if (!isValidAudioUrl(url)) {
             throw new Error('Invalid or unsupported URL. Only YouTube URLs are supported.');
@@ -62,97 +223,49 @@ async function playAudioInVoiceChannel(interaction, url) {
         }
 
         const guildId = interaction.guildId;
+        const entry = activeConnections.get(guildId)
+            || createVoiceEntry(guildId, channelId, interaction.channel.guild.voiceAdapterCreator);
+        const wasPlaying = Boolean(entry.currentUrl);
 
-        let audioProcess;
-        try {
-            const cleanUrl = url.trim().replace(/['"]+$/, '');
-            audioProcess = createYouTubeAudioStream(cleanUrl);
-        } catch (err) {
-            throw new Error('failed to create audio stream', { cause: err });
+        if (playNext) {
+            entry.queue.unshift(url);
+        } else {
+            entry.queue.push(url);
         }
 
-        const resource = createAudioResource(audioProcess.stdout, { inputType: StreamType.WebmOpus });
-
-        // Reuse existing connection/player if present
-        const entry = activeConnections.get(guildId);
-        if (entry) {
-            // stop any scheduled teardown
-            if (entry.idleTimer) {
-                clearTimeout(entry.idleTimer);
-                entry.idleTimer = null;
-            }
-
-            try {
-                if (entry.audioProcess) {
-                    entry.audioProcess.kill();
-                }
-
-                entry.audioProcess = audioProcess;
-                entry.player.play(resource);
-                return;
-            } catch (err) {
-                // if reuse fails, cleanup and continue to create new
-                logger.error('Error reusing existing player, cleaning up and recreating:', err);
-                cleanupVoiceConnection(guildId);
+        if (!wasPlaying) {
+            const started = await startNextTrack(guildId, entry);
+            if (!started) {
+                throw new Error('Failed to start audio');
             }
         }
 
-        const connection = joinVoiceChannel({
-            channelId: channelId,
-            guildId: guildId,
-            adapterCreator: interaction.channel.guild.voiceAdapterCreator,
-        });
-
-        const player = createAudioPlayer();
-
-        // Listen for state changes to schedule cleanup when idle
-        player.on('stateChange', (oldState, newState) => {
-            if (oldState.status !== newState.status) {
-                if (newState.status === AudioPlayerStatus.Idle) {
-                    // schedule cleanup
-                    const timer = setTimeout(() => cleanupVoiceConnection(guildId), DEFAULT_IDLE_TIMEOUT_MS);
-                    const cur = activeConnections.get(guildId) || {};
-                    cur.idleTimer = timer;
-                    activeConnections.set(guildId, cur);
-                } else if (newState.status === AudioPlayerStatus.Playing) {
-                    // clear idle timer when playback resumes
-                    const cur = activeConnections.get(guildId);
-                    if (cur && cur.idleTimer) {
-                        clearTimeout(cur.idleTimer);
-                        cur.idleTimer = null;
-                        activeConnections.set(guildId, cur);
-                    }
-                }
-            }
-        });
-
-        player.on('error', (error) => {
-            logger.error('Audio player error for guild', guildId, error);
-            cleanupVoiceConnection(guildId);
-        });
-
-        audioProcess.on('error', (error) => {
-            logger.error('yt-dlp process error for guild', guildId, error);
-            cleanupVoiceConnection(guildId);
-        });
-
-        audioProcess.on('close', (code) => {
-            if (code !== 0) {
-                logger.error(`yt-dlp exited with code ${code} for guild ${guildId}`);
-                cleanupVoiceConnection(guildId);
-            }
-        });
-
-        connection.subscribe(player);
-        player.play(resource);
-
-        // store connection
-        activeConnections.set(guildId, { connection, player, audioProcess, idleTimer: null });
-
-        return;
+        return { queued: wasPlaying };
     } catch (error) {
         throw new Error('Failed to join or play in voice channel', { cause: error });
     }
 }
 
-module.exports = { playAudioInVoiceChannel, isValidAudioUrl, cleanupVoiceConnection };
+function stopAudioInVoiceChannel(guildId) {
+    const entry = activeConnections.get(guildId);
+    if (!entry || !entry.currentUrl) return false;
+
+    finishCurrentTrack(guildId, entry);
+    return true;
+}
+
+function clearAudioQueue(guildId) {
+    const entry = activeConnections.get(guildId);
+    if (!entry || entry.queue.length === 0) return false;
+
+    entry.queue.length = 0;
+    return true;
+}
+
+module.exports = {
+    playAudioInVoiceChannel,
+    stopAudioInVoiceChannel,
+    clearAudioQueue,
+    isValidAudioUrl,
+    cleanupVoiceConnection,
+};

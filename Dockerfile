@@ -1,4 +1,4 @@
-FROM node:18-bookworm-slim AS build
+FROM node:22-bookworm-slim AS build
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -48,7 +48,7 @@ COPY . .
 RUN npm prune --production
 
 # Runtime image
-FROM node:18-bookworm-slim
+FROM node:22-bookworm-slim
 WORKDIR /app
 
 ARG TARGETARCH

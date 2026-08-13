@@ -15,6 +15,26 @@ function ensureYtDlpAvailable() {
     });
 }
 
+function getYouTubeTitle(url) {
+    return new Promise((resolve, reject) => {
+        execFile(YT_DLP_COMMAND, [
+            '--ignore-config',
+            '--no-playlist',
+            '--print',
+            'title',
+            '--',
+            url,
+        ], (error, stdout) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+
+            resolve(stdout.trim());
+        });
+    });
+}
+
 function createYouTubeAudioStream(url) {
     return spawn(YT_DLP_COMMAND, [
         '--ignore-config',
@@ -33,4 +53,4 @@ function createYouTubeAudioStream(url) {
     });
 }
 
-module.exports = { ensureYtDlpAvailable, createYouTubeAudioStream };
+module.exports = { ensureYtDlpAvailable, getYouTubeTitle, createYouTubeAudioStream };

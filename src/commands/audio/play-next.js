@@ -5,8 +5,8 @@ const logger = require('../../utils/logger.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('play')
-        .setDescription('for when the other bots are broken')
+        .setName('playnext')
+        .setDescription('play a video after the current one')
         .addStringOption(option =>
             option.setName('url')
                 .setDescription('url')
@@ -21,7 +21,7 @@ module.exports = {
         }
 
         try {
-            const playback = await playAudioInVoiceChannel(interaction, url);
+            const playback = await playAudioInVoiceChannel(interaction, url, { playNext: true });
 
             if (!playback.queued) {
                 await interaction.reply({ content: `Now playing: ${url}` });

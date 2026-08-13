@@ -42,6 +42,22 @@ describe('YouTube audio service', () => {
         }
     });
 
+    it('gets the title for a single YouTube video', async () => {
+        execFileStub.callsFake((command, args, callback) => callback(null, 'Video title\n'));
+
+        const title = await youtubeAudioService.getYouTubeTitle('https://youtu.be/video');
+
+        expect(title).to.equal('Video title');
+        expect(execFileStub).to.have.been.calledWith('yt-dlp', [
+            '--ignore-config',
+            '--no-playlist',
+            '--print',
+            'title',
+            '--',
+            'https://youtu.be/video',
+        ]);
+    });
+
     it('spawns yt-dlp for a single WebM Opus stream', () => {
         const child = { stdout: {}, stderr: {} };
         spawnStub.returns(child);
