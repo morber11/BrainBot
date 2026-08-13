@@ -40,6 +40,8 @@ function createYouTubeAudioStream(url) {
         '--ignore-config',
         '--no-playlist',
         '--quiet',
+        '--extractor-args',
+        'youtube:player_client=android_vr', // this should avoid throwing 403 errors
         '--format',
         'bestaudio[ext=webm][acodec=opus]',
         '--output',
