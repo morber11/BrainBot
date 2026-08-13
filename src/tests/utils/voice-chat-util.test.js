@@ -1,4 +1,5 @@
 const { EventEmitter } = require('node:events');
+const { PassThrough } = require('node:stream');
 
 describe('Voice chat utility queue', () => {
     let joinVoiceChannel;
@@ -36,7 +37,8 @@ describe('Voice chat utility queue', () => {
         });
         createYouTubeAudioStream = sinon.stub().callsFake(() => {
             const process = new EventEmitter();
-            process.stdout = {};
+            process.stdout = new PassThrough();
+            process.stdout.write('audio');
             process.stderr = new EventEmitter();
             process.kill = sinon.stub();
             processes.push(process);

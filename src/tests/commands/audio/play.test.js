@@ -64,4 +64,15 @@ describe('Play command', () => {
 
         expect(interaction.reply).to.have.been.calledWith({ content: 'Added to queue: https://youtu.be/video' });
     });
+
+    it('reports a playback failure instead of confirming playback', async () => {
+        isValidAudioUrl.returns(true);
+        playAudioInVoiceChannel.rejects(new Error('yt-dlp failed'));
+
+        await playCommand.execute(interaction);
+
+        expect(interaction.reply).to.have.been.calledWithMatch({ ephemeral: true });
+        // not have been called with so we don't need to hardcode the specific error message
+        expect(interaction.reply).not.to.have.been.calledWith({ content: 'Now playing: https://youtu.be/video' });
+    });
 });

@@ -73,6 +73,43 @@ function finishCurrentTrack(guildId, entry) {
     startNextTrack(guildId, entry);
 }
 
+function waitForAudioStream(audioProcess) {
+    return new Promise((resolve, reject) => {
+        let errorOutput = '';
+
+        function removeListeners() {
+            audioProcess.stdout.off('data', onData);
+            audioProcess.stderr.off('data', onErrorOutput);
+            audioProcess.off('error', onError);
+            audioProcess.off('close', onClose);
+        }
+
+        function onData() {
+            removeListeners();
+            resolve();
+        }
+
+        function onError(error) {
+            removeListeners();
+            reject(error);
+        }
+
+        function onErrorOutput(chunk) {
+            errorOutput += chunk;
+        }
+
+        function onClose(code) {
+            removeListeners();
+            reject(new Error(`yt-dlp exited with code ${code}: ${errorOutput.trim()}`));
+        }
+
+        audioProcess.stdout.once('data', onData);
+        audioProcess.stderr.on('data', onErrorOutput);
+        audioProcess.once('error', onError);
+        audioProcess.once('close', onClose);
+    });
+}
+
 function monitorAudioProcess(guildId, entry, audioProcess) {
     let errorOutput = '';
     audioProcess.stderr.on('data', (chunk) => {
@@ -97,35 +134,50 @@ function monitorAudioProcess(guildId, entry, audioProcess) {
     });
 }
 
-function startTrack(guildId, entry, url) {
+async function startTrack(guildId, entry, url) {
+    let audioProcess;
     try {
         const cleanUrl = url.trim().replace(/['"]+$/, '');
-        const audioProcess = createYouTubeAudioStream(cleanUrl);
+        audioProcess = createYouTubeAudioStream(cleanUrl);
         const resource = createAudioResource(audioProcess.stdout, { inputType: StreamType.WebmOpus });
 
         entry.audioProcess = audioProcess;
         entry.currentUrl = url;
 
-        monitorAudioProcess(guildId, entry, audioProcess);
+        const audioReady = waitForAudioStream(audioProcess);
         entry.player.play(resource);
+
+        await audioReady;
+        monitorAudioProcess(guildId, entry, audioProcess);
     } catch (error) {
-        logger.error(`Failed to start audio for guild ${guildId}:`, error);
-        startNextTrack(guildId, entry);
+        if (entry.audioProcess === audioProcess) {
+            entry.audioProcess = null;
+            entry.currentUrl = null;
+        }
+
+        throw error;
     }
 }
 
-function startNextTrack(guildId, entry) {
-    if (!isActiveVoiceEntry(guildId, entry) || entry.currentUrl) return;
+async function startNextTrack(guildId, entry) {
+    if (!isActiveVoiceEntry(guildId, entry) || entry.currentUrl) return false;
 
     const url = entry.queue.shift();
     if (!url) {
         scheduleCleanup(guildId, entry);
-        return;
+        return false;
     }
 
     clearIdleTimer(entry);
-    startTrack(guildId, entry, url);
+    try {
+        await startTrack(guildId, entry, url);
+        return true;
+    } catch (error) {
+        logger.error(`Failed to start audio for guild ${guildId}:`, error);
+        return startNextTrack(guildId, entry);
+    }
 }
+
 
 function createVoiceEntry(guildId, channelId, adapterCreator) {
     const connection = joinVoiceChannel({ channelId, guildId, adapterCreator });
@@ -182,7 +234,10 @@ async function playAudioInVoiceChannel(interaction, url, { playNext = false } = 
         }
 
         if (!wasPlaying) {
-            startNextTrack(guildId, entry);
+            const started = await startNextTrack(guildId, entry);
+            if (!started) {
+                throw new Error('Failed to start audio');
+            }
         }
 
         return { queued: wasPlaying };
