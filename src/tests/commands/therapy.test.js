@@ -1,10 +1,16 @@
 const sinon = require('sinon');
-const therapyCommand = require('../../commands/simple-text-commands/therapy.js');
+const proxyquire = require('proxyquire');
 
 describe('Therapy Command', () => {
     let mockCommandInteraction;
+    let therapyCommand;
+    let loggerStub;
 
     beforeEach(() => {
+        loggerStub = { error: sinon.stub() };
+        therapyCommand = proxyquire('../../commands/simple-text-commands/therapy.js', {
+            '../../utils/logger.js': loggerStub,
+        });
         mockCommandInteraction = {
             deferReply: sinon.stub(),
             editReply: sinon.stub(),
@@ -33,5 +39,6 @@ describe('Therapy Command', () => {
         await therapyCommand.execute(mockCommandInteraction);
 
         expect(mockCommandInteraction.editReply).to.have.been.calledWith('An error occurred.');
+        expect(loggerStub.error).to.have.been.calledOnce;
     });
 });
