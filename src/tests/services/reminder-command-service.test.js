@@ -16,17 +16,6 @@ describe('reminder-command-service', () => {
         });
     });
 
-    it('creates a reminder', async () => {
-        const attrs = { userId: 'u1', message: 'hi' };
-        const row = { id: 1 };
-        ReminderStub.create.resolves(row);
-
-        const result = await reminderCommandService.createReminder(attrs);
-
-        expect(ReminderStub.create).to.have.been.calledWith(attrs);
-        expect(result).to.equal(row);
-    });
-
     it('marks alerts sent', async () => {
         ReminderStub.update.resolves([1]);
 

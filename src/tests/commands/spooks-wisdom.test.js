@@ -7,6 +7,7 @@ describe('Spooks-wisdom Command', () => {
     let pathUtilityStub;
     let statsStub;
     let userStatsStub;
+    let loggerStub;
     let spookswisdomCommand;
 
     beforeEach(() => {
@@ -14,12 +15,14 @@ describe('Spooks-wisdom Command', () => {
         pathUtilityStub = { getMediaFilePath: sinon.stub().returns('fake/path/spookswisdom/1.jpg') };
         statsStub = { incrementSystemStat: sinon.stub().resolves() };
         userStatsStub = { incrementUserStat: sinon.stub().resolves() };
+        loggerStub = { error: sinon.stub(), warn: sinon.stub() };
 
         spookswisdomCommand = proxyquire('../../commands/simple-text-commands/spooks-wisdom.js', {
             '../../utils/string-util.js': stringUtilityStub,
             '../../utils/path-util.js': pathUtilityStub,
             '../../services/system-stat-command-service.js': statsStub,
             '../../services/user-stat-command-service.js': userStatsStub,
+            '../../utils/logger.js': loggerStub,
         });
 
         mockCommandInteraction = {
@@ -48,5 +51,6 @@ describe('Spooks-wisdom Command', () => {
         await spookswisdomCommand.execute(mockCommandInteraction);
 
         expect(mockCommandInteraction.editReply).to.have.been.calledWith('An error occurred.');
+        expect(loggerStub.error).to.have.been.calledOnce;
     });
 });

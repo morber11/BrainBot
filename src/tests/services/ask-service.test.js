@@ -3,42 +3,29 @@ const proxyquire = require('proxyquire');
 
 describe('ask-service', () => {
     let askService;
+    let askResponseServiceStub;
 
     beforeEach(() => {
+        askResponseServiceStub = { evaluateAskResponse: sinon.stub() };
         askService = proxyquire('../../services/ask-service.js', {
             './system-stat-command-service.js': { incrementSystemStat: sinon.stub() },
+            './ask-response-service.js': askResponseServiceStub,
             '../utils/logger.js': { error: sinon.stub() },
         });
     });
 
     describe('getAskText', () => {
-        it('returns null when the message already contains "i didn\'t ask"', () => {
-            expect(askService.getAskText({ content: "i didn't ask for this" })).to.equal(null);
-        });
+        it('passes message content to the response evaluator', () => {
+            askResponseServiceStub.evaluateAskResponse.returns({ replyText: "i didn't ask" });
+            sinon.stub(Math, 'random').returns(0.42);
 
-        it('returns null for the reported bug message (@mention + name + question phrase)', () => {
-            expect(askService.getAskText({ content: '@Weightlifter nate what are your thoughts' })).to.equal(null);
-        });
+            const result = askService.getAskText({ content: 'the sky is blue' });
 
-        it('returns null for questions', () => {
-            // one case per detection path: leading question word, leading aux
-            // verb, trailing "?", and @-mention / <@id> mention prefixes
-            [
-                'what are your thoughts',
-                'do you want to play',
-                'anyone around?',
-                '@Bob do you agree',
-                '<@123456789> is this ok',
-            ].forEach((content) => {
-                expect(askService.getAskText({ content }), content).to.equal(null);
+            expect(askResponseServiceStub.evaluateAskResponse).to.have.been.calledWith({
+                content: 'the sky is blue',
+                roll: 42,
             });
-        });
-
-        it('returns "i didn\'t ask" for statements', () => {
-            sinon.stub(Math, 'random').returns(0);
-            ['the sky is blue', 'i am hungry', 'i know what you did'].forEach((content) => {
-                expect(askService.getAskText({ content }), content).to.equal("i didn't ask");
-            });
+            expect(result).to.equal("i didn't ask");
         });
     });
 });

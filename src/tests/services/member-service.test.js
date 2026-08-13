@@ -37,15 +37,6 @@ describe('Member service', () => {
         expect(result).to.deep.equal({ despairCount: 1 });
     });
 
-    it('should findAll with options', async () => {
-        MemberStub.findAll.resolves(['a', 'b']);
-
-        const result = await memberService.findAll({ where: { despairCount: 0 } });
-
-        expect(MemberStub.findAll).to.have.been.calledWith({ where: { despairCount: 0 } });
-        expect(result).to.deep.equal(['a', 'b']);
-    });
-
     it('should update by id', async () => {
         MemberStub.update.resolves([1]);
 

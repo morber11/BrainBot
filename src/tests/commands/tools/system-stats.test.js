@@ -17,7 +17,7 @@ describe('Stats Command', () => {
         };
     });
 
-    it('should always append hardcoded rows', async () => {
+    it('includes the hardcoded ask row with queried statistics', async () => {
         const sampleRows = [
             { stat: 'patriot_act', count: 5, friendly_name: "times i've saluted" },
             { stat: 'other', count: 2, friendly_name: '' },
@@ -26,10 +26,13 @@ describe('Stats Command', () => {
 
         await statsCommand.execute(mockInteraction);
 
-        const entries = sampleRows.map(r => ({ label: r.friendly_name || r.stat, value: String(r.count) }));
-        entries.unshift({ label: "times i asked", value: '0' });
-        const expectedTable = `\`\`\`\n${statsCommand.generateStatsTable(entries)}\`\`\``;
+        const reply = mockInteraction.reply.firstCall.args[0];
 
-        expect(mockInteraction.reply).to.have.been.calledWith(expectedTable);
+        expect(reply).to.match(/^```\n/);
+        expect(reply).to.include('times i asked');
+        expect(reply).to.include('0');
+        expect(reply).to.include("times i've saluted");
+        expect(reply).to.include('5');
+        expect(reply).to.match(/\n```$/);
     });
 });

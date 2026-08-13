@@ -5,15 +5,18 @@ describe('Magic Ball Command', () => {
     let mockCommandInteraction;
     let stringUtilityStub;
     let constantsStub;
+    let loggerStub;
     let magicBallCommand;
 
     beforeEach(() => {
         stringUtilityStub = { selectRandomFromArray: sinon.stub() };
         constantsStub = { MAGIC_BALL: { RESPONSES: [{ response: 'Yes, definitely' }, { response: 'Ask again later' }, { response: 'No way' }] } };
+        loggerStub = { error: sinon.stub() };
 
         magicBallCommand = proxyquire('../../commands/simple-text-commands/magic-ball.js', {
             '../../utils/string-util.js': stringUtilityStub,
             '../../utils/constants.js': constantsStub,
+            '../../utils/logger.js': loggerStub,
         });
 
         mockCommandInteraction = {
@@ -44,5 +47,6 @@ describe('Magic Ball Command', () => {
         await magicBallCommand.execute(mockCommandInteraction);
         
         expect(mockCommandInteraction.editReply).to.have.been.calledWith('An error occurred.');
+        expect(loggerStub.error).to.have.been.calledOnce;
     });
 });

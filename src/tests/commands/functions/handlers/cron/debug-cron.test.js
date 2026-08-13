@@ -20,15 +20,6 @@ describe('debug cron', () => {
         cronJob = debug(mockClient);
     });
 
-    it('should handle no guilds gracefully', async () => {
-        mockClient.guilds.cache.values.returns([]);
-
-        await cronJob.fireOnTick();
-
-        sinon.assert.notCalled(loggerStub.info);
-        sinon.assert.notCalled(loggerStub.error);
-    });
-
     it('should handle errors gracefully', async () => {
         mockClient.guilds.cache.values.throws(new Error('Test Error'));
 

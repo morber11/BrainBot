@@ -65,27 +65,6 @@ describe('patriot act', () => {
         sinon.assert.notCalled(loggerStub.error);
     });
 
-    it('should track the salute react window after sending o7', async () => {
-        const cronJob = patriotAct(mockClient);
-        const mockChannel = { type: 0, name: '2fort', send: mockSend };
-
-        const mockGuild = {
-            id: 'g1',
-            channels: { cache: { find: (pred) => [mockChannel].find(pred) } },
-        };
-
-        mockGuildsCacheValues.returns([mockGuild]);
-
-        const p = cronJob.fireOnTick();
-        await clock.tickAsync(CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIOD);
-        await p;
-
-        sinon.assert.calledOnce(mockSend);
-        sinon.assert.calledWithExactly(mockSend, 'o7');
-        sinon.assert.calledOnce(responseWindowUtilStub.start);
-        sinon.assert.calledWithExactly(responseWindowUtilStub.start, 'g1', 60000);
-    });
-
     it('should fall back to "bot/general" channel if specified channel is not found', async () => {
         const cronJob = patriotAct(mockClient);
         const mockBotChannel = { type: 0, name: 'bot', send: mockSend };

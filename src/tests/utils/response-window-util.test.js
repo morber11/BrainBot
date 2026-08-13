@@ -23,11 +23,12 @@ describe('response window util', () => {
     });
 
     it('does not count after window expires until a new window opens', async () => {
+        const clock = sinon.useFakeTimers();
         responseWindowUtil.start('g1', 100);
         expect(responseWindowUtil.shouldCount('g1', 'u1')).to.be.true;
         expect(responseWindowUtil.shouldCount('g1', 'u1')).to.be.false;
 
-        await new Promise(resolve => setTimeout(resolve, 150));
+        await clock.tickAsync(100);
 
         responseWindowUtil.start('g1', 100);
         expect(responseWindowUtil.shouldCount('g1', 'u1')).to.be.true;
