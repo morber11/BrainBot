@@ -1,5 +1,5 @@
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require('@discordjs/voice');
-const ytdl = require('ytdl-core');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, StreamType } = require('@discordjs/voice');
+const { createYouTubeAudioStream } = require('../services/youtube-audio-service.js');
 const logger = require('./logger.js');
 
 const DEFAULT_IDLE_TIMEOUT_MS = process.env.VOICE_IDLE_TIMEOUT_MS ? parseInt(process.env.VOICE_IDLE_TIMEOUT_MS, 10) : 30000;
@@ -17,7 +17,7 @@ function isValidAudioUrl(url) {
             return false;
         }
         const host = parsed.hostname.toLowerCase();
-        const ytHosts = ['www.youtube.com', 'youtube.com', 'youtu.be', 'm.youtube.com'];
+        const ytHosts = ['www.youtube.com', 'youtube.com', 'youtu.be', 'm.youtube.com', 'music.youtube.com'];
 
         return ytHosts.includes(host);
     } catch (err) {
@@ -29,51 +29,30 @@ function cleanupVoiceConnection(guildId) {
     const entry = activeConnections.get(guildId);
     if (!entry) return;
 
+    activeConnections.delete(guildId);
+
     try {
         if (entry.idleTimer) {
             clearTimeout(entry.idleTimer);
             entry.idleTimer = null;
         }
 
-        if (entry.player) {
-            try { entry.player.stop(true); } catch (err) { /* ignore */ }
+        if (entry.audioProcess) {
+            try { entry.audioProcess.kill(); } catch (err) { /* ignore */ }
         }
 
-        if (entry.connection) {
-            try { entry.connection.destroy(); } catch (err) { /* ignore */ }
-        }
+        try { entry.player.stop(true); } catch (err) { /* ignore */ }
+        try { entry.connection.destroy(); } catch (err) { /* ignore */ }
     } finally {
-        activeConnections.delete(guildId);
         logger.info(`Cleaned up voice connection for guild ${guildId}`);
     }
 }
-
-// removed unused helper: extractYouTubeVideoId
 
 async function playAudioInVoiceChannel(interaction, url) {
     try {
         if (!isValidAudioUrl(url)) {
             throw new Error('Invalid or unsupported URL. Only YouTube URLs are supported.');
         }
-
-        let stream;
-        try {
-            const cleanUrl = url.trim().replace(/['"]+$/, '');
-
-            if (!ytdl.validateURL(cleanUrl)) {
-                throw new Error('Invalid YouTube URL.');
-            }
-
-            stream = ytdl(cleanUrl, {
-                filter: 'audioonly',
-                quality: 'highestaudio',
-                highWaterMark: 1 << 25,
-            });
-        } catch (err) {
-            throw new Error('Failed to create audio stream', { cause: err });
-        }
-
-        const resource = createAudioResource(stream);
 
         const guildMember = await interaction.member.guild.members.fetch(interaction.user.id);
         const { channelId } = guildMember.voice;
@@ -83,6 +62,16 @@ async function playAudioInVoiceChannel(interaction, url) {
         }
 
         const guildId = interaction.guildId;
+
+        let audioProcess;
+        try {
+            const cleanUrl = url.trim().replace(/['"]+$/, '');
+            audioProcess = createYouTubeAudioStream(cleanUrl);
+        } catch (err) {
+            throw new Error('failed to create audio stream', { cause: err });
+        }
+
+        const resource = createAudioResource(audioProcess.stdout, { inputType: StreamType.WebmOpus });
 
         // Reuse existing connection/player if present
         const entry = activeConnections.get(guildId);
@@ -94,6 +83,11 @@ async function playAudioInVoiceChannel(interaction, url) {
             }
 
             try {
+                if (entry.audioProcess) {
+                    entry.audioProcess.kill();
+                }
+
+                entry.audioProcess = audioProcess;
                 entry.player.play(resource);
                 return;
             } catch (err) {
@@ -137,11 +131,23 @@ async function playAudioInVoiceChannel(interaction, url) {
             cleanupVoiceConnection(guildId);
         });
 
+        audioProcess.on('error', (error) => {
+            logger.error('yt-dlp process error for guild', guildId, error);
+            cleanupVoiceConnection(guildId);
+        });
+
+        audioProcess.on('close', (code) => {
+            if (code !== 0) {
+                logger.error(`yt-dlp exited with code ${code} for guild ${guildId}`);
+                cleanupVoiceConnection(guildId);
+            }
+        });
+
         connection.subscribe(player);
         player.play(resource);
 
         // store connection
-        activeConnections.set(guildId, { connection, player, idleTimer: null });
+        activeConnections.set(guildId, { connection, player, audioProcess, idleTimer: null });
 
         return;
     } catch (error) {

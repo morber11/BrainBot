@@ -8,7 +8,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('meditate')
         .setDescription('Realign your chakras with 30khz binaural beats and 528hz frequency music'),
-    deprecated: true,
     async execute(interaction) {
         try {
             const urls = await customUrlService.getUrls('meditate');

@@ -11,7 +11,6 @@ module.exports = {
                 .setDescription('url')
                 .setRequired(true),
         ),
-    deprecated: true,
     async execute(interaction) {
         const url = interaction.options.getString('url');
 
