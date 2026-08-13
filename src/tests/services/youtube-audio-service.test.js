@@ -69,8 +69,6 @@ describe('YouTube audio service', () => {
             '--ignore-config',
             '--no-playlist',
             '--quiet',
-            '--extractor-args',
-            'youtube:player_client=android_vr',
             '--format',
             'bestaudio[ext=webm][acodec=opus]',
             '--output',
