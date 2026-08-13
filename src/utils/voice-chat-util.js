@@ -74,6 +74,11 @@ function finishCurrentTrack(guildId, entry) {
 }
 
 function monitorAudioProcess(guildId, entry, audioProcess) {
+    let errorOutput = '';
+    audioProcess.stderr.on('data', (chunk) => {
+        errorOutput += chunk;
+    });
+
     audioProcess.on('error', (error) => {
         if (!isActiveVoiceEntry(guildId, entry)) return;
         if (entry.audioProcess !== audioProcess) return;
@@ -87,7 +92,7 @@ function monitorAudioProcess(guildId, entry, audioProcess) {
         if (!isActiveVoiceEntry(guildId, entry)) return;
         if (entry.audioProcess !== audioProcess) return;
 
-        logger.error(`yt-dlp exited with code ${code} for guild ${guildId}`);
+        logger.error(`yt-dlp exited with code ${code} for guild ${guildId}: ${errorOutput.trim()}`);
         finishCurrentTrack(guildId, entry);
     });
 }

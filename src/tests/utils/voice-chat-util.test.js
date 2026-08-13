@@ -37,6 +37,7 @@ describe('Voice chat utility queue', () => {
         createYouTubeAudioStream = sinon.stub().callsFake(() => {
             const process = new EventEmitter();
             process.stdout = {};
+            process.stderr = new EventEmitter();
             process.kill = sinon.stub();
             processes.push(process);
             return process;
