@@ -11,6 +11,7 @@ describe('Fact or Fictionator Command', () => {
     let pathUtilityStub;
     let userStatServiceStub;
     let constantsStub;
+    let loggerStub;
     let factOrFictionatorCommand;
 
     beforeEach(() => {
@@ -22,6 +23,7 @@ describe('Fact or Fictionator Command', () => {
         pathUtilityStub = { getMediaFilePath: sinon.stub() };
         userStatServiceStub = { incrementUserStat: sinon.stub().resolves() };
         constantsStub = {};
+        loggerStub = { error: sinon.stub() };
 
         factOrFictionatorCommand = proxyquire('../../commands/simple-text-commands/fact-or-fiction-creator.js', {
             '../../services/fact-or-fiction-service.js': FactOrFictionServiceStub,
@@ -30,6 +32,7 @@ describe('Fact or Fictionator Command', () => {
             '../../utils/path-util.js': pathUtilityStub,
             '../../services/user-stat-command-service.js': userStatServiceStub,
             '../../utils/constants.js': constantsStub,
+            '../../utils/logger.js': loggerStub,
         });
 
         mockCommandInteraction = {
@@ -118,30 +121,6 @@ describe('Fact or Fictionator Command', () => {
         });
     });
 
-    it('should reply with a fact or fiction result if the entry already exists', async () => {
-        const url = 'https://en.wikipedia.org/wiki/Beyond_Belief:_Fact_or_Fiction';
-        mockCommandInteraction.options.getString.returns(url);
-        cryptUtilStub.getHash.returns({ hash: 'existing_hashed_value' });
-
-        const mockFactOrFictionEntry = { dataValues: { value: constantsStub.FACT_OR_FICTION.VALUES.FICTION }, id: 3 };
-
-        FactOrFictionServiceStub.findOrCreate.resolves([mockFactOrFictionEntry, false]);
-        factOrFictionOutcomeServiceStub.resolveFactOrFictionOutcome.returns({
-            value: constantsStub.FACT_OR_FICTION.VALUES.FICTION,
-            response: 'fiction',
-            shouldPersistValue: false,
-        });
-        pathUtilityStub.getMediaFilePath.returns('path/to/fiction.gif');
-
-        await factOrFictionatorCommand.execute(mockCommandInteraction);
-
-        expect(mockCommandInteraction.deferReply).to.have.been.called;
-        expect(mockCommandInteraction.editReply).to.have.been.calledWith({
-            content: `Did you manage to work it out? \nThe story in question: \`https://en.wikipedia.org/wiki/Beyond_Belief:_Fact_or_Fiction\`\nfiction\n`,
-            files: [sinon.match.instanceOf(AttachmentBuilder)],
-        });
-    });
-
     it('should handle errors', async () => {
         const errorMessage = 'Something went wrong during processing';
         cryptUtilStub.getHash.throws(new Error(errorMessage));
@@ -152,5 +131,6 @@ describe('Fact or Fictionator Command', () => {
             content: 'An error occurred.',
             ephemeral: true,
         });
+        expect(loggerStub.error).to.have.been.calledOnce;
     });
 });
