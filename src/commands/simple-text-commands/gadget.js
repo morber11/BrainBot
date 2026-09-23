@@ -45,7 +45,9 @@ module.exports = {
                 'wind sail',
                 'phone',
                 // custom ones now
-                'gun'
+                'gun',
+                'brown bricks',
+                'free iPad'
             ]);
 
             const messageText = `Go Go Gadget ${el}!`;
