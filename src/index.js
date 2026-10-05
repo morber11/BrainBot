@@ -3,6 +3,7 @@ const { BOT_TOKEN } = process.env;
 const { Client, Collection, GatewayIntentBits, ActivityType } = require('discord.js');
 const fs = require('node:fs');
 const database = require('./dal/database/database.js');
+const { ensureMigrationsApplied } = require('./dal/database/schema-check.js');
 const retryOperation = require('./utils/retry.js');
 const logger = require('./utils/logger.js');
 const { ensureYtDlpAvailable } = require('./services/youtube-audio-service.js');
@@ -37,6 +38,7 @@ const commandFolders = fs.readdirSync('./src/commands');
         logger.info('Checking database connection...');
         await retryOperation(() => database.authenticate(), 5, 1000);
         logger.info('Database connection established.');
+        await ensureMigrationsApplied();
 
         // load functions after DB is ready
         const functionFolders = fs.readdirSync(`./src/functions`);
