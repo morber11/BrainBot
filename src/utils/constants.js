@@ -28,9 +28,25 @@ const CONSTANTS = {
         PATRIOT_ACT_DELAY_PERIOD: 30000,
         DEBUG: "* * * * *",
         REMINDER_POLL: "*/5 * * * *",
+        POLL_EXPIRY: "*/5 * * * *",
     },
     REMINDER: {
         DEFAULT_ALERT_MINUTES: 15,
+    },
+    POLL: {
+        DEFAULT_DURATION_HOURS: 24,
+        BAR_LENGTH: 10,
+        REFRESH_DEBOUNCE_MS: 1500,
+        MESSAGE_CHAR_LIMIT: 2000,
+        MAX_QUESTION_LENGTH: 256,
+        MAX_ANSWER_LENGTH: 100,
+        FORM_TIMEOUT_MS: 10 * 60 * 1000,
+        // matches CRON.POLL_EXPIRY so every poll gets a timer before it is due
+        EXPIRY_LOOKAHEAD_MS: 5 * 60 * 1000,
+        EMOJIS: [
+            "1\uFE0F\u20E3", "2\uFE0F\u20E3", "3\uFE0F\u20E3", "4\uFE0F\u20E3", "5\uFE0F\u20E3",
+            "6\uFE0F\u20E3", "7\uFE0F\u20E3", "8\uFE0F\u20E3", "9\uFE0F\u20E3", "\uD83D\uDD1F",
+        ],
     },
     STATS: {
         PATRIOT_ACT: "patriot_act",

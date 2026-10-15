@@ -15,6 +15,11 @@ module.exports = {
                 await command.execute(interaction, client);
             } catch (err) {
                 logger.error(err, { handler: 'interactionCreate', commandName });
+
+                // if already replied, don't spam more replies
+                // otherwise it'll loop forever in errs
+                if (interaction.replied || interaction.deferred) return;
+
                 await interaction.reply({
                     content: `Something went wrong while executing this command`,
                     ephemeral: true

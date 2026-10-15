@@ -17,6 +17,7 @@ describe('messageReactionAdd event handler', () => {
             '../../services/user-stat-command-service.js': statsStub,
             '../../utils/logger.js': loggerStub,
             '../../utils/response-window-util.js': responseWindowUtilStub,
+            '../../services/poll/poll-message-service.js': { handlePollReaction: sinon.stub(), handleSingleChoice: sinon.stub() },
         });
     });
 

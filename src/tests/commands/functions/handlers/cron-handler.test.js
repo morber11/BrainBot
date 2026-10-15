@@ -6,6 +6,7 @@ describe('handleCrons', () => {
     let mockDecrementDespair;
     let mockPatriotAct;
     let mockReminderPoller;
+    let mockPollExpiryPoller;
     let mockDebug;
     let cronHandler;
 
@@ -13,12 +14,14 @@ describe('handleCrons', () => {
         mockDecrementDespair = { start: sinon.stub() };
         mockPatriotAct = { start: sinon.stub() };
         mockReminderPoller = { start: sinon.stub() };
+        mockPollExpiryPoller = { start: sinon.stub() };
         mockDebug = { start: sinon.stub() };
 
         cronHandler = proxyquire('../../../../functions/handlers/cron-handler', {
             './cron/decrement-despair-cron': mockDecrementDespair,
             './cron/patriot-act-cron': sinon.stub().returns(mockPatriotAct),
             './cron/reminder-poller': sinon.stub().returns(mockReminderPoller),
+            './cron/poll-expiry-poller': sinon.stub().returns(mockPollExpiryPoller),
             './cron/debug-cron': sinon.stub().returns(mockDebug),
         });
 
@@ -47,6 +50,7 @@ describe('handleCrons', () => {
         sinon.assert.calledOnce(mockDecrementDespair.start);
         sinon.assert.calledOnce(mockPatriotAct.start);
         sinon.assert.calledOnce(mockReminderPoller.start);
+        sinon.assert.calledOnce(mockPollExpiryPoller.start);
         sinon.assert.notCalled(mockDebug.start);
     });
 });
