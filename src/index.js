@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { BOT_TOKEN } = process.env;
-const { Client, Collection, GatewayIntentBits, ActivityType } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, ActivityType, Partials } = require('discord.js');
 const fs = require('node:fs');
 const database = require('./dal/database/database.js');
 const { ensureMigrationsApplied } = require('./dal/database/schema-check.js');
@@ -21,7 +21,10 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildVoiceStates]
+    GatewayIntentBits.GuildVoiceStates],
+    // used in the /vote command. without these, reactions on messages sent
+    // before the last restart are silently dropped
+    partials: [Partials.Message, Partials.Reaction, Partials.User],
 });
 
 client.commands = new Collection();
