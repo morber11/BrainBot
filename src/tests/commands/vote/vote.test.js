@@ -6,6 +6,7 @@ const CONSTANTS = require('../../../utils/constants.js');
 describe('Vote command', () => {
     let pollCommandServiceStub;
     let pollMessageServiceStub;
+    let pollEmojiServiceStub;
     let voteCommand;
     let mockInteraction;
     let mockSubmission;
@@ -36,7 +37,7 @@ describe('Vote command', () => {
     function setServerEmojis(...emojis) {
         const collection = new Collection(emojis.map(emoji => [emoji.id, emoji]));
 
-        mockSubmission.guild = { emojis: { fetch: sinon.stub().resolves(collection) } };
+        mockSubmission.guild = { id: 'guild-1', emojis: { fetch: sinon.stub().resolves(collection) } };
     }
 
     function savedEmojis() {
@@ -51,10 +52,12 @@ describe('Vote command', () => {
         };
 
         pollMessageServiceStub = { schedulePollEnd: sinon.stub() };
+        pollEmojiServiceStub = { getPollEmojiIds: sinon.stub().resolves(null) };
 
-        voteCommand = proxyquire('../../../commands/poll/vote.js', {
+        voteCommand = proxyquire('../../../commands/vote/vote.js', {
             '../../services/poll/poll-command-service.js': pollCommandServiceStub,
             '../../services/poll/poll-message-service.js': pollMessageServiceStub,
+            '../../services/poll/poll-emoji-service.js': pollEmojiServiceStub,
         });
 
         mockMessage = {
@@ -168,13 +171,36 @@ describe('Vote command', () => {
         expect(mockMessage.react.args.map(args => args[0])).to.deep.equal(savedEmojis());
     });
 
-    it('falls back to number emojis when the server does not have enough', async () => {
+    it('fills answers the server has no emojis for with numbers', async () => {
         submitForm('What day?', 'Monday\nTuesday\nThursday', { settings: ['server-emojis'] });
         setServerEmojis(serverEmoji('1'), serverEmoji('2'));
 
         await voteCommand.execute(mockInteraction);
 
-        expect(savedEmojis()).to.deep.equal(CONSTANTS.POLL.EMOJIS.slice(0, 3));
+        const emojis = savedEmojis();
+        expect(emojis.slice(0, 2)).to.have.members(['<:emoji1:1>', '<:emoji2:2>']);
+        expect(emojis[2]).to.equal(CONSTANTS.POLL.EMOJIS[2]);
+    });
+
+    it('uses configured emojis in order, then other server emojis, then numbers', async () => {
+        submitForm('What day?', 'Monday\nTuesday\nWednesday\nThursday', { settings: ['server-emojis'] });
+        setServerEmojis(serverEmoji('1'), serverEmoji('2'), serverEmoji('4'));
+        pollEmojiServiceStub.getPollEmojiIds.withArgs('guild-1').resolves(['4', '1']);
+
+        await voteCommand.execute(mockInteraction);
+
+        expect(savedEmojis()).to.deep.equal(['<:emoji4:4>', '<:emoji1:1>', '<:emoji2:2>', CONSTANTS.POLL.EMOJIS[3]]);
+        expect(mockMessage.react.args.map(args => args[0])).to.deep.equal(savedEmojis());
+    });
+
+    it('skips configured emojis that are no longer in the server', async () => {
+        submitForm('What day?', 'Monday\nTuesday', { settings: ['server-emojis'] });
+        setServerEmojis(serverEmoji('1'));
+        pollEmojiServiceStub.getPollEmojiIds.withArgs('guild-1').resolves(['9', '1']);
+
+        await voteCommand.execute(mockInteraction);
+
+        expect(savedEmojis()).to.deep.equal(['<:emoji1:1>', CONSTANTS.POLL.EMOJIS[1]]);
     });
 
     it('ends the vote after the expiration given', async () => {

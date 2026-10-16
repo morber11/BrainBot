@@ -22,7 +22,7 @@ const SERVER_EMOJIS_SETTING = 'server-emojis';
 const MIN_ANSWERS = 2;
 const MAX_ANSWERS = CONSTANTS.POLL.EMOJIS.length;
 
-function buildPollForm(formId) {
+function buildVoteForm(formId) {
     const questionInput = new TextInputBuilder()
         .setCustomId(QUESTION_INPUT_ID)
         .setStyle(TextInputStyle.Short)
@@ -93,7 +93,7 @@ function buildPollForm(formId) {
         );
 }
 
-function readPollForm(fields) {
+function readVoteForm(fields) {
     const labels = fields.getTextInputValue(ANSWERS_INPUT_ID)
         .split('\n')
         .map(line => line.trim())
@@ -114,6 +114,6 @@ function readPollForm(fields) {
 module.exports = {
     MIN_ANSWERS,
     MAX_ANSWERS,
-    buildPollForm,
-    readPollForm,
+    buildVoteForm,
+    readVoteForm,
 };

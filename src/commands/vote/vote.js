@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, InteractionContextType, MessageFlags } = require('discord.js');
 const pollCommandService = require('../../services/poll/poll-command-service.js');
-const pollForm = require('./poll-form.js');
+const pollEmojiService = require('../../services/poll/poll-emoji-service.js');
+const voteForm = require('./vote-form.js');
 const pollHelper = require('../../services/poll/poll-helper.js');
 const pollMessageService = require('../../services/poll/poll-message-service.js');
 const reminderHelper = require('../../services/reminder-helper.js');
@@ -14,22 +15,29 @@ function getEndsAt(expiresIn, now) {
     return reminderHelper.parseDuration(expiresIn, now);
 }
 
-async function pickEmojis(guild, count, useServerEmojis) {
-    if (!useServerEmojis) return CONSTANTS.POLL.EMOJIS;
-
-    const serverEmojis = await guild.emojis.fetch();
-    const usable = serverEmojis.filter(emoji => emoji.available && emoji.roles.cache.size === 0);
-
-    if (usable.size < count) {
+// configured emojis first
+// then the server's other emojis
+// then regional numbers for any answers left over
+async function pickEmojis(guild, useServerEmojis) {
+    if (!useServerEmojis) {
         return CONSTANTS.POLL.EMOJIS;
     }
 
-    return usable.random(count).map(emoji => emoji.toString());
+    const usable = await pollEmojiService.getUsableEmojis(guild);
+    const configuredIds = await pollEmojiService.getPollEmojiIds(guild.id) ?? [];
+
+    const configured = configuredIds.map(id => usable.get(id)).filter(Boolean);
+
+    const others = usable.filter(emoji => !configuredIds.includes(emoji.id)).random(usable.size);
+    
+    const serverEmojis = configured.concat(others).map(emoji => emoji.toString());
+
+    return CONSTANTS.POLL.EMOJIS.map((number, i) => serverEmojis[i] ?? number);
 }
 
 function isValidAnswerList(labels) {
-    return labels.length >= pollForm.MIN_ANSWERS
-        && labels.length <= pollForm.MAX_ANSWERS
+    return labels.length >= voteForm.MIN_ANSWERS
+        && labels.length <= voteForm.MAX_ANSWERS
         && labels.every(label => label.length <= CONSTANTS.POLL.MAX_ANSWER_LENGTH);
 }
 
@@ -41,7 +49,7 @@ module.exports = {
     async execute(interaction) {
         const formId = `vote-${interaction.id}`;
 
-        await interaction.showModal(pollForm.buildPollForm(formId));
+        await interaction.showModal(voteForm.buildVoteForm(formId));
 
         let submission;
         try {
@@ -54,12 +62,12 @@ module.exports = {
             return;
         }
 
-        const form = pollForm.readPollForm(submission.fields);
+        const form = voteForm.readVoteForm(submission.fields);
         const endsAt = getEndsAt(form.expiresIn, new Date());
 
         if (!isValidAnswerList(form.labels)) {
             await submission.reply({
-                content: `Please give ${pollForm.MIN_ANSWERS} to ${pollForm.MAX_ANSWERS} answers, one per line, each up to ${CONSTANTS.POLL.MAX_ANSWER_LENGTH} characters`,
+                content: `Please give ${voteForm.MIN_ANSWERS} to ${voteForm.MAX_ANSWERS} answers, one per line, each up to ${CONSTANTS.POLL.MAX_ANSWER_LENGTH} characters`,
                 flags: MessageFlags.Ephemeral,
             });
             return;
@@ -73,7 +81,7 @@ module.exports = {
             return;
         }
 
-        const emojis = await pickEmojis(submission.guild, form.labels.length, form.useServerEmojis);
+        const emojis = await pickEmojis(submission.guild, form.useServerEmojis);
         const options = form.labels.map((label, i) => ({ label, emoji: emojis[i] }));
 
         const content = pollHelper.buildPollContent({
