@@ -47,6 +47,15 @@ describe('handleBasicReactResponse handler', () => {
         expect(message.react).to.have.been.calledWith(CONSTANTS.EMOJI.THINKING);
     });
 
+    it('does not react with thinking emoji for words that start with um', async () => {
+        const message = { content: 'umbrella', guildId: 'g', channelId: 'c', id: 'm6', author: { id: 'u6' } };
+        message.react = sinon.stub().resolves();
+
+        await handleBasicReactResponse(message);
+
+        expect(message.react).to.not.have.been.calledWith(CONSTANTS.EMOJI.THINKING);
+    });
+
     it('reacts with ONE_HUNDRED on maricon', async () => {
         const message = { content: 'maricon', guildId: 'g', channelId: 'c', id: 'm4', author: { id: 'u4' } };
         message.react = sinon.stub().resolves();

@@ -44,6 +44,20 @@ describe('handleMentalDespair handler', () => {
         expect(MemberServiceStub.update).to.have.been.calledWith('u1', sinon.match.has('despairCount', 3));
     });
 
+    it('creates a new member with the despair score from their message', async () => {
+        KeywordServiceStub.findAllByType.resolves([{ name: 'detroit', value: 5 }]);
+        MemberServiceStub.findOrCreate.resolves([{ id: 'u4', despairCount: 5 }, true]);
+
+        const message = { content: 'detroit', author: { id: 'u4', username: 'alice' }, reply: sinon.stub().resolves() };
+
+        await handleMentalDespair(message);
+
+        expect(MemberServiceStub.findOrCreate).to.have.been.calledWith('u4', {
+            defaults: { name: 'alice', despairCount: 5 },
+        });
+        expect(MemberServiceStub.update).to.not.have.been.called;
+    });
+
     it('replies with a despair URL when count exceeds limit', async () => {
         MemberServiceStub.findOne.resolves({ despairCount: CONSTANTS.POINT_VALUES.MAX_DESPAIR });
         CustomUrlStub.findAllByType.resolves([{ url: 'http://a' }, { url: 'http://b' }]);

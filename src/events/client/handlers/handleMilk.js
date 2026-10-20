@@ -9,10 +9,10 @@ module.exports = async function handleMilk(message) {
         const msgContent = message.content.toLowerCase();
         if (!(msgContent.includes("milk") || msgContent.includes(CONSTANTS.EMOJI.MILK))) return;
 
-        const dir = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'audio', 'milk03.mp3');
+        const audioPath = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'audio', 'milk03.mp3');
 
         await statService.incrementSystemStat(CONSTANTS.STATS.MILK, CONSTANTS.STATS.MILK_FRIENDLY);
-        await message.reply({ files: [dir] });
+        await message.reply({ files: [audioPath] });
     } catch (err) {
         logger.error(err, { handler: 'handleMilk' });
     }

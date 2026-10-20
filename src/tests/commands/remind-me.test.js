@@ -1,5 +1,6 @@
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
+const { MessageFlags } = require('discord.js');
 
 describe('Remind-me command', () => {
     let reminderServiceStub;
@@ -80,7 +81,7 @@ describe('Remind-me command', () => {
 
         expect(mockInteraction.reply).to.have.been.calledOnce;
         const replyArg = mockInteraction.reply.getCall(0).args[0];
-        expect(replyArg).to.have.property('ephemeral', true);
+        expect(replyArg).to.have.property('flags', MessageFlags.Ephemeral);
         expect(replyArg.content).to.match(/valid future time/i);
     });
 });

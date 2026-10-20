@@ -18,7 +18,7 @@ const FactOrFiction = database.define('fact-or-fiction', {
     createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: new Date(new Date().toUTCString())
+        defaultValue: Sequelize.NOW
     },
 });
 

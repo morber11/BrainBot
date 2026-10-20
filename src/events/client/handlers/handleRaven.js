@@ -1,5 +1,6 @@
 const path = require('node:path');
 const pathUtility = require('../../../utils/path-util.js');
+const stringUtility = require('../../../utils/string-util.js');
 const CONSTANTS = require('../../../utils/constants.js');
 const statService = require('../../../services/system-stat-command-service.js');
 const logger = require('../../../utils/logger.js');
@@ -17,14 +18,14 @@ module.exports = async function handleRaven(message) {
         const lastForGuild = lastRavenByGuild.get(guildKey);
 
         const choices = lastForGuild ? ravenImages.filter(img => img !== lastForGuild) : ravenImages;
-        const selection = choices[Math.floor(Math.random() * choices.length)];
+        const selection = stringUtility.selectRandomFromArray(choices);
 
         lastRavenByGuild.set(guildKey, selection);
 
-        const dir = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'images', selection);
+        const imgPath = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'images', selection);
 
         await statService.incrementSystemStat(CONSTANTS.STATS.RAVEN, CONSTANTS.STATS.RAVEN_FRIENDLY);
-        await message.reply({ files: [dir] });
+        await message.reply({ files: [imgPath] });
 
     } catch (err) {
         logger.error(err, { handler: 'handleRaven' });

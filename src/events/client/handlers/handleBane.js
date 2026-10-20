@@ -8,6 +8,7 @@ const env = require('../../../utils/env.js');
 
 const lastBaneByGuild = new Map();
 const BANE_COOLDOWN_MS = 6 * 60 * 60 * 1000;
+const BANE_CHANCE_PERCENT = 50;
 
 module.exports = async function handleBane(message) {
     try {
@@ -22,16 +23,14 @@ module.exports = async function handleBane(message) {
             if (Date.now() - last < BANE_COOLDOWN_MS) return;
         }
 
-        const chance = env.isDev ? 100 : 50;
-        
-        if (!env.isDev && mathUtil.getRandomInt(100) >= chance) return;
+        if (!env.isDev && mathUtil.getRandomInt(100) >= BANE_CHANCE_PERCENT) return;
 
         lastBaneByGuild.set(guildKey, Date.now());
 
-        const dir = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'images', 'bane/bane.jpeg');
+        const imgPath = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'images', 'bane/bane.jpeg');
 
         await statService.incrementSystemStat(CONSTANTS.STATS.BANE, CONSTANTS.STATS.BANE_FRIENDLY);
-        await message.reply({ files: [dir] });
+        await message.reply({ files: [imgPath] });
     } catch (err) {
         logger.error(err, {
             guildId: message.guildId,

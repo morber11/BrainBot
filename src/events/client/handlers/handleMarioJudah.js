@@ -6,6 +6,7 @@ const env = require('../../../utils/env.js');
 
 const lastMissTheRageByGuild = new Map();
 const MISS_THE_RAGE_COOLDOWN_MS = 6 * 60 * 60 * 1000;
+const MISS_THE_RAGE_CHANCE_PERCENT = 20;
 const missTheRageRegex = /\bi miss\s+(\S+)/;
 
 module.exports = async function handleMarioJudah(message) {
@@ -23,8 +24,7 @@ module.exports = async function handleMarioJudah(message) {
             if (Date.now() - last < MISS_THE_RAGE_COOLDOWN_MS) return;
         }
 
-        const chance = env.isDev ? 100 : 20;
-        if (!env.isDev && mathUtil.getRandomInt(100) >= chance) return;
+        if (!env.isDev && mathUtil.getRandomInt(100) >= MISS_THE_RAGE_CHANCE_PERCENT) return;
 
         lastMissTheRageByGuild.set(guildKey, Date.now());
 

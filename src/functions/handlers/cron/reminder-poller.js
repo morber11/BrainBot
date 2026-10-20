@@ -65,7 +65,7 @@ const onTick = async (client) => {
 
 module.exports = (client, tz) => cron.CronJob.from({
     cronTime: CONSTANTS.CRON.REMINDER_POLL,
-    onTick: () => onTick(client, tz),
+    onTick: () => onTick(client),
     start: false,
     waitForCompletion: true,
     timeZone: tz,

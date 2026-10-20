@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 const reminderCommandService = require('../../services/reminder-command-service.js');
 const reminderHelper = require('../../services/reminder-helper.js');
 const CONSTANTS = require('../../utils/constants.js');
@@ -31,7 +31,7 @@ module.exports = {
         if (!schedule) {
             await interaction.reply({
                 content: 'Please provide a valid future time. Format like so: "3h, 30m, 60 minutes, etc..." or use an ISO date string',
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
             return;
         }
@@ -41,7 +41,7 @@ module.exports = {
         if (remindAt <= now) {
             await interaction.reply({
                 content: 'Please provide a future time for the reminder. Try "3h, 30m, etc..." or leave blank to use default',
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
             return;
         }

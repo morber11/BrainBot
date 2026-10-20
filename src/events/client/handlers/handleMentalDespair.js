@@ -19,9 +19,9 @@ module.exports = async function handleMentalDespair(message) {
         if (currentDespair.despairCount >= CONSTANTS.POINT_VALUES.MAX_DESPAIR) {
             const urls = await customUrlService.findAllByType('despair', ['url']);
 
-            const el = stringUtility.selectRandomFromArray(urls);
+            const { url } = stringUtility.selectRandomFromArray(urls);
 
-            await message.reply(`Your despair is too high! \n${el.url}`);
+            await message.reply(`Your despair is too high! \n${url}`);
         }
     } catch (err) {
         logger.error(err, {
@@ -43,7 +43,12 @@ async function parseMentalDespairKeywords(message) {
     });
 
     if (change.delta !== 0) {
-        const [member, created] = await memberService.findOrCreate(message.author.id);
+        const [member, created] = await memberService.findOrCreate(message.author.id, {
+            defaults: {
+                name: message.author.username,
+                despairCount: change.nextCount,
+            },
+        });
 
         if (!created) {
             const updatedDespair = despairScoreService.calculateNextDespairCount({

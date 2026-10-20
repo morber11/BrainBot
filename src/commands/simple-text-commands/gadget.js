@@ -18,7 +18,7 @@ module.exports = {
             // don't really want to clutter the CONSTANTS file with a huge list
             // these are only used in this command
             // TODO: consider mapping these to an image of the gadget
-            const el = stringUtility.selectRandomFromArray([
+            const gadget = stringUtility.selectRandomFromArray([
                 'arms',
                 'copter',
                 'binoculars',
@@ -50,9 +50,9 @@ module.exports = {
                 'free iPad'
             ]);
 
-            const messageText = `Go Go Gadget ${el}!`;
+            const messageText = `Go Go Gadget ${gadget}!`;
 
-            const baseName = el.toLowerCase().replace(/\s+/g, '-');
+            const baseName = gadget.toLowerCase().replace(/\s+/g, '-');
             const imgPath = pathUtility.getMediaFilePath(__dirname, 'images', `gadgets/${baseName}.jpg`);
             
             try {

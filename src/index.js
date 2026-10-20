@@ -32,7 +32,6 @@ client.commandArray = [];
 
 
 const commandFolders = fs.readdirSync('./src/commands');
-//const commandFilesPath = path.join(__dirname, '..', '..', 'commands', commandFolders);
 
 (async function init() {
     try {
@@ -61,9 +60,9 @@ const commandFolders = fs.readdirSync('./src/commands');
             }
         }
 
-        client.handleEvents();
-        client.handleCommands(commandFolders);
-        client.handleCrons();
+        await client.handleEvents();
+        await client.handleCommands(commandFolders);
+        await client.handleCrons();
 
         if (!BOT_TOKEN) {
             logger.error('BOT_TOKEN is not set. Please set it in your .env file or environment variables.');

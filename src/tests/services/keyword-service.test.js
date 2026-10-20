@@ -8,8 +8,6 @@ describe('keyword-service', () => {
     beforeEach(() => {
         KeywordStub = {
             findAll: sinon.stub(),
-            findOrCreate: sinon.stub(),
-            create: sinon.stub(),
         };
 
         keywordService = proxyquire('../../services/keyword-service.js', {
@@ -34,27 +32,5 @@ describe('keyword-service', () => {
         const res = await keywordService.findAllByType('despair', ['name', 'value']);
 
         expect(res).to.deep.equal([]);
-    });
-
-    it('findOrCreate should forward to Keyword.findOrCreate', async () => {
-        const attrs = { name: 'sad', type: 'despair', value: 2 };
-        const dbRes = [{ id: 1 }, true];
-        KeywordStub.findOrCreate.resolves(dbRes);
-
-        const res = await keywordService.findOrCreate(attrs);
-
-        expect(KeywordStub.findOrCreate).to.have.been.calledWith({ where: { name: attrs.name, type: attrs.type }, defaults: attrs });
-        expect(res).to.equal(dbRes);
-    });
-
-    it('create should forward to Keyword.create', async () => {
-        const attrs = { name: 'sad', type: 'despair', value: 1 };
-        const created = { id: 2 };
-        KeywordStub.create.resolves(created);
-
-        const res = await keywordService.create(attrs);
-
-        expect(KeywordStub.create).to.have.been.calledWith(attrs);
-        expect(res).to.equal(created);
     });
 });

@@ -6,9 +6,8 @@ module.exports = {
         .setDescription('Returns a ping and latency'),
     devOnly: true,
     async execute(interaction, client) {
-        const { createdTimestamp } = await interaction.deferReply({
-            fetchReply: true
-        });
+        await interaction.deferReply();
+        const { createdTimestamp } = await interaction.fetchReply();
 
         const { ping } = client.ws;
 

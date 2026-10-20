@@ -17,8 +17,8 @@ module.exports = {
 			await interaction.deferReply();
 
 			const question = interaction.options.getString('question');
-			const el = stringUtility.selectRandomFromArray(CONSTANTS.MAGIC_BALL.RESPONSES);
-			const response = `You have pondered the Magic 9-Ball for guidance\nYour answer is: ${el.response}.\nYour question was: "${question}"`;
+			const answer = stringUtility.selectRandomFromArray(CONSTANTS.MAGIC_BALL.RESPONSES);
+			const response = `You have pondered the Magic 9-Ball for guidance\nYour answer is: ${answer.response}.\nYour question was: "${question}"`;
 			await interaction.editReply(response);
 		} catch (error) {
 			logger.error(error);

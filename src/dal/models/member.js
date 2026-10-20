@@ -18,12 +18,12 @@ const Member = database.define('member', {
     createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: new Date(new Date().toUTCString())
+        defaultValue: Sequelize.NOW
     },
     updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: new Date(new Date().toUTCString())
+        defaultValue: Sequelize.NOW
     },
 });
 

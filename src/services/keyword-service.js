@@ -10,12 +10,4 @@ async function findAllByType(type, attributes) {
     }
 }
 
-async function findOrCreate(attrs) {
-    return Keyword.findOrCreate({ where: { name: attrs.name, type: attrs.type }, defaults: attrs });
-}
-
-async function create(attrs) {
-    return Keyword.create(attrs);
-}
-
-module.exports = { findAllByType, findOrCreate, create };
+module.exports = { findAllByType };

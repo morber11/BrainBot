@@ -20,12 +20,9 @@ module.exports = {
             statsUtil.addStatEntry({ label: r.friendly_name || r.stat, value: r.count })
         );
 
-        const askEntry = statsUtil.addStatEntry({ label: CONSTANTS.STATS.ASK_FRIENDLY, value: '0' });
-        if (askEntry) entries.unshift(askEntry);
+        entries.unshift(statsUtil.addStatEntry({ label: CONSTANTS.STATS.ASK_FRIENDLY, value: '0' }));
 
         const table = statsUtil.generateStatsTable(entries);
         await interaction.reply(`\`\`\`\n${table}\`\`\``);
     },
-    buildTable: statsUtil.buildTable,
-    generateStatsTable: statsUtil.generateStatsTable,
 };

@@ -1,4 +1,5 @@
 const cron = require('cron');
+const { ChannelType } = require('discord.js');
 const CONSTANTS = require('../../../utils/constants.js');
 const statService = require('../../../services/system-stat-command-service.js');
 const logger = require('../../../utils/logger.js');
@@ -27,7 +28,7 @@ const patriotAct = (client, tz, delayMs = CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIO
                 // we have to do this because of funky behaviour with .find() always finding bot/bots instead
                 // manually force priority on these special channels
                 let targetChannel = guild.channels.cache.find(ch =>
-                    ch.type === 0 && (
+                    ch.type === ChannelType.GuildText && (
                         ch.name.toLowerCase().includes('2fort') ||
                         ch.name.toLowerCase().includes('real-fungheads')
                     )
@@ -35,9 +36,8 @@ const patriotAct = (client, tz, delayMs = CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIO
 
                 if (!targetChannel) {
                     targetChannel = guild.channels.cache.find(ch =>
-                        ch.type === 0 && (
+                        ch.type === ChannelType.GuildText && (
                             ch.name.toLowerCase().includes('bot') ||
-                            ch.name.toLowerCase().includes('bots') ||
                             ch.name.toLowerCase() === 'general'
                         )
                     );

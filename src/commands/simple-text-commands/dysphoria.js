@@ -18,9 +18,9 @@ module.exports = {
 				return;
 			}
 
-			const el = stringUtility.selectRandomFromArray(urls);
+			const { url } = stringUtility.selectRandomFromArray(urls);
 
-			await interaction.editReply(el.url);
+			await interaction.editReply(url);
 		} catch (error) {
 			logger.error(error);
 			await interaction.editReply('An error occurred.');

@@ -37,10 +37,10 @@ module.exports = {
                 await factOrFictionService.update(factOrFictionEntry.id, outcome.value);
             }
 
-            const dir = pathUtility.getMediaFilePath(__dirname, 'images',
+            const imgPath = pathUtility.getMediaFilePath(__dirname, 'images',
                 outcome.value === CONSTANTS.FACT_OR_FICTION.VALUES.FACT ? 'fact/fact.gif' : 'fiction/fiction.gif');
 
-            const attachment = new AttachmentBuilder(dir);
+            const attachment = new AttachmentBuilder(imgPath);
 
             // ideas
             // add a based on x events by y etc, column in db.
@@ -55,10 +55,7 @@ module.exports = {
         }
         catch (error) {
             logger.error('An error occurred.:', error);
-            await interaction.reply({
-                content: 'An error occurred.',
-                ephemeral: true,
-            });
+            await interaction.editReply('An error occurred.');
         }
     }
 };

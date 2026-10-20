@@ -76,11 +76,6 @@ async function forceSend(messageOrInteraction) {
 }
 
 module.exports = {
-    COOLDOWN_MS,
-    CHANCE,
-    cooldownGuilds,
-    lastTriggerTimestamps,
-    shouldReply,
     chanceToSend,
     forceSend,
     getAskText,

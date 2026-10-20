@@ -23,13 +23,9 @@ I will consider expanding to other services like soundcloud later
    ```
 2. **Configure database**
    - edit `src/config.json` with your file path and credentials for the SQLite database.
-   - run migrations to create required tables:
+   - run migrations to create and update the required tables. this works on a new or existing database and is safe to run again:
      ```bash
      npm run db-run-migrations
-     ```
-   - alternatively, you can reset and sync the schema in development via:
-     ```bash
-     node ./src/dal/database/sync-db.js
      ```
 
 ## Running tests
