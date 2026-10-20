@@ -19,9 +19,9 @@ module.exports = async function handleMentalDespair(message) {
         if (currentDespair.despairCount >= CONSTANTS.POINT_VALUES.MAX_DESPAIR) {
             const urls = await customUrlService.findAllByType('despair', ['url']);
 
-            const el = stringUtility.selectRandomFromArray(urls);
+            const { url } = stringUtility.selectRandomFromArray(urls);
 
-            await message.reply(`Your despair is too high! \n${el.url}`);
+            await message.reply(`Your despair is too high! \n${url}`);
         }
     } catch (err) {
         logger.error(err, {

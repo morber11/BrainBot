@@ -9,10 +9,10 @@ module.exports = async function handleJigsaw(message) {
         const msgContent = message.content.toLowerCase();
         if (!msgContent.includes("make your choice")) return;
 
-        const dir = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'images', 'jigsaw/jigsaw.jpg');
+        const imgPath = pathUtility.getMediaFilePath(path.join(__dirname, '..'), 'images', 'jigsaw/jigsaw.jpg');
 
         await statService.incrementSystemStat(CONSTANTS.STATS.JIGSAW, CONSTANTS.STATS.JIGSAW_FRIENDLY);
-        await message.reply({ files: [dir] });
+        await message.reply({ files: [imgPath] });
     } catch (err) {
         logger.error(err, { handler: 'handleJigsaw' });
     }
