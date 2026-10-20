@@ -20,8 +20,7 @@ module.exports = async function handleBasicReactResponse(message) {
             await statService.incrementSystemStat(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
         }
 
-        const re = new RegExp("^umm*");
-        if (re.test(msgContent))
+        if (/^um+\b/.test(msgContent))
             await message.react(CONSTANTS.EMOJI.THINKING);
 
         // we dont need i18n, we only need one spanish word
