@@ -28,6 +28,4 @@ module.exports = {
         const table = statsUtil.generateStatsTable(entries);
         await interaction.reply(`\`\`\`\n${table}\`\`\``);
     },
-    buildTable: statsUtil.buildTable,
-    generateStatsTable: statsUtil.generateStatsTable,
 };

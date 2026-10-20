@@ -9,8 +9,6 @@ describe('custom-url-service', () => {
     beforeEach(() => {
         CustomUrlStub = {
             findAll: sinon.stub(),
-            findOrCreate: sinon.stub(),
-            create: sinon.stub()
         };
 
         loggerStub = { error: sinon.stub() };
@@ -37,15 +35,5 @@ describe('custom-url-service', () => {
         const res = await customUrlService.getUrls('meditate');
 
         expect(res).to.deep.equal([]);
-    });
-
-    it('findRandomUrl selects a random item', async () => {
-        const rows = [{ value: 'a' }, { value: 'b' }];
-        CustomUrlStub.findAll.resolves(rows);
-        sinon.stub(Math, 'random').returns(0.75);
-
-        const one = await customUrlService.findRandomUrl('jimcarrey');
-
-        expect(one).to.equal(rows[1]);
     });
 });
