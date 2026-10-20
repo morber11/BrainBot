@@ -127,10 +127,8 @@ describe('Fact or Fictionator Command', () => {
 
         await factOrFictionatorCommand.execute(mockCommandInteraction);
 
-        expect(mockCommandInteraction.reply).to.have.been.calledWith({
-            content: 'An error occurred.',
-            ephemeral: true,
-        });
+        expect(mockCommandInteraction.editReply).to.have.been.calledWith('An error occurred.');
+        expect(mockCommandInteraction.reply).to.not.have.been.called;
         expect(loggerStub.error).to.have.been.calledOnce;
     });
 });

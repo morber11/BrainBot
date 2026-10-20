@@ -55,10 +55,7 @@ module.exports = {
         }
         catch (error) {
             logger.error('An error occurred.:', error);
-            await interaction.reply({
-                content: 'An error occurred.',
-                ephemeral: true,
-            });
+            await interaction.editReply('An error occurred.');
         }
     }
 };
