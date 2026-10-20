@@ -61,9 +61,9 @@ const commandFolders = fs.readdirSync('./src/commands');
             }
         }
 
-        client.handleEvents();
-        client.handleCommands(commandFolders);
-        client.handleCrons();
+        await client.handleEvents();
+        await client.handleCommands(commandFolders);
+        await client.handleCrons();
 
         if (!BOT_TOKEN) {
             logger.error('BOT_TOKEN is not set. Please set it in your .env file or environment variables.');
