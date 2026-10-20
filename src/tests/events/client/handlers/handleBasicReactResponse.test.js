@@ -27,6 +27,39 @@ describe('handleBasicReactResponse handler', () => {
         expect(statsStub.incrementSystemStat).to.have.been.calledWith(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
     });
 
+    it('does not react with brain when "brain" only appears as "brainbot"', async () => {
+        for (const content of ['brainbot', 'i like brainbot, he\'s my favourite bot']) {
+            const message = { content, guildId: 'g1', channelId: 'c1', id: 'm7', author: { id: 'u7' } };
+            message.react = sinon.stub().resolves();
+
+            await handleBasicReactResponse(message);
+
+            expect(message.react, content).to.not.have.been.called;
+        }
+
+        expect(statsStub.incrementSystemStat).to.not.have.been.called;
+    });
+
+    it('reacts with brain when "brain" also appears outside of "brainbot"', async () => {
+        for (const content of ['brainbot brain', 'i like brainbot, he really helps tickle my brain']) {
+            const message = { content, guildId: 'g1', channelId: 'c1', id: 'm8', author: { id: 'u8' } };
+            message.react = sinon.stub().resolves();
+
+            await handleBasicReactResponse(message);
+
+            expect(message.react, content).to.have.been.calledWith(CONSTANTS.EMOJI.BRAIN);
+        }
+    });
+
+    it('reacts with regional signs when "brainbot" appears alongside the brain emoji', async () => {
+        const message = { content: `check out this brainbot response ${CONSTANTS.EMOJI.BRAIN}`, guildId: 'g1', channelId: 'c1', id: 'm9', author: { id: 'u9' } };
+        message.react = sinon.stub().resolves();
+
+        await handleBasicReactResponse(message);
+
+        expect(message.react).to.have.been.calledWith(CONSTANTS.EMOJI.REGIONAL_SIGN_B);
+    });
+
     it('reacts with regional signs when content includes brain emoji', async () => {
         const message = { content: CONSTANTS.EMOJI.BRAIN, guildId: 'g1', channelId: 'c1', id: 'm2', author: { id: 'u2' } };
         message.react = sinon.stub().resolves();
