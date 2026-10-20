@@ -43,7 +43,12 @@ async function parseMentalDespairKeywords(message) {
     });
 
     if (change.delta !== 0) {
-        const [member, created] = await memberService.findOrCreate(message.author.id);
+        const [member, created] = await memberService.findOrCreate(message.author.id, {
+            defaults: {
+                name: message.author.username,
+                despairCount: change.nextCount,
+            },
+        });
 
         if (!created) {
             const updatedDespair = despairScoreService.calculateNextDespairCount({
