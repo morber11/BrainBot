@@ -14,11 +14,6 @@ function buildTable(entries) {
 }
 
 function addStatEntry(item) {
-    if (item == null) return null;
-
-    if ('stat' in item && 'count' in item) {
-        return { label: item.stat, value: String(item.count) };
-    }
     if ('label' in item && 'value' in item) {
         return { label: item.label, value: String(item.value) };
     }
@@ -27,11 +22,10 @@ function addStatEntry(item) {
 }
 
 function generateStatsTable(entries) {
-    return buildTable(entries.filter(Boolean));
+    return buildTable(entries);
 }
 
 module.exports = {
-    buildTable,
     addStatEntry,
     generateStatsTable,
 };
