@@ -1,3 +1,4 @@
+const { MessageFlags } = require('discord.js');
 const logger = require('../../utils/logger.js');
 
 module.exports = {
@@ -22,7 +23,7 @@ module.exports = {
 
                 await interaction.reply({
                     content: `Something went wrong while executing this command`,
-                    ephemeral: true
+                    flags: MessageFlags.Ephemeral,
                 });
             }
         }

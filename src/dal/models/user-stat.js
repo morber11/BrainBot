@@ -28,12 +28,12 @@ const UserStat = database.define('user_stat', {
     createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: new Date(new Date().toUTCString())
+        defaultValue: Sequelize.NOW
     },
     updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: new Date(new Date().toUTCString())
+        defaultValue: Sequelize.NOW
     },
 }, {
     tableName: 'user_stat',

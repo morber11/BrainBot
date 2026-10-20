@@ -1,5 +1,6 @@
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
+const { MessageFlags } = require('discord.js');
 
 describe('Play command', () => {
     let playAudioInVoiceChannel;
@@ -29,7 +30,7 @@ describe('Play command', () => {
 
         expect(interaction.reply).to.have.been.calledWith({
             content: 'Invalid or unsupported URL. Please provide a valid YouTube URL',
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
         });
         expect(playAudioInVoiceChannel).not.to.have.been.called;
     });
@@ -71,7 +72,7 @@ describe('Play command', () => {
 
         await playCommand.execute(interaction);
 
-        expect(interaction.reply).to.have.been.calledWithMatch({ ephemeral: true });
+        expect(interaction.reply).to.have.been.calledWithMatch({ flags: MessageFlags.Ephemeral });
         // not have been called with so we don't need to hardcode the specific error message
         expect(interaction.reply).not.to.have.been.calledWith({ content: 'Now playing: https://youtu.be/video' });
     });

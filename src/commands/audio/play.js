@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 const { playAudioInVoiceChannel, isValidAudioUrl } = require('../../utils/voice-chat-util');
 const { getYouTubeTitle } = require('../../services/youtube-audio-service.js');
 const logger = require('../../utils/logger.js');
@@ -16,7 +16,7 @@ module.exports = {
         const url = interaction.options.getString('url');
 
         if (!isValidAudioUrl(url)) {
-            await interaction.reply({ content: 'Invalid or unsupported URL. Please provide a valid YouTube URL', ephemeral: true });
+            await interaction.reply({ content: 'Invalid or unsupported URL. Please provide a valid YouTube URL', flags: MessageFlags.Ephemeral });
             return;
         }
 
@@ -37,7 +37,7 @@ module.exports = {
             }
         } catch (error) {
             logger.error('Error playing audio:', error);
-            await interaction.reply({ content: 'An error occurred while trying to play the audio', ephemeral: true });
+            await interaction.reply({ content: 'An error occurred while trying to play the audio', flags: MessageFlags.Ephemeral });
         }
     },
 };
