@@ -32,7 +32,6 @@ client.commandArray = [];
 
 
 const commandFolders = fs.readdirSync('./src/commands');
-//const commandFilesPath = path.join(__dirname, '..', '..', 'commands', commandFolders);
 
 (async function init() {
     try {
