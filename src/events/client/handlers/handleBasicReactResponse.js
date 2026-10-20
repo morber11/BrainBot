@@ -20,12 +20,15 @@ module.exports = async function handleBasicReactResponse(message) {
             await statService.incrementSystemStat(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
         }
 
-        if (/^um+\b/.test(msgContent))
+        if (/^um+\b/.test(msgContent)) {
             await message.react(CONSTANTS.EMOJI.THINKING);
+        }
 
-        // we dont need i18n, we only need one spanish word
-        if (msgContent.includes("maricon") || msgContent.includes("maricón"))
+
+        // we dont need i18n, we only need one spanish word 
+        if (msgContent.includes("maricon") || msgContent.includes("maricón")) {
             await message.react(CONSTANTS.EMOJI.ONE_HUNDRED);
+        }
 
     } catch (err) {
         logger.error(err, {
