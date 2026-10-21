@@ -13,7 +13,7 @@ const patriotAct = (client, tz, delayMs = CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIO
             // disgusting double for loop so we set the window before the delay
             for (const guild of client.guilds.cache.values()) {
                 try {
-                    responseWindowUtil.start(guild.id, 60000); // one minute
+                    responseWindowUtil.start(CONSTANTS.RESPONSE_WINDOW.SALUTE, guild.id, 60000); // one minute
                 } catch (e) {
                     logger.error('Failed to start response window for guild:', guild.id, e);
                 }

@@ -1,29 +1,35 @@
 const responses = new Map();
 
-function start(guildId, durationMs = 60000) {
-    if (!guildId) {
+function getKey(type, id) {
+    return `${type}:${id}`;
+}
+
+function start(type, id, durationMs = 60000) {
+    if (!id) {
         return;
     }
 
-    if (responses.has(guildId)) {
-        const existing = responses.get(guildId);
+    const key = getKey(type, id);
+
+    if (responses.has(key)) {
+        const existing = responses.get(key);
         clearTimeout(existing.timer);
     }
 
     const seenUsers = new Set();
     const timer = setTimeout(() => {
-        responses.delete(guildId);
+        responses.delete(key);
     }, durationMs);
 
-    responses.set(guildId, { timer, seenUsers });
+    responses.set(key, { timer, seenUsers });
 }
 
-function isActive(guildId) {
-    return responses.has(guildId);
+function isActive(type, id) {
+    return responses.has(getKey(type, id));
 }
 
-function shouldCount(guildId, userId) {
-    const response = responses.get(guildId);
+function shouldCount(type, id, userId) {
+    const response = responses.get(getKey(type, id));
     if (!response) {
         return false;
     }

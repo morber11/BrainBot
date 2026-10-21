@@ -34,6 +34,10 @@ const CONSTANTS = {
     REMINDER: {
         DEFAULT_ALERT_MINUTES: 15,
     },
+    RESPONSE_WINDOW: {
+        SALUTE: "salute",
+        REPLY: "reply",
+    },
     POLL: {
         DEFAULT_DURATION_HOURS: 24,
         BAR_LENGTH: 10,

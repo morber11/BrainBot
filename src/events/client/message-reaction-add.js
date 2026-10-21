@@ -22,7 +22,7 @@ async function handlePatriotReaction(reaction, user) {
         return;
     }
 
-    if (!responseWindowUtil.isActive(message.guild.id)) {
+    if (!responseWindowUtil.isActive(CONSTANTS.RESPONSE_WINDOW.SALUTE, message.guild.id)) {
         return;
     }
 
@@ -31,7 +31,7 @@ async function handlePatriotReaction(reaction, user) {
         return;
     }
 
-    if (!responseWindowUtil.shouldCount(message.guild.id, user.id)) {
+    if (!responseWindowUtil.shouldCount(CONSTANTS.RESPONSE_WINDOW.SALUTE, message.guild.id, user.id)) {
         return;
     }
 
