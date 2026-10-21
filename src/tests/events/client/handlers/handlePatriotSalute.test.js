@@ -36,7 +36,7 @@ describe('handlePatriotSalute handler', () => {
 
         await handlePatriotSalute(message);
 
-        expect(responseWindowUtilStub.shouldCount).to.have.been.calledWith('g1', 'u1');
+        expect(responseWindowUtilStub.shouldCount).to.have.been.calledWith(CONSTANTS.RESPONSE_WINDOW.SALUTE, 'g1', 'u1');
         expect(statsStub.incrementUserStat).to.have.been.calledWith(
             'u1',
             CONSTANTS.STATS.SALUTES_GIVEN,

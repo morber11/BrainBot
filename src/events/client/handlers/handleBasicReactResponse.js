@@ -6,7 +6,8 @@ module.exports = async function handleBasicReactResponse(message) {
     try {
         const msgContent = message.content.toLowerCase();
 
-        if (msgContent.includes("brain")) {
+        // any "brain" that isn't part of "brainbot"
+        if (/brain(?!bot)/.test(msgContent)) {
             await message.react(CONSTANTS.EMOJI.BRAIN);
             await statService.incrementSystemStat(CONSTANTS.STATS.BRAIN, CONSTANTS.STATS.BRAIN_FRIENDLY);
         }

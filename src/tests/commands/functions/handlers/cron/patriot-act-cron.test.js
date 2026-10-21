@@ -59,7 +59,7 @@ describe('patriot act', () => {
         sinon.assert.calledOnce(mockSend);
         sinon.assert.calledWithExactly(mockSend, 'o7');
         sinon.assert.calledOnce(responseWindowUtilStub.start);
-        sinon.assert.calledWithExactly(responseWindowUtilStub.start, 'g1', 60000);
+        sinon.assert.calledWithExactly(responseWindowUtilStub.start, CONSTANTS.RESPONSE_WINDOW.SALUTE, 'g1', 60000);
         sinon.assert.calledOnce(statsUtilStub.incrementSystemStat);
         sinon.assert.calledWithExactly(statsUtilStub.incrementSystemStat, CONSTANTS.STATS.PATRIOT_ACT);
         sinon.assert.notCalled(loggerStub.error);
@@ -86,7 +86,7 @@ describe('patriot act', () => {
         sinon.assert.calledOnce(mockSend);
         sinon.assert.calledWithExactly(mockSend, 'o7');
         sinon.assert.calledOnce(responseWindowUtilStub.start);
-        sinon.assert.calledWithExactly(responseWindowUtilStub.start, 'g1', 60000);
+        sinon.assert.calledWithExactly(responseWindowUtilStub.start, CONSTANTS.RESPONSE_WINDOW.SALUTE, 'g1', 60000);
         sinon.assert.calledOnce(statsUtilStub.incrementSystemStat);
         sinon.assert.calledWithExactly(statsUtilStub.incrementSystemStat, CONSTANTS.STATS.PATRIOT_ACT);
     });

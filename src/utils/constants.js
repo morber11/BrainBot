@@ -10,7 +10,8 @@ const CONSTANTS = {
         ONE_HUNDRED: "\uD83D\uDCAF",
         MILK: "🥛",
         SALUTE: "\u{1FAE1}",
-        SALUTE_EMOJI: ":saluting_face:"
+        SALUTE_EMOJI: ":saluting_face:",
+        HEART: "❤️",
     },
     BRAIN: {
         MAX_BRAINS: 330,
@@ -32,6 +33,10 @@ const CONSTANTS = {
     },
     REMINDER: {
         DEFAULT_ALERT_MINUTES: 15,
+    },
+    RESPONSE_WINDOW: {
+        SALUTE: "salute",
+        REPLY: "reply",
     },
     POLL: {
         DEFAULT_DURATION_HOURS: 24,

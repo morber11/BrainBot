@@ -9,7 +9,7 @@ module.exports = async (message) => {
             return;
         }
 
-        if (!responseWindowUtil.isActive(message.guild.id)) {
+        if (!responseWindowUtil.isActive(CONSTANTS.RESPONSE_WINDOW.SALUTE, message.guild.id)) {
             return;
         }
 
@@ -23,7 +23,7 @@ module.exports = async (message) => {
             return;
         }
 
-        if (!responseWindowUtil.shouldCount(message.guild.id, message.author.id)) {
+        if (!responseWindowUtil.shouldCount(CONSTANTS.RESPONSE_WINDOW.SALUTE, message.guild.id, message.author.id)) {
             return;
         }
 
