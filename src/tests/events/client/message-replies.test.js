@@ -92,6 +92,50 @@ describe('messageReplies event handler', () => {
         expect(message.react).not.to.have.been.called;
     });
 
+    it('reacts only once per member in a window', async () => {
+        await botPosts();
+        const first = createMessage('thanks brainbot');
+        const repeat = createMessage('thanks brainbot');
+
+        await messageReplies.execute(first);
+        await messageReplies.execute(repeat);
+
+        expect(first.react).to.have.been.calledOnce;
+        expect(repeat.react).not.to.have.been.called;
+    });
+
+    it('reacts to different members in the same window', async () => {
+        await botPosts();
+        const first = createMessage('thanks brainbot');
+        const other = createMessage('thanks brainbot', { authorId: 'u2' });
+
+        await messageReplies.execute(first);
+        await messageReplies.execute(other);
+
+        expect(other.react).to.have.been.calledOnce;
+    });
+
+    it('reacts again after the bot posts again', async () => {
+        await botPosts();
+        await messageReplies.execute(createMessage('thanks brainbot'));
+        await botPosts();
+        const message = createMessage('thanks brainbot');
+
+        await messageReplies.execute(message);
+
+        expect(message.react).to.have.been.calledOnce;
+    });
+
+    it('does not use up the reaction on an unrelated thanks', async () => {
+        await botPosts();
+        await messageReplies.execute(createMessage('thanks'));
+        const message = createMessage('thanks brainbot');
+
+        await messageReplies.execute(message);
+
+        expect(message.react).to.have.been.calledOnce;
+    });
+
     it('does not react to words that only start with thanks', async () => {
         await botPosts();
         const message = createMessage('happy thanksgiving');

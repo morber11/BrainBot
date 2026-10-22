@@ -8,7 +8,7 @@ function escapeRegex(text) {
     return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function isThanksToBot(msgContent, botName) {
+function isThankingBot(msgContent, botName) {
     const names = [DEFAULT_BOT_NAME];
 
     if (botName) {
@@ -20,7 +20,7 @@ function isThanksToBot(msgContent, botName) {
 
 const TRIGGERS = [
     {
-        matches: (msgContent, message) => isThanksToBot(msgContent, message.guild?.members.me.displayName),
+        matches: (msgContent, message) => isThankingBot(msgContent, message.guild?.members.me.displayName),
         respond: (message) => message.react(CONSTANTS.EMOJI.HEART),
     },
 ];
@@ -41,7 +41,21 @@ module.exports = {
             const msgContent = message.content.toLowerCase();
 
             for (const trigger of TRIGGERS) {
-                if (trigger.matches(msgContent, message)) {
+                if (!trigger.matches(msgContent, message)) {
+                    continue;
+                }
+
+                // respond once per window, we don't want the bot
+                // to react to every single thanks if a user
+                // continues to just post thank yous
+                // like a crazed thankful maniac
+                const isFirstReply = responseWindowUtil.shouldCount(
+                    CONSTANTS.RESPONSE_WINDOW.REPLY,
+                    message.channelId,
+                    message.author.id,
+                );
+
+                if (isFirstReply) {
                     await trigger.respond(message);
                 }
             }
