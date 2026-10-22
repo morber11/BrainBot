@@ -12,6 +12,8 @@ const CONSTANTS = {
         SALUTE: "\u{1FAE1}",
         SALUTE_EMOJI: ":saluting_face:",
         HEART: "❤️",
+        BLUE_HEART: "💙",
+        GREEN_HEART: "💚",
     },
     BRAIN: {
         MAX_BRAINS: 330,

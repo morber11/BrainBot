@@ -6,6 +6,7 @@ const responseWindowUtil = require('../../../utils/response-window-util.js');
 describe('messageReplies event handler', () => {
     let messageReplies;
     let loggerStub;
+    let stringUtilityStub;
     let clock;
 
     const client = { user: { id: 'bot' } };
@@ -28,9 +29,11 @@ describe('messageReplies event handler', () => {
     beforeEach(() => {
         clock = sinon.useFakeTimers();
         loggerStub = { error: sinon.stub() };
+        stringUtilityStub = { selectRandomFromArray: sinon.stub().returns(CONSTANTS.EMOJI.HEART) };
 
         messageReplies = proxyquire('../../../events/client/message-replies.js', {
             '../../utils/logger.js': loggerStub,
+            '../../utils/string-util.js': stringUtilityStub,
         });
     });
 
@@ -44,7 +47,7 @@ describe('messageReplies event handler', () => {
 
         await messageReplies.execute(message);
 
-        expect(message.react).to.have.been.calledWith(CONSTANTS.EMOJI.HEART);
+        expect(message.react).to.have.been.calledOnce;
     });
 
     it('reacts with a heart to thank you after the bot posts', async () => {
@@ -53,7 +56,30 @@ describe('messageReplies event handler', () => {
 
         await messageReplies.execute(message);
 
-        expect(message.react).to.have.been.calledWith(CONSTANTS.EMOJI.HEART);
+        expect(message.react).to.have.been.calledOnce;
+    });
+
+    it('reacts with a random reaction', async () => {
+        await botPosts();
+        stringUtilityStub.selectRandomFromArray.returns(CONSTANTS.EMOJI.SALUTE);
+        const message = createMessage('thanks brainbot');
+
+        await messageReplies.execute(message);
+
+        expect(message.react).to.have.been.calledWith(CONSTANTS.EMOJI.SALUTE);
+    });
+
+    it('picks from hearts and the salute', async () => {
+        await botPosts();
+
+        await messageReplies.execute(createMessage('thanks brainbot'));
+
+        expect(stringUtilityStub.selectRandomFromArray).to.have.been.calledWith([
+            CONSTANTS.EMOJI.HEART,
+            CONSTANTS.EMOJI.BLUE_HEART,
+            CONSTANTS.EMOJI.GREEN_HEART,
+            CONSTANTS.EMOJI.SALUTE,
+        ]);
     });
 
     it('reacts when the bot has been renamed in the guild', async () => {
@@ -62,7 +88,7 @@ describe('messageReplies event handler', () => {
 
         await messageReplies.execute(message);
 
-        expect(message.react).to.have.been.calledWith(CONSTANTS.EMOJI.HEART);
+        expect(message.react).to.have.been.calledOnce;
     });
 
     it('falls back to brainbot when the bot has been renamed', async () => {
@@ -71,7 +97,7 @@ describe('messageReplies event handler', () => {
 
         await messageReplies.execute(message);
 
-        expect(message.react).to.have.been.calledWith(CONSTANTS.EMOJI.HEART);
+        expect(message.react).to.have.been.calledOnce;
     });
 
     it('does not react to thanks without the bot name', async () => {
