@@ -1,8 +1,16 @@
 const CONSTANTS = require('../../utils/constants.js');
 const logger = require('../../utils/logger.js');
 const responseWindowUtil = require('../../utils/response-window-util.js');
+const stringUtility = require('../../utils/string-util.js');
 
 const DEFAULT_BOT_NAME = 'brainbot';
+
+const THANKS_REACTIONS = [
+    CONSTANTS.EMOJI.HEART,
+    CONSTANTS.EMOJI.BLUE_HEART,
+    CONSTANTS.EMOJI.GREEN_HEART,
+    CONSTANTS.EMOJI.SALUTE,
+];
 
 function escapeRegex(text) {
     return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -21,7 +29,7 @@ function isThankingBot(msgContent, botName) {
 const TRIGGERS = [
     {
         matches: (msgContent, message) => isThankingBot(msgContent, message.guild?.members.me.displayName),
-        respond: (message) => message.react(CONSTANTS.EMOJI.HEART),
+        respond: (message) => message.react(stringUtility.selectRandomFromArray(THANKS_REACTIONS)),
     },
 ];
 
