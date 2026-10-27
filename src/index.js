@@ -35,6 +35,11 @@ const commandFolders = fs.readdirSync('./src/commands');
 
 (async function init() {
     try {
+        if (!BOT_TOKEN) {
+            logger.error('BOT_TOKEN is not set');
+            process.exit(1);
+        }
+
         await ensureYtDlpAvailable();
         logger.info('yt-dlp is available.');
         logger.info('Checking database connection...');
@@ -63,11 +68,6 @@ const commandFolders = fs.readdirSync('./src/commands');
         await client.handleEvents();
         await client.handleCommands(commandFolders);
         await client.handleCrons();
-
-        if (!BOT_TOKEN) {
-            logger.error('BOT_TOKEN is not set. Please set it in your .env file or environment variables.');
-            process.exit(1);
-        }
 
         await client.login(BOT_TOKEN);
         logger.info('Bot logged in successfully.');
