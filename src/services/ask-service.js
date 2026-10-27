@@ -1,16 +1,12 @@
 const statService = require('./system-stat-command-service.js');
 const askResponseService = require('./ask-response-service.js');
 const CONSTANTS = require('../utils/constants.js');
+const mathUtil = require('../utils/math-util.js');
 const logger = require('../utils/logger.js');
 
 function getAskText(messageOrInteraction) {
-    const original = (messageOrInteraction && (
-        messageOrInteraction.content ||
-        (messageOrInteraction.message && messageOrInteraction.message.content) ||
-        ''
-    ) || '');
     const roll = Math.floor(Math.random() * 100);
-    const result = askResponseService.evaluateAskResponse({ content: original, roll });
+    const result = askResponseService.evaluateAskResponse({ content: messageOrInteraction.content, roll });
 
     return result.replyText;
 }
@@ -19,40 +15,40 @@ function getAskText(messageOrInteraction) {
 const COOLDOWN_MS = 48 * 60 * 60 * 1000;
 const CHANCE = 20000;
 
-const cooldownGuilds = new Set();
 // similar logic used in message-create event
 // consisder making more generic later
 const lastTriggerTimestamps = new Map();
 
 function shouldReply(guildId) {
     const now = Date.now();
+    const last = lastTriggerTimestamps.get(guildId);
 
-    if (cooldownGuilds.has(guildId)) {
-        const last = lastTriggerTimestamps.get(guildId) || 0;
-        if (now - last < COOLDOWN_MS) return false;
-        cooldownGuilds.delete(guildId);
+    if (last && now - last < COOLDOWN_MS) {
+        return false;
     }
 
-    if (Math.floor(Math.random() * CHANCE) === 0) {
-        cooldownGuilds.add(guildId);
-        lastTriggerTimestamps.set(guildId, now);
-        return true;
+    const roll = mathUtil.getRandomInt(CHANCE);
+    if (roll !== 0) {
+        return false;
     }
 
-    return false;
+    lastTriggerTimestamps.set(guildId, now);
+    return true;
 }
 
 async function chanceToSend(messageOrInteraction) {
-    const guildId = messageOrInteraction.guildId || (messageOrInteraction.guild && messageOrInteraction.guild.id);
-    if (!guildId) return false;
-
-    if (!shouldReply(guildId)) return false;
+    if (!shouldReply(messageOrInteraction.guildId)) {
+        return false;
+    }
 
     try {
         await statService.incrementSystemStat(CONSTANTS.STATS.DIDNT_ASK, CONSTANTS.STATS.DIDNT_ASK_FRIENDLY, 1);
 
         const text = getAskText(messageOrInteraction);
-        if (!text) return false;
+        if (!text) {
+            return false;
+        }
+
         await messageOrInteraction.reply(text);
 
         return true;
