@@ -8,7 +8,6 @@ RUN apt-get update \
     make \
     g++ \
     libsqlite3-dev \
-    libopus-dev \
     pkg-config \
     git \
     ca-certificates \
@@ -58,7 +57,6 @@ ARG YT_DLP_VERSION=2026.07.04
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     libsqlite3-0 \
-    libopus0 \
     ca-certificates \
     curl \
   && case "$TARGETARCH" in \
