@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { BOT_TOKEN } = process.env;
-const { Client, Collection, GatewayIntentBits, ActivityType, Partials } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, ActivityType, Partials, Events } = require('discord.js');
 const fs = require('node:fs');
 const database = require('./dal/database/database.js');
 const { ensureMigrationsApplied } = require('./dal/database/schema-check.js');
@@ -29,6 +29,11 @@ const client = new Client({
 
 client.commands = new Collection();
 client.commandArray = [];
+
+// discord.js reports a failed event handler as an error event, which crashes the process if nothing listens
+client.on(Events.Error, (err) => {
+    logger.error('client error', { err });
+});
 
 
 const commandFolders = fs.readdirSync('./src/commands');

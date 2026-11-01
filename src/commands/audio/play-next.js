@@ -20,25 +20,27 @@ module.exports = {
             return;
         }
 
+        await interaction.deferReply();
+
         try {
             const playback = await playAudioInVoiceChannel(interaction, url, { playNext: true });
 
             if (!playback.queued) {
-                await interaction.reply({ content: `Now playing: ${url}` });
+                await interaction.editReply({ content: `Now playing: ${url}` });
                 return;
             }
 
             try {
                 const title = await getYouTubeTitle(url);
-                await interaction.reply({ content: `Added to queue: ${title}` });
+                await interaction.editReply({ content: `Added to queue: ${title}` });
             } catch (error) {
                 logger.error('Error getting YouTube title:', error);
-                await interaction.reply({ content: `Added to queue: ${url}` });
+                await interaction.editReply({ content: `Added to queue: ${url}` });
             }
         } catch (error) {
             logger.error('Error playing audio:', error);
             const content = error.userMessage ?? 'An error occurred while trying to play the audio';
-            await interaction.reply({ content, flags: MessageFlags.Ephemeral });
+            await interaction.editReply({ content });
         }
     },
 };

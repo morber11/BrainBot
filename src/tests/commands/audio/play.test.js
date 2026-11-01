@@ -20,6 +20,8 @@ describe('Play command', () => {
         interaction = {
             options: { getString: sinon.stub().returns('https://youtu.be/video') },
             reply: sinon.stub(),
+            deferReply: sinon.stub().resolves(),
+            editReply: sinon.stub(),
         };
     });
 
@@ -42,7 +44,7 @@ describe('Play command', () => {
         await playCommand.execute(interaction);
 
         expect(playAudioInVoiceChannel).to.have.been.calledWith(interaction, 'https://youtu.be/video');
-        expect(interaction.reply).to.have.been.calledWith({ content: 'Now playing: https://youtu.be/video' });
+        expect(interaction.editReply).to.have.been.calledWith({ content: 'Now playing: https://youtu.be/video' });
         expect(getYouTubeTitle).not.to.have.been.called;
     });
 
@@ -53,7 +55,7 @@ describe('Play command', () => {
 
         await playCommand.execute(interaction);
 
-        expect(interaction.reply).to.have.been.calledWith({ content: 'Added to queue: Video title' });
+        expect(interaction.editReply).to.have.been.calledWith({ content: 'Added to queue: Video title' });
     });
 
     it('uses the URL when the video title is unavailable', async () => {
@@ -63,7 +65,16 @@ describe('Play command', () => {
 
         await playCommand.execute(interaction);
 
-        expect(interaction.reply).to.have.been.calledWith({ content: 'Added to queue: https://youtu.be/video' });
+        expect(interaction.editReply).to.have.been.calledWith({ content: 'Added to queue: https://youtu.be/video' });
+    });
+
+    it('acknowledges the command before starting playback, which can take longer than discord waits', async () => {
+        isValidAudioUrl.returns(true);
+        playAudioInVoiceChannel.resolves({ queued: false });
+
+        await playCommand.execute(interaction);
+
+        expect(interaction.deferReply).to.have.been.calledBefore(playAudioInVoiceChannel);
     });
 
     it('reports a playback failure instead of confirming playback', async () => {
@@ -72,9 +83,9 @@ describe('Play command', () => {
 
         await playCommand.execute(interaction);
 
-        expect(interaction.reply).to.have.been.calledWithMatch({ flags: MessageFlags.Ephemeral });
+        expect(interaction.editReply).to.have.been.calledOnce;
         // not have been called with so we don't need to hardcode the specific error message
-        expect(interaction.reply).not.to.have.been.calledWith({ content: 'Now playing: https://youtu.be/video' });
+        expect(interaction.editReply).not.to.have.been.calledWith({ content: 'Now playing: https://youtu.be/video' });
     });
 
     it('tells the user to join a voice channel when they are not in one', async () => {
@@ -88,7 +99,7 @@ describe('Play command', () => {
 
         await playWithRealVoiceUtil.execute(interaction);
 
-        expect(interaction.reply).to.have.been.calledOnce;
-        expect(interaction.reply.firstCall.args[0].content).to.match(/join a voice channel/i);
+        expect(interaction.editReply).to.have.been.calledOnce;
+        expect(interaction.editReply.firstCall.args[0].content).to.match(/join a voice channel/i);
     });
 });
