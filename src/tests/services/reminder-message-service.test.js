@@ -1,5 +1,6 @@
 const sinon = require('sinon');
 const proxyquire = require('proxyquire');
+const { RESTJSONErrorCodes } = require('discord.js');
 const CONSTANTS = require('../../utils/constants.js');
 
 describe('reminder-message-service', () => {
@@ -24,11 +25,13 @@ describe('reminder-message-service', () => {
         clock = sinon.useFakeTimers();
 
         reminderCommandServiceStub = {
+            beginAdvanceSending: sinon.stub().resolves(true),
             beginReminderSending: sinon.stub().resolves(true),
             markComplete: sinon.stub().resolves(),
+            releaseAdvanceSending: sinon.stub().resolves(),
             releaseReminderSending: sinon.stub().resolves(),
         };
-        loggerStub = { error: sinon.stub() };
+        loggerStub = { error: sinon.stub(), warn: sinon.stub() };
 
         reminderMessageService = proxyquire('../../services/reminder-message-service.js', {
             './reminder-command-service.js': reminderCommandServiceStub,
@@ -79,6 +82,31 @@ describe('reminder-message-service', () => {
             expect(reminderCommandServiceStub.releaseReminderSending).to.have.been.calledOnce;
             expect(reminderCommandServiceStub.markComplete).not.to.have.been.called;
             expect(loggerStub.error.firstCall.args[1]).to.include({ reminderId: 1 });
+        });
+
+        it('marks the reminder complete when its channel was deleted', async () => {
+            client.channels.fetch.rejects(Object.assign(new Error('Unknown Channel'), { code: RESTJSONErrorCodes.UnknownChannel }));
+
+            reminderMessageService.scheduleReminder(client, createReminder(0));
+            await clock.tickAsync(0);
+
+            expect(reminderCommandServiceStub.markComplete).to.have.been.calledOnceWith([1]);
+            expect(reminderCommandServiceStub.releaseReminderSending).not.to.have.been.called;
+            expect(loggerStub.warn).to.have.been.calledOnce;
+        });
+    });
+
+    describe('scheduleAlert', () => {
+        it('marks the whole reminder complete when its channel was deleted', async () => {
+            client.channels.fetch.rejects(Object.assign(new Error('Unknown Channel'), { code: RESTJSONErrorCodes.UnknownChannel }));
+            const reminder = { ...createReminder(15 * 60 * 1000), alertAt: new Date() };
+
+            reminderMessageService.scheduleAlert(client, reminder);
+            await clock.tickAsync(0);
+
+            expect(reminderCommandServiceStub.markComplete).to.have.been.calledOnceWith([1]);
+            expect(reminderCommandServiceStub.releaseAdvanceSending).not.to.have.been.called;
+            expect(loggerStub.warn).to.have.been.calledOnce;
         });
     });
 });

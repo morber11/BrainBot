@@ -1,3 +1,4 @@
+const { RESTJSONErrorCodes } = require('discord.js');
 const reminderCommandService = require('./reminder-command-service.js');
 const CONSTANTS = require('../utils/constants.js');
 const logger = require('../utils/logger.js');
@@ -30,6 +31,12 @@ async function sendAlert(client, reminder) {
 
         await reminderCommandService.markAlertsSent([reminder.id]);
     } catch (err) {
+        if (err.code === RESTJSONErrorCodes.UnknownChannel) {
+            await reminderCommandService.markComplete([reminder.id]);
+            logger.warn('reminder channel no longer exists, marking reminder complete', { reminderId: reminder.id });
+            return;
+        }
+
         await reminderCommandService.releaseAdvanceSending(reminder.id, claimedAt);
         logger.error('failed to send advance reminder', { reminderId: reminder.id, err });
     }
@@ -49,6 +56,12 @@ async function sendReminder(client, reminder) {
 
         await reminderCommandService.markComplete([reminder.id]);
     } catch (err) {
+        if (err.code === RESTJSONErrorCodes.UnknownChannel) {
+            await reminderCommandService.markComplete([reminder.id]);
+            logger.warn('reminder channel no longer exists, marking reminder complete', { reminderId: reminder.id });
+            return;
+        }
+
         await reminderCommandService.releaseReminderSending(reminder.id, claimedAt);
         logger.error('failed to send final reminder', { reminderId: reminder.id, err });
     }
