@@ -3,7 +3,6 @@ const Reminder = require('../dal/models/reminder.js');
 
 async function findAdvanceDueReminders(cutoffTime) {
     return Reminder.findAll({
-        raw: true,
         where: {
             alertSent: false,
             complete: false,
@@ -15,7 +14,6 @@ async function findAdvanceDueReminders(cutoffTime) {
 
 async function findFinalDueReminders(cutoffTime) {
     return Reminder.findAll({
-        raw: true,
         where: {
             complete: false,
             reminderSendingAt: { [Sequelize.Op.is]: null },

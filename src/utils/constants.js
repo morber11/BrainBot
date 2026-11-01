@@ -35,6 +35,8 @@ const CONSTANTS = {
     },
     REMINDER: {
         DEFAULT_ALERT_MINUTES: 15,
+        // matches CRON.REMINDER_POLL so every reminder gets a timer before it is due
+        LOOKAHEAD_MS: 5 * 60 * 1000,
     },
     RESPONSE_WINDOW: {
         SALUTE: "salute",
