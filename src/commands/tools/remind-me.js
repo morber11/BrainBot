@@ -55,6 +55,7 @@ module.exports = {
             remindAt,
             alertAt,
             alertOffsetMinutes,
+            alertSent: alertAt <= now,
         });
 
         const reminderTarget = targetUser.id === interaction.user.id ? 'you' : `<@${targetUser.id}>`;

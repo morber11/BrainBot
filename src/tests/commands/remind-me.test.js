@@ -36,8 +36,19 @@ describe('Remind-me command', () => {
         await remindMeCommand.execute(mockInteraction);
 
         expect(reminderServiceStub.createReminder).to.have.been.calledOnce;
+        expect(reminderServiceStub.createReminder.firstCall.args[0]).to.include({ alertSent: false });
         expect(mockInteraction.reply).to.have.been.calledOnce;
         expect(mockInteraction.reply.getCall(0).args[0]).to.match(/Reminder set for <@target-1> at/);
+    });
+
+    it('should skip the early alert when the reminder is due sooner than the alert offset', async () => {
+        mockInteraction.options.getString.withArgs('time').returns('5m');
+        mockInteraction.options.getString.withArgs('message').returns('Take the bins out');
+        mockInteraction.options.getUser.withArgs('target').returns(null);
+
+        await remindMeCommand.execute(mockInteraction);
+
+        expect(reminderServiceStub.createReminder.firstCall.args[0]).to.include({ alertSent: true });
     });
 
     it('should create a reminder with human text duration when time is provided', async () => {
