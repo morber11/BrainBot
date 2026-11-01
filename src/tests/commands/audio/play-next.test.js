@@ -18,6 +18,8 @@ describe('Play next command', () => {
         interaction = {
             options: { getString: sinon.stub().returns('https://youtu.be/video') },
             reply: sinon.stub(),
+            deferReply: sinon.stub().resolves(),
+            editReply: sinon.stub(),
         };
     });
 
@@ -33,7 +35,7 @@ describe('Play next command', () => {
             'https://youtu.be/video',
             { playNext: true },
         );
-        expect(interaction.reply).to.have.been.calledWith({ content: 'Added to queue: Video title' });
+        expect(interaction.editReply).to.have.been.calledWith({ content: 'Added to queue: Video title' });
     });
 
     it('starts playback immediately when nothing is playing', async () => {
@@ -42,7 +44,7 @@ describe('Play next command', () => {
 
         await playNextCommand.execute(interaction);
 
-        expect(interaction.reply).to.have.been.calledWith({ content: 'Now playing: https://youtu.be/video' });
+        expect(interaction.editReply).to.have.been.calledWith({ content: 'Now playing: https://youtu.be/video' });
         expect(getYouTubeTitle).not.to.have.been.called;
     });
 });

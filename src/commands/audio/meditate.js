@@ -9,21 +9,24 @@ module.exports = {
         .setName('meditate')
         .setDescription('Realign your chakras with 30khz binaural beats and 528hz frequency music'),
     async execute(interaction) {
+        await interaction.deferReply();
+
         try {
             const urls = await customUrlService.getUrls('meditate');
 
             if (urls.length === 0) {
-                await interaction.reply('No URLs found.');
+                await interaction.editReply('No URLs found.');
                 return;
             }
 
             const { url } = stringUtility.selectRandomFromArray(urls);
             await playAudioInVoiceChannel(interaction, url);
 
-            await interaction.reply("release yourself from worldly desires and become one with the universe.");
+            await interaction.editReply("release yourself from worldly desires and become one with the universe.");
         } catch (error) {
             logger.error('Error:', error);
-            await interaction.reply('An error occurred while trying to play the audio.');
+            const content = error.userMessage ?? 'An error occurred while trying to play the audio.';
+            await interaction.editReply(content);
         }
     },
 };

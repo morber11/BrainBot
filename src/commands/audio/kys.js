@@ -9,13 +9,16 @@ module.exports = {
     async execute(interaction) {
         const url = 'https://www.youtube.com/watch?v=SQsmW0mMKZc'
 
+        await interaction.deferReply();
+
         try {
             await playAudioInVoiceChannel(interaction, url);
 
-            await interaction.reply("young man");
+            await interaction.editReply("young man");
         } catch (error) {
             logger.error('Error:', error);
-            await interaction.reply('An error occurred while trying to play the audio.');
+            const content = error.userMessage ?? 'An error occurred while trying to play the audio.';
+            await interaction.editReply(content);
         }
     },
 };

@@ -210,18 +210,20 @@ function createVoiceEntry(guildId, channelId, adapterCreator) {
 }
 
 async function playAudioInVoiceChannel(interaction, url, { playNext = false } = {}) {
+    if (!isValidAudioUrl(url)) {
+        throw new Error('Invalid or unsupported URL. Only YouTube URLs are supported.');
+    }
+
+    const guildMember = await interaction.member.guild.members.fetch(interaction.user.id);
+    const { channelId } = guildMember.voice;
+
+    if (!channelId) {
+        const error = new Error('user is not in a voice channel');
+        error.userMessage = 'You must join a voice channel first!';
+        throw error;
+    }
+
     try {
-        if (!isValidAudioUrl(url)) {
-            throw new Error('Invalid or unsupported URL. Only YouTube URLs are supported.');
-        }
-
-        const guildMember = await interaction.member.guild.members.fetch(interaction.user.id);
-        const { channelId } = guildMember.voice;
-
-        if (!channelId) {
-            throw new Error('You must join a voice channel first!');
-        }
-
         const guildId = interaction.guildId;
         const entry = activeConnections.get(guildId)
             || createVoiceEntry(guildId, channelId, interaction.channel.guild.voiceAdapterCreator);
