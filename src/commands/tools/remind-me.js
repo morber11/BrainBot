@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 const reminderCommandService = require('../../services/reminder-command-service.js');
 const reminderHelper = require('../../services/reminder-helper.js');
+const reminderMessageService = require('../../services/reminder-message-service.js');
 const CONSTANTS = require('../../utils/constants.js');
 
 module.exports = {
@@ -46,7 +47,7 @@ module.exports = {
             return;
         }
 
-        await reminderCommandService.createReminder({
+        const reminder = await reminderCommandService.createReminder({
             guildId: interaction.guildId,
             channelId: interaction.channelId,
             creatorId: interaction.user.id,
@@ -57,6 +58,11 @@ module.exports = {
             alertOffsetMinutes,
             alertSent: alertAt <= now,
         });
+
+        if (!reminder.alertSent) {
+            reminderMessageService.scheduleAlert(interaction.client, reminder);
+        }
+        reminderMessageService.scheduleReminder(interaction.client, reminder);
 
         const reminderTarget = targetUser.id === interaction.user.id ? 'you' : `<@${targetUser.id}>`;
         await interaction.reply(`Reminder set for ${reminderTarget} at ${reminderHelper.formatReminderTime(remindAt)} in this channel`);
