@@ -15,7 +15,8 @@ module.exports = {
             await interaction.reply("WAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         } catch (error) {
             logger.error('Error:', error);
-            await interaction.reply('An error occurred while trying to play the audio.');
+            const content = error.userMessage ?? 'An error occurred while trying to play the audio.';
+            await interaction.reply(content);
         }
     },
 };

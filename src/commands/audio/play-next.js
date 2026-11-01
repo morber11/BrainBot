@@ -37,7 +37,8 @@ module.exports = {
             }
         } catch (error) {
             logger.error('Error playing audio:', error);
-            await interaction.reply({ content: 'An error occurred while trying to play the audio', flags: MessageFlags.Ephemeral });
+            const content = error.userMessage ?? 'An error occurred while trying to play the audio';
+            await interaction.reply({ content, flags: MessageFlags.Ephemeral });
         }
     },
 };

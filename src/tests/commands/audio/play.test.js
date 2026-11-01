@@ -76,4 +76,19 @@ describe('Play command', () => {
         // not have been called with so we don't need to hardcode the specific error message
         expect(interaction.reply).not.to.have.been.calledWith({ content: 'Now playing: https://youtu.be/video' });
     });
+
+    it('tells the user to join a voice channel when they are not in one', async () => {
+        const playWithRealVoiceUtil = proxyquire('../../../commands/audio/play.js', {
+            '../../utils/logger.js': { error: sinon.stub() },
+        });
+        interaction.user = { id: 'user-1' };
+        interaction.member = {
+            guild: { members: { fetch: sinon.stub().resolves({ voice: { channelId: null } }) } },
+        };
+
+        await playWithRealVoiceUtil.execute(interaction);
+
+        expect(interaction.reply).to.have.been.calledOnce;
+        expect(interaction.reply.firstCall.args[0].content).to.match(/join a voice channel/i);
+    });
 });
