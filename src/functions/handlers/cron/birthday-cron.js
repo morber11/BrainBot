@@ -69,10 +69,13 @@ const onTick = async (client) => {
     }
 };
 
-module.exports = (client, tz) => cron.CronJob.from({
+const birthdayCron = (client, tz) => cron.CronJob.from({
     cronTime: CONSTANTS.CRON.BIRTHDAY,
     onTick: () => onTick(client),
     start: false,
     waitForCompletion: true,
     timeZone: tz,
 });
+
+module.exports = birthdayCron;
+module.exports.celebrate = celebrate;

@@ -91,6 +91,7 @@ const CONSTANTS = {
     COMMANDS: {
         PATRIOT_ACT: "patriot_act",
         DIDNT_ASK: "didnt_ask",
+        BIRTHDAY: "birthday",
     },
     MAGIC_BALL: {
         RESPONSES: [
