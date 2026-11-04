@@ -38,7 +38,7 @@ const patriotAct = (client, tz, delayMs = CONSTANTS.CRON.PATRIOT_ACT_DELAY_PERIO
                     targetChannel = guild.channels.cache.find(ch =>
                         ch.type === ChannelType.GuildText && (
                             ch.name.toLowerCase().includes('bot') ||
-                            ch.name.toLowerCase() === 'general'
+                            ch.name.toLowerCase() === CONSTANTS.GENERAL_CHANNEL
                         )
                     );
                 }

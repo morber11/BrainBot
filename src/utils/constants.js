@@ -32,12 +32,14 @@ const CONSTANTS = {
         DEBUG: "* * * * *",
         REMINDER_POLL: "*/5 * * * *",
         POLL_EXPIRY: "*/5 * * * *",
+        BIRTHDAY: "0 8 * * *",
     },
     REMINDER: {
         DEFAULT_ALERT_MINUTES: 15,
         // matches CRON.REMINDER_POLL so every reminder gets a timer before it is due
         LOOKAHEAD_MS: 5 * 60 * 1000,
     },
+    GENERAL_CHANNEL: "general",
     RESPONSE_WINDOW: {
         SALUTE: "salute",
         REPLY: "reply",
