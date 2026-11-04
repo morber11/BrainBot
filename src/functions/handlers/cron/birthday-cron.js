@@ -4,6 +4,8 @@ const birthdayService = require('../../../services/birthday-service.js');
 const CONSTANTS = require('../../../utils/constants.js');
 const logger = require('../../../utils/logger.js');
 
+const LISA_ITS_YOUR_BIRTHDAY_URL = "https://youtu.be/5KQVdn0oYFU";
+
 // returns false if the user has left the guild
 // since birthdays only happen once a year
 async function isStillMember(guild, userId) {
@@ -54,7 +56,7 @@ async function celebrate(client, birthday) {
         return;
     }
 
-    await channel.send(`It is <@${userId}>'s birthday today... Happy Birthday <@${userId}>!!! 🎉🎂🥳🎈🎊`);
+    await channel.send(`<@${userId}>' it's your birthday! Happy Birthday <@${userId}>!!! 🎉🎂🥳🎈🎊\n${LISA_ITS_YOUR_BIRTHDAY_URL}`);
 }
 
 const onTick = async (client) => {
